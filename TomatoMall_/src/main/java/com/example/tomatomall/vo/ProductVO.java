@@ -1,5 +1,6 @@
 package com.example.tomatomall.vo;
 
+import com.example.tomatomall.po.Product;
 import com.example.tomatomall.po.Specification;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,5 +22,10 @@ public class ProductVO {
     private String detail;      // 商品详情
     private Set<Specification> specifications; // 商品规格信息
 
+    public Product toPO(){
+        Product product=new Product();
+        product.setId(id);
+
+    }
 
 }
