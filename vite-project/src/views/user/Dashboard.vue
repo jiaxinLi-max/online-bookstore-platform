@@ -39,27 +39,6 @@ async function fetchStores() {
   }
 }
 
-
-// function getUserInfo() {
-//   userInfo().then(res => {
-//
-//     console.log("res",res.data);
-//     name.value = res.data.result.name
-//     tel.value = res.data.result.phone
-//
-//     storeId.value = res.data.result.storeId ;
-//     address.value = res.data.result.address
-//     regTime.value = parseTime(res.data.result.createTime)
-//
-//     newName.value = name.value
-//
-//     // 打印商店名称到控制台
-//     console.log(`所属商店: ${storeId.value}`);
-//
-//     const store = stores.find(store => store.id === storeId.value); // 使用 storeId.value
-//     storeName.value = store ? store.name : '未知商店'; // 更新 storeName
-//   })
-// }
 getUserInfo()
 function getUserInfo() {
   userInfo().then(res => {

@@ -2,48 +2,87 @@
 import {ref, computed, watch, onMounted} from 'vue';
 import { router } from '../../router';
 import { userRegister } from "../../api/user.ts";
-import { ElMessage } from 'element-plus'; // 确保引入 ElMessage
+import {ElMessage, UploadFile} from 'element-plus'; // 确保引入 ElMessage
+import { getImage } from '../../api/tools';
+import {Product} from "../../api/product.ts"; // 导入 getImage 函数
 
-const name = ref('');
 const identity = ref('');
+const name = ref('');
 const tel = ref('');
 const address = ref('');
 const password = ref('');
 const confirmPassword = ref('');
-const storeId = ref<number | null>(null); // 将商店ID初始化为空字符串
-const storeName = ref(''); // 商店名称
+const avatar = ref('https://cn.bing.com/images/search?view=detailV2&ccid=1Wut6rTV&id=9B31B80562F73BE8D8E767384D64ECC5A7A4F566&thid=OIP.1Wut6rTVdRgHLAadQzGBsgHaHa&mediaurl=https%3a%2f%2fpreview.qiantucdn.com%2f58pic%2f20220301%2f00458PICz982a4w23M488_PIC2018_PIC2018.jpg!w1024_new_0_1&exph=1024&expw=1024&q=%e5%a4%b4%e5%83%8f%e6%a0%87%e5%bf%97&simid=608013507271276788&FORM=IRPRST&ck=0291D5F60F9FE1EDB538B995D8043054&selectedIndex=0&itb=0&idpp=overlayview&ajaxhist=0&ajaxserp=0');
+const fileList = ref<UploadFile[]>([]);
+const dialogImageUrl = ref('');
+const dialogVisible = ref(false);
 
-// 商店列表
-// const stores = [
-//   { id: '1', name: '商店1' },
-//   { id: '2', name: '商店2' },
-//   { id: '3', name: '商店3' },
-// ];
- import { getAllStore, createStore, Store } from '../../api/store';
-
- const stores = ref<Store[]>([]);
+const products = ref<Product[]>([]);
 // 各种输入验证
 const hasTelInput = computed(() => tel.value !== '');
+const hasIdentityChosen = computed(() => identity.value !== '');
 const hasPasswordInput = computed(() => password.value !== '');
 const hasConfirmPasswordInput = computed(() => confirmPassword.value !== '');
 const hasAddressInput = computed(() => address.value !== '');
-const hasIdentityChosen = computed(() => identity.value !== '');
-const hasStoreName = computed(() => identity.value === 'STAFF' ? storeId.value !== null : true); // 修改为检查空字符串
-
+const hasImageFile = computed(() => avatar.value !== '');
 const chinaMobileRegex = /^1(3[0-9]|4[579]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[189])\d{8}$/;
 const telLegal = computed(() => chinaMobileRegex.test(tel.value));
 const isPasswordIdentical = computed(() => password.value === confirmPassword.value);
 const registerDisabled = computed(() => {
   if (!hasIdentityChosen.value) {
     return true;
-  } else if (identity.value === 'CUSTOMER') {
+  }else {
     return !(hasTelInput.value && hasPasswordInput.value && hasConfirmPasswordInput.value && hasAddressInput.value &&
-        telLegal.value && isPasswordIdentical.value);
-  } else if (identity.value === 'STAFF') {
-    return !(hasTelInput.value && hasPasswordInput.value && hasConfirmPasswordInput.value && hasAddressInput.value &&
-        hasStoreName.value && telLegal.value && isPasswordIdentical.value);
+        telLegal.value && isPasswordIdentical.value && hasImageFile.value);
   }
+
 });
+
+
+async function handleChange(file: UploadFile, fileListNew: UploadFile[]) {
+  const rawFile = file.raw; // 获取原始文件对象
+  if (!rawFile) {
+    ElMessage.error('无法获取文件');
+    return;
+  }
+
+  try {
+    const res = await getImage(rawFile); // 调用上传接口
+    console.log(res);
+    if (res) {
+      console.log("res.result",res.result); // 输出返回的链接
+
+      if (res.code === '000') {
+        avatar.value = res.result.trim(); // 去除可能的多余空格
+        console.log('avatar URL:', avatar.value);
+
+        // 更新 fileList 中的文件对象，添加 URL
+        fileListNew[0].url = avatar.value;
+        fileList.value = fileListNew;
+
+        ElMessage.success('上传成功');
+      } else {
+        ElMessage.error('上传失败，请重试');
+      }
+    } else {
+      ElMessage.error('响应格式错误，请重试');
+    }
+  } catch (error) {
+    console.error('上传失败:', error);
+    ElMessage.error('上传失败，请重试');
+  }
+}
+
+// 处理图片预览
+const handlePictureCardPreview = (file: UploadFile) => {
+  dialogImageUrl.value = file.url || ''; // 使用 file.url 进行预览
+  dialogVisible.value = true;
+};
+
+// 处理文件删除
+const handleRemove = (file: UploadFile) => {
+  fileList.value = fileList.value.filter(item => item.uid !== file.uid); // 从文件列表中移除
+};
 
 // 加载状态
 const loading = ref(false);
@@ -58,7 +97,7 @@ async function handleRegister() {
       phone: tel.value,
       password: password.value,
       address: address.value,
-      storeId: storeId.value !== null ? storeId.value : undefined,
+      avatar: avatar.value,
 
     });
 
@@ -88,36 +127,26 @@ async function handleRegister() {
   }
 }
 
-// // 监听 storeId 的变化，更新 storeName
-// watch(storeId, (newId) => {
-//   const store = stores.find(store => store.id === newId?.toString());
-//   storeName.value = store ? store.name : '';
-// });
 
- // 监听 storeId 的变化，更新 storeName
- watch(storeId, (newId) => {
-   const store = stores.value.find(store => store.id === newId);
-   storeName.value = store ? store.name : '';
- });
 
- // 获取所有商店
- async function get_getAllStores() {
-   try {
-     const res = await getAllStore(); // 调用从后端获取商店的函数
-     if (res.data && Array.isArray(res.data.result)) {
-       stores.value = res.data.result; // 更新商店列表
-     } else {
-       console.error('获取数据失败：响应格式不符合预期');
-     }
-   } catch (error) {
-     console.error('获取商店列表失败:', error);
-   }
- }
+ // 获取所有书籍
+ // async function get_getAllProducts() {
+ //   try {
+ //     const res = await getAllProduct(); // 调用从后端获取商店的函数
+ //     if (res.data && Array.isArray(res.data.result)) {
+ //       products.value = res.data.result; // 更新商店列表
+ //     } else {
+ //       console.error('获取数据失败：响应格式不符合预期');
+ //     }
+ //   } catch (error) {
+ //     console.error('获取商店列表失败:', error);
+ //   }
+ // }
 
  // 在组件挂载时获取商店列表
- onMounted(() => {
-   get_getAllStores();
- });
+ // onMounted(() => {
+ //   get_getAllProducts();
+ // });
 </script>
 
 <template>
@@ -174,18 +203,18 @@ async function handleRegister() {
               </el-form-item>
             </el-col>
 
-            <el-col :span="1" v-if="identity === 'STAFF'"></el-col>
+<!--            <el-col :span="1" v-if="identity === 'STAFF'"></el-col>-->
 
-            <!-- 所属商店选择 -->
-            <el-col :span="7" v-if="identity === 'STAFF'">
-              <el-form-item :prop="hasStoreName ? 'storeId' : ''">
-                <label for="storeId">所属商店</label>
-                <el-select id="storeId" v-model="storeId" placeholder="请选择" style="width: 100%;">
-                  <el-option v-for="store in stores" :key="store.id" :value="store.id" :label="store.name" />
-                </el-select>
+<!--            &lt;!&ndash; 所属商店选择 &ndash;&gt;-->
+<!--            <el-col :span="7" v-if="identity === 'STAFF'">-->
+<!--              <el-form-item :prop="hasStoreName ? 'storeId' : ''">-->
+<!--                <label for="storeId">所属商店</label>-->
+<!--                <el-select id="storeId" v-model="storeId" placeholder="请选择" style="width: 100%;">-->
+<!--                  <el-option v-for="store in stores" :key="store.id" :value="store.id" :label="store.name" />-->
+<!--                </el-select>-->
 
-              </el-form-item>
-            </el-col>
+<!--              </el-form-item>-->
+<!--            </el-col>-->
           </el-row>
 
           <el-form-item>
@@ -199,6 +228,26 @@ async function handleRegister() {
             <label v-else>确认密码</label>
             <el-input type="password" id="confirm-password" v-model="confirmPassword" :class="{'error-warn-input': (hasConfirmPasswordInput && !isPasswordIdentical)}" placeholder="••••••••"/>
           </el-form-item>
+
+          <el-form-item label="头像" prop="logo">
+            <el-upload
+                action="http://localhost:3000/api/images"
+                list-type="picture-card"
+                :auto-upload="true"
+                :file-list="fileList"
+                :on-change="handleChange"
+                :on-remove="handleRemove"
+                :on-preview="handlePictureCardPreview"
+            >
+              <el-icon><Plus /></el-icon>
+              <div>点击上传头像</div>
+            </el-upload>
+            <el-dialog v-model="dialogVisible">
+              <img class="dialog-image" :src="dialogImageUrl" alt="Logo Preview" />
+            </el-dialog>
+          </el-form-item>
+
+
 
           <span class="button-group">
             <el-button @click.prevent="handleRegister" :disabled="registerDisabled || loading" type="primary">
@@ -226,10 +275,11 @@ async function handleRegister() {
 }
 
 .bgimage {
-  background-image: url("../../assets/shopping-1s-1084px.svg");
+  background-image: url("../../assets/login.png");
 }
 
 .login-card {
+  background: rgba(255, 215, 0, 0.8);
   width: 60%;
   padding: 10px;
 }
