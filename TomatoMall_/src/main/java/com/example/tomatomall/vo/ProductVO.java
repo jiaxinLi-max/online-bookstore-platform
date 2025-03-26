@@ -13,7 +13,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 public class ProductVO {
-    private String id;          // 商品ID
+    private Integer id;          // 商品ID
     private String title;       // 商品名称
     private BigDecimal price;   // 商品价格
     private Float rate;        // 评分
@@ -25,7 +25,14 @@ public class ProductVO {
     public Product toPO(){
         Product product=new Product();
         product.setId(id);
-
+        product.setPrice(this.price);
+        product.setRate(this.rate);
+        product.setDetail(this.detail);
+        product.setSpecifications(this.specifications);
+        product.setTitle(this.title);
+        product.setCover(this.cover);
+        product.setDescription(this.description);
+        return product;
     }
 
 }
