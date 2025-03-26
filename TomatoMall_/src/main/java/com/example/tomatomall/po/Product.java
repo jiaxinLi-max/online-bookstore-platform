@@ -1,0 +1,69 @@
+package com.example.tomatomall.po;
+
+
+import com.example.tomatomall.vo.ProductVO;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.util.Set;
+
+//用来和数据库进行交互
+@Getter
+@Setter
+@NoArgsConstructor
+@Entity
+public class Product {
+
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @Column(name="id",nullable = false)
+    private Integer id;
+
+    @Basic
+    @Column(name="title",nullable = false)
+    private String title;
+
+    @Basic
+    @Column(name="price",nullable = false)
+    private BigDecimal price;
+
+    @Basic
+    @Column(name="rate",nullable = false)
+    private Float rate;
+
+    @Basic
+    @Column(name="description")
+    private String description;
+
+    @Basic
+    @Column(name = "cover")
+    private String cover;
+
+    @Basic
+    @Column(name = "detail")
+    private String detail;
+
+    //和规格的关联
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Specification> specifications; // 关联规格
+
+    //和库存的关联
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Stockpile stockpile;
+
+
+    public ProductVO toVO(){
+        ProductVO productVO=new ProductVO();
+        productVO.setId(this.id);
+        productVO.setPrice(this.price);
+        productVO.setRate(this.rate);
+        productVO.setDetail(this.detail);
+        productVO.setCover(this.cover);
+        productVO.setTitle(this.title);
+        productVO.setDescription(this.description);
+        productVO.setSpecifications(this.specifications);
+        return productVO;
+    }
+}
