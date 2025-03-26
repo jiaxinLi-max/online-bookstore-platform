@@ -31,7 +31,7 @@ public class ProductController {
      * 获取特定商品信息
      */
     @GetMapping("/{id}")
-    public Response<ProductVO> getProductInfo(@PathVariable String id){
+    public Response<ProductVO> getProductInfo(@PathVariable Integer id){
         return Response.buildSuccess(productService.getProductInfo(id));
     }
 
@@ -39,7 +39,7 @@ public class ProductController {
      * 更新商品信息
      */
     @PutMapping
-    public Response<Boolean> updateProductInfo(@RequestBody ProductVO productVO,@PathVariable String id){
+    public Response<Boolean> updateProductInfo(@RequestBody ProductVO productVO,@PathVariable Integer id){
         return Response.buildSuccess(productService.updateProductInfo(productVO,id));
     }
 
@@ -55,7 +55,7 @@ public class ProductController {
      * 删除商品
      */
     @DeleteMapping("/{id}")
-    public Response<Boolean> deleteProduct(@PathVariable String id){
+    public Response<Boolean> deleteProduct(@PathVariable Integer id){
         return Response.buildSuccess(productService.deleteProduct(id));
     }
 
@@ -66,7 +66,7 @@ public class ProductController {
      * @return
      */
     @PatchMapping("/stockpile/{productId}")
-    public Response<Boolean> updateStock(@PathVariable String productId, @RequestBody StockpileVO stockpileVO) {
+    public Response<Boolean> updateStock(@PathVariable Integer productId, @RequestBody StockpileVO stockpileVO) {
         return Response.buildSuccess(productService.updateStock(productId, stockpileVO));
     }
 
@@ -77,7 +77,7 @@ public class ProductController {
      * @return
      */
     @GetMapping("/stockpile/{productId}")
-    public Response<StockpileVO> getStock(@PathVariable String productId){
+    public Response<StockpileVO> getStock(@PathVariable Integer productId){
         return Response.buildSuccess(productService.getStock(productId));
     }
 
