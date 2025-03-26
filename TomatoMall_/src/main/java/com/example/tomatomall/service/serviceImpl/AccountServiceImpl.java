@@ -1,5 +1,6 @@
 package com.example.tomatomall.service.serviceImpl;
 
+import com.example.tomatomall.exception.TomatoMallException;
 import com.example.tomatomall.po.Account;
 import com.example.tomatomall.repository.AccountRepository;
 import com.example.tomatomall.service.AccountService;
@@ -28,7 +29,7 @@ public class AccountServiceImpl implements AccountService {
     public Boolean register(AccountVO accountVO){
         Account account=accountRepository.findByUsername(accountVO.getUsername());
         if(account!=null){
-            //TODO throw
+            throw  TomatoMallException.usernameAlreadyExists();
         }
         String rawPassword = accountVO.getPassword();
 
@@ -54,7 +55,7 @@ public class AccountServiceImpl implements AccountService {
                 return tokenUtil.getToken(account);
             }
 
-            return "1";//TODO throw
+            throw  TomatoMallException.usernameOrPasswordError();
         }
     }
 
@@ -62,7 +63,7 @@ public class AccountServiceImpl implements AccountService {
     public AccountVO getInformation(String username){
         Account account=accountRepository.findByUsername(username);
         if(account==null){
-            //TODO THROW
+            throw TomatoMallException.userNotExist();
         }
         return  account.toVO();
     }
