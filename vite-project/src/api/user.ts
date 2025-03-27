@@ -10,19 +10,16 @@ type RegisterInfo = {
     username: string,
     password: string,
     name: string,
-    avatar: string,
+    avatar?: string,
     role: string,
-    telephone: string,
-    email: string,
-    location: string,
+    telephone?: string,
+    email?: string,
+    location?: string,
 }
 
 type UpdateInfo = {
-    username?: string,
     password?: string,
-    name?: string,
     avatar?: string,
-    role?: string,
     telephone?: string,
     email?: string,
     location?: string,

@@ -4,12 +4,14 @@ import { router } from '../../router';
 import { userRegister } from "../../api/user.ts";
 import {ElMessage, UploadFile} from 'element-plus'; // 确保引入 ElMessage
 import { getImage } from '../../api/tools';
-import {Product} from "../../api/product.ts"; // 导入 getImage 函数
+// import {Product} from "../../api/product.ts"; // 导入 getImage 函数
 
 const identity = ref('');
+const username = ref('');
 const name = ref('');
 const tel = ref('');
-const address = ref('');
+const location = ref('');
+const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const avatar = ref('https://cn.bing.com/images/search?view=detailV2&ccid=1Wut6rTV&id=9B31B80562F73BE8D8E767384D64ECC5A7A4F566&thid=OIP.1Wut6rTVdRgHLAadQzGBsgHaHa&mediaurl=https%3a%2f%2fpreview.qiantucdn.com%2f58pic%2f20220301%2f00458PICz982a4w23M488_PIC2018_PIC2018.jpg!w1024_new_0_1&exph=1024&expw=1024&q=%e5%a4%b4%e5%83%8f%e6%a0%87%e5%bf%97&simid=608013507271276788&FORM=IRPRST&ck=0291D5F60F9FE1EDB538B995D8043054&selectedIndex=0&itb=0&idpp=overlayview&ajaxhist=0&ajaxserp=0');
@@ -17,13 +19,13 @@ const fileList = ref<UploadFile[]>([]);
 const dialogImageUrl = ref('');
 const dialogVisible = ref(false);
 
-const products = ref<Product[]>([]);
+// const products = ref<Product[]>([]);
 // 各种输入验证
 const hasTelInput = computed(() => tel.value !== '');
 const hasIdentityChosen = computed(() => identity.value !== '');
 const hasPasswordInput = computed(() => password.value !== '');
 const hasConfirmPasswordInput = computed(() => confirmPassword.value !== '');
-const hasAddressInput = computed(() => address.value !== '');
+const hasAddressInput = computed(() => location.value !== '');
 const hasImageFile = computed(() => avatar.value !== '');
 const chinaMobileRegex = /^1(3[0-9]|4[579]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[189])\d{8}$/;
 const telLegal = computed(() => chinaMobileRegex.test(tel.value));
@@ -92,17 +94,18 @@ async function handleRegister() {
   loading.value = true;
   try {
     const res = await userRegister({
+      username: username.value,
       role: identity.value,
       name: name.value,
-      phone: tel.value,
+      telephone: tel.value,
       password: password.value,
-      address: address.value,
+      location: location.value,
       avatar: avatar.value,
-
+      email: email.value,
     });
 
     // 处理注册结果
-    if (res.data.code === '000') {
+    if (res.data.code === '200') {
       ElMessage({
         message: "注册成功！请登录账号",
         type: 'success',
@@ -171,7 +174,7 @@ async function handleRegister() {
                 <label for="identity">身份</label>
                 <el-select id="identity" v-model="identity" placeholder="请选择" style="width: 100%;">
                   <el-option value="CUSTOMER" label="顾客"/>
-                  <el-option value="STAFF" label="商家"/>
+                  <el-option value="MANAGER" label="管理员"/>
                 </el-select>
               </el-form-item>
             </el-col>
@@ -191,15 +194,15 @@ async function handleRegister() {
 
             <el-col :span="15" v-if="identity !== 'STAFF'">
               <el-form-item>
-                <label for="address">地址</label>
-                <el-input id="address" v-model="address" placeholder="请输入地址"/>
+                <label for="location">地址</label>
+                <el-input id="location" v-model="location" placeholder="请输入地址"/>
               </el-form-item>
             </el-col>
 
             <el-col :span="7" v-if="identity === 'STAFF'">
               <el-form-item>
-                <label for="address">地址</label>
-                <el-input id="address" v-model="address" placeholder="请输入地址"/>
+                <label for="location">地址</label>
+                <el-input id="location" v-model="location" placeholder="请输入地址"/>
               </el-form-item>
             </el-col>
 
