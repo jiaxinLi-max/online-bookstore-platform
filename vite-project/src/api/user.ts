@@ -2,24 +2,27 @@ import {axios} from '../utils/request'
 import {USER_MODULE} from './_prefix'
 
 type LoginInfo = {
-    phone: string,
+    username: string,
     password: string
 }
 
 type RegisterInfo = {
-    role: string,
-    name: string,
-    phone: string,
+    username: string,
     password: string,
-    address: string,
-    avatar: string,
+    name: string,
+    avatar?: string,
+    role: string,
+    telephone?: string,
+    email?: string,
+    location?: string,
 }
 
 type UpdateInfo = {
-    name?: string,
     password?: string,
-    address?: string,
-    avatar: string,
+    avatar?: string,
+    telephone?: string,
+    email?: string,
+    location?: string,
 }
 
 // 如果有“Vue: This may be converted to an async function”警告，可以不管

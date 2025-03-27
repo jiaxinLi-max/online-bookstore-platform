@@ -4,17 +4,21 @@ import {userInfo, userInfoUpdate} from '../../api/user.ts'
 import {parseRole, parseTime} from "../../utils"
 import {router} from '../../router'
 import {UserFilled} from "@element-plus/icons-vue";
+// import { getAllStore,  Store } from '../../api/store';
 
-import { getAllStore,  Store } from '../../api/store';
-
-const stores = ref<Store[]>([]);
+// const stores = ref<Store[]>([]);
+const username = ref('')
 const role = sessionStorage.getItem("role")
 const name = ref('')
-const storeName = ref('')
-const storeId=ref<number | null>(null)
+const avatar = ref('')
+// const storeName = ref('')
+// const storeId=ref<number | null>(null)
 
-const tel = ref('')
-const address = ref('')
+// const tel = ref('')
+// const address = ref('')
+const telephone = ref('')
+const location = ref('')
+const email = ref('')
 const regTime = ref()
 
 const newName = ref('')
@@ -30,30 +34,34 @@ const changeDisabled = computed(() => {
   return !(hasConfirmPasswordInput.value && isPasswordIdentical.value)
 })
 
-async function fetchStores() {
-  try {
-    const res = await getAllStore(); // 调用 API 获取商店列表
-    stores.value = res.data.result; // 假设返回的数据格式正确
-  } catch (error) {
-    console.error('获取商店列表失败:', error);
-  }
-}
+// async function fetchStores() {
+//   try {
+//     const res = await getAllStore(); // 调用 API 获取商店列表
+//     stores.value = res.data.result; // 假设返回的数据格式正确
+//   } catch (error) {
+//     console.error('获取商店列表失败:', error);
+//   }
+// }
 
 getUserInfo()
 function getUserInfo() {
   userInfo().then(res => {
     console.log("res", res.data);
+    username.value = res.data.username;
     name.value = res.data.result.name;
-    tel.value = res.data.result.phone;
-    storeId.value = res.data.result.storeId;
-    address.value = res.data.result.address;
+    telephone.value = res.data.result.phone;
+    // storeId.value = res.data.result.storeId;
+    // address.value = res.data.result.address;
+    location.value = res.data.result.location;
+    avatar.value = res.data.result.avatar;
+    email.value = res.data.result.email;
     regTime.value = parseTime(res.data.result.createTime);
     newName.value = name.value;
 
     // 查找对应的商店名称
-    const store = stores.value.find(store => store.id === storeId.value);
-    storeName.value = store ? store.name : '未知商店'; // 更新 storeName
-    console.log(`所属商店: ${storeName.value}`);
+    // const store = stores.value.find(store => store.id === storeId.value);
+    // storeName.value = store ? store.name : '未知商店'; // 更新 storeName
+    // console.log(`所属商店: ${storeName.value}`);
   }).catch(error => {
     console.error('获取用户信息失败:', error);
   });
@@ -61,18 +69,20 @@ function getUserInfo() {
 
 function updateInfo() {
   userInfoUpdate({
-    name: newName.value,
     password: undefined,
-    address: address.value,
+    avatar: avatar.value,
+    telephone: telephone.value,
+    email: email.value,
+    location: location.value,
   }).then(res => {
-    if (res.data.code === '000') {
+    if (res.data.code === '200') {
       ElMessage({
         customClass: 'customMessage',
         type: 'success',
         message: '更新成功！',
       })
       getUserInfo()
-    } else if (res.data.code === '400') {
+    } else {
       ElMessage({
         customClass: 'customMessage',
         type: 'error',
@@ -84,11 +94,13 @@ function updateInfo() {
 
 function updatePassword() {
   userInfoUpdate({
-    name: undefined,
     password: password.value,
-    address: undefined
+    avatar: undefined,
+    telephone: undefined,
+    email: undefined,
+    location: undefined,
   }).then(res => {
-    if (res.data.code === '000') {
+    if (res.data.code === '200') {
       password.value = ''
       confirmPassword.value = ''
       ElMessageBox.alert(
@@ -102,7 +114,7 @@ function updatePassword() {
             roundButton: true,
             center: true
           }).then(() => router.push({path: "/login"}))
-    } else if (res.data.code === '400') {
+    } else {
       ElMessage({
         customClass: 'customMessage',
         type: 'error',
@@ -114,7 +126,7 @@ function updatePassword() {
   })
 }
 onMounted(async () => {
-  await fetchStores(); // 首先获取商店列表
+  // await fetchStores(); // 首先获取商店列表
   await getUserInfo(); // 然后获取用户信息
 });
 </script>
@@ -148,17 +160,17 @@ onMounted(async () => {
           <el-tag>{{ parseRole(role) }}</el-tag>
         </el-descriptions-item>
 
-        <el-descriptions-item label="所属商店" v-if="role === 'STAFF'">
-          {{ storeName }}
-<!--          {{ storeId }}-->
-        </el-descriptions-item>
+<!--        <el-descriptions-item label="所属商店" v-if="role === 'STAFF'">-->
+<!--          {{ storeName }}-->
+<!--&lt;!&ndash;          {{ storeId }}&ndash;&gt;-->
+<!--        </el-descriptions-item>-->
 
         <el-descriptions-item label="联系电话">
-          {{ tel }}
+          {{ telephone }}
         </el-descriptions-item>
 
-        <el-descriptions-item label="地址" v-if="role === 'CUSTOMER' || role === 'STAFF'">
-          {{ address }}
+        <el-descriptions-item label="地址" v-if="role === 'CUSTOMER'">
+          {{ location }}
         </el-descriptions-item>
 
         <el-descriptions-item label="注册时间">
@@ -176,21 +188,26 @@ onMounted(async () => {
       </template>
 
       <el-form>
-        <el-form-item>
-          <label for="name">昵称</label>
-          <el-input type="text" id="name" v-model="newName"/>
-        </el-form-item>
+<!--        <el-form-item>-->
+<!--          <label for="name">昵称</label>-->
+<!--          <el-input type="text" id="name" v-model="newName"/>-->
+<!--        </el-form-item>-->
 
         <el-form-item>
-          <label for="phone">手机号</label>
-          <el-input id="phone" v-model="tel" disabled/>
+          <label for="telephone">手机号</label>
+          <el-input id="telephone" v-model="telephone" disabled/>
         </el-form-item>
 
-        <el-form-item v-if="role === 'CUSTOMER' || role === 'STAFF'">
-          <label for="address">收货地址</label>
-          <el-input id="address" type="textarea"
+        <el-form-item v-if="role === 'CUSTOMER'">
+          <label for="location">收货地址</label>
+          <el-input id="location" type="textarea"
                     rows="4"
-                    v-model="address" placeholder="中华门"></el-input>
+                    v-model="location" placeholder="中华门"></el-input>
+        </el-form-item>
+
+        <el-form-item>
+          <label for="email">邮箱</label>
+          <el-input id="email" v-model="email" disabled/>
         </el-form-item>
       </el-form>
     </el-card>
