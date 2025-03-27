@@ -7,9 +7,10 @@ import com.example.tomatomall.po.Account;
 import com.example.tomatomall.repository.AccountRepository;
 import com.example.tomatomall.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
-
+@Component
 public class TokenUtil {
     private static final long EXPIRE_TIME = 24 * 60 * 60 * 1000;
 
