@@ -174,10 +174,6 @@
   background-image: url("../../assets/login.png");
 }
 
-.login-card {
-  width: 60%;
-  padding: 10px;
-}
 .login-form {
   background: rgba(255, 215, 0, 0.5);
   padding: 40px 40px;
@@ -237,7 +233,7 @@ function handleLogin() {
     phone: tel.value,
     password: password.value
   }).then(res => {
-    if (res.data.code === '000') {
+    if (res.data.code === '200') {
       ElMessage({
         message: "登录成功！",
         type: 'success',
@@ -252,7 +248,7 @@ function handleLogin() {
         //router.push({path: "/dashboard"})
         router.push({ path: "/home/all-products" }); // 确保这条路由存在
       })
-    } else if (res.data.code === '400') {
+    } else if (res.data.code === '401') {
       ElMessage({
         message: res.data.msg,
         type: 'error',
