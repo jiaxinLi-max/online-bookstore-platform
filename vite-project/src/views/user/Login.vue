@@ -133,12 +133,18 @@
       <h2>侦探小说网 登录</h2>
       <el-form>
         <el-form-item>
-          <label v-if="!hasTelInput" for="tel">注册手机号</label>
-          <label v-else-if="!telLegal" for="tel" class="error-warn">手机号不合法</label>
-          <label v-else for="tel">注册手机号</label>
-          <el-input id="tel" type="text" v-model="tel"
-                    required :class="{'error-warn-input' :(hasTelInput && !telLegal)}"
-                    placeholder="请输入手机号"/>
+<!--          <label v-if="!hasTelInput" for="tel">注册手机号</label>-->
+<!--          <label v-else-if="!telLegal" for="tel" class="error-warn">手机号不合法</label>-->
+<!--          <label v-else for="tel">注册手机号</label>-->
+<!--          <el-input id="tel" type="text" v-model="tel"-->
+<!--                    required :class="{'error-warn-input' :(hasTelInput && !telLegal)}"-->
+<!--                    placeholder="请输入手机号"/>-->
+          <label v-if="!hasUsernameInput" for="username">注册用户名</label>
+<!--          <label v-else-if="!telLegal" for="tel" class="error-warn">用户名不合法</label>-->
+          <label v-else for="username">注册用户名</label>
+          <el-input id="username" type="text" v-model="username"
+                    required :class="{'error-warn-input' :(hasUsernameInput)}"
+                    placeholder="请输入用户名"/>
         </el-form-item>
 
         <el-form-item>
@@ -211,26 +217,30 @@ import { router } from '../../router'
 import { userInfo, userLogin } from '../../api/user.ts'
 
 // 输入框值（需要在前端拦截不合法输入：是否为空+额外规则）
-const tel = ref('')
+const username = ref('')
+// const tel = ref('')
 const password = ref('')
 
 // 电话号码是否为空
-const hasTelInput = computed(() => tel.value != '')
+// const hasTelInput = computed(() => tel.value != '')
+// 用户名是否为空
+const hasUsernameInput = computed(() => username.value != '')
 // 密码是否为空
 const hasPasswordInput = computed(() => password.value != '')
-// 电话号码的规则
-const chinaMobileRegex = /^1(3[0-9]|4[579]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[189])\d{8}$/
-const telLegal = computed(() => chinaMobileRegex.test(tel.value))
+// // 电话号码的规则
+// const chinaMobileRegex = /^1(3[0-9]|4[579]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[189])\d{8}$/
+// const telLegal = computed(() => chinaMobileRegex.test(tel.value))
 // 密码不设置特殊规则
 // 登录按钮可用性
 const loginDisabled = computed(() => {
-  return !(hasTelInput.value && telLegal.value && hasPasswordInput.value)
+  // return !(hasTelInput.value && telLegal.value && hasPasswordInput.value)
+  return !(hasUsernameInput.value && hasPasswordInput.value)
 })
 
 // 登录按钮触发
 function handleLogin() {
   userLogin({
-    phone: tel.value,
+    username: username.value,
     password: password.value
   }).then(res => {
     if (res.data.code === '200') {
@@ -243,7 +253,7 @@ function handleLogin() {
       sessionStorage.setItem('token', token)
 
       userInfo().then(res => {
-        sessionStorage.setItem('name', res.data.result.name)
+        sessionStorage.setItem('username', res.data.result.username)
         sessionStorage.setItem('role', res.data.result.role)
         //router.push({path: "/dashboard"})
         router.push({ path: "/home/all-products" }); // 确保这条路由存在

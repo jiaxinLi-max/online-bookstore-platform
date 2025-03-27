@@ -4,17 +4,21 @@ import {userInfo, userInfoUpdate} from '../../api/user.ts'
 import {parseRole, parseTime} from "../../utils"
 import {router} from '../../router'
 import {UserFilled} from "@element-plus/icons-vue";
+// import { getAllStore,  Store } from '../../api/store';
 
-import { getAllStore,  Store } from '../../api/store';
-
-const stores = ref<Store[]>([]);
+// const stores = ref<Store[]>([]);
+const username = sessionStorage.getItem("username")
 const role = sessionStorage.getItem("role")
 const name = ref('')
-const storeName = ref('')
-const storeId=ref<number | null>(null)
+const avatar = ref('')
+// const storeName = ref('')
+// const storeId=ref<number | null>(null)
 
-const tel = ref('')
-const address = ref('')
+// const tel = ref('')
+// const address = ref('')
+const telephone = ref('')
+const location = ref('')
+const email = ref('')
 const regTime = ref()
 
 const newName = ref('')
@@ -30,30 +34,33 @@ const changeDisabled = computed(() => {
   return !(hasConfirmPasswordInput.value && isPasswordIdentical.value)
 })
 
-async function fetchStores() {
-  try {
-    const res = await getAllStore(); // 调用 API 获取商店列表
-    stores.value = res.data.result; // 假设返回的数据格式正确
-  } catch (error) {
-    console.error('获取商店列表失败:', error);
-  }
-}
+// async function fetchStores() {
+//   try {
+//     const res = await getAllStore(); // 调用 API 获取商店列表
+//     stores.value = res.data.result; // 假设返回的数据格式正确
+//   } catch (error) {
+//     console.error('获取商店列表失败:', error);
+//   }
+// }
 
 getUserInfo()
 function getUserInfo() {
   userInfo().then(res => {
     console.log("res", res.data);
     name.value = res.data.result.name;
-    tel.value = res.data.result.phone;
-    storeId.value = res.data.result.storeId;
-    address.value = res.data.result.address;
+    telephone.value = res.data.result.phone;
+    // storeId.value = res.data.result.storeId;
+    // address.value = res.data.result.address;
+    location.value = res.data.result.location;
+    avatar.value = res.data.result.avatar;
+    email.value = res.data.result.email;
     regTime.value = parseTime(res.data.result.createTime);
     newName.value = name.value;
 
     // 查找对应的商店名称
-    const store = stores.value.find(store => store.id === storeId.value);
-    storeName.value = store ? store.name : '未知商店'; // 更新 storeName
-    console.log(`所属商店: ${storeName.value}`);
+    // const store = stores.value.find(store => store.id === storeId.value);
+    // storeName.value = store ? store.name : '未知商店'; // 更新 storeName
+    // console.log(`所属商店: ${storeName.value}`);
   }).catch(error => {
     console.error('获取用户信息失败:', error);
   });
