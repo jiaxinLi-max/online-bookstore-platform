@@ -35,7 +35,6 @@ public class Account {
 
     @Basic
     @Column(name = "role")  //数据库  下划线
-    @Enumerated(EnumType.STRING)
     private String role;
 
     @Basic
