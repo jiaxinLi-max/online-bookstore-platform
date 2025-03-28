@@ -1,5 +1,5 @@
-import axios from 'axios';
-
+//import axios from 'axios';
+import {axios} from '../utils/request'
 export interface Specification {
     id: string; // 规格的唯一标识符
     item: string; // 规格的名称（例如 "作者" 或 "副标题"）
