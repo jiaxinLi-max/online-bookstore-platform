@@ -44,7 +44,7 @@ export const userRegister = (registerInfo: RegisterInfo) => {
 }
 
 // 获取用户信息
-export const userInfo = (username: string) => {
+export const userInfo = (username: string | null) => {
     console.log(username);
     return axios.get(`${USER_MODULE}/${username}`)
         .then(res => {
