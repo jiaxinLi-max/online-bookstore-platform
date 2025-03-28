@@ -47,17 +47,20 @@ getUserInfo()
 function getUserInfo() {
 
   userInfo(username).then(res => {
-    console.log("res", res.data);
-    //username = res.data.username;
-    name.value = res.data.result.name;
-    telephone.value = res.data.result.phone;
-    // storeId.value = res.data.result.storeId;
-    // address.value = res.data.result.address;
-    location.value = res.data.result.location;
-    avatar.value = res.data.result.avatar;
-    email.value = res.data.result.email;
-    regTime.value = parseTime(res.data.result.createTime);
-    newName.value = name.value;
+    if (res.data.code === 200) {
+      console.log("获取成功");
+      console.log("res", res.data);
+      //username = res.data.username;
+      name.value = res.data.result.name;
+      telephone.value = res.data.result.phone;
+      // storeId.value = res.data.result.storeId;
+      // address.value = res.data.result.address;
+      location.value = res.data.result.location;
+      avatar.value = res.data.result.avatar;
+      email.value = res.data.result.email;
+      regTime.value = parseTime(res.data.result.createTime);
+      newName.value = name.value;
+    }
 
     // 查找对应的商店名称
     // const store = stores.value.find(store => store.id === storeId.value);
