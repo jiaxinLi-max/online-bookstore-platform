@@ -201,12 +201,12 @@ router.beforeEach((to, _, next) => {
     }
     else {
         //用户未登录
-        // if (to.path === '/login' || to.path === '/register' ) {
-        //     next();
-        // } else {
-        //     next('/login');
-        // }
-        next();
+        if (to.path === '/login' || to.path === '/register' ) {
+            next();
+        } else {
+            next('/login');
+        }
+        //next();
     }
 });
 

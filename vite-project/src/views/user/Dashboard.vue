@@ -7,7 +7,7 @@ import {UserFilled} from "@element-plus/icons-vue";
 // import { getAllStore,  Store } from '../../api/store';
 
 // const stores = ref<Store[]>([]);
-const username = ref('')
+const username = sessionStorage.getItem("username")
 const role = sessionStorage.getItem("role")
 const name = ref('')
 const avatar = ref('')
@@ -45,9 +45,10 @@ const changeDisabled = computed(() => {
 
 getUserInfo()
 function getUserInfo() {
-  userInfo().then(res => {
+
+  userInfo(username).then(res => {
     console.log("res", res.data);
-    username.value = res.data.username;
+    //username = res.data.username;
     name.value = res.data.result.name;
     telephone.value = res.data.result.phone;
     // storeId.value = res.data.result.storeId;

@@ -54,8 +54,8 @@ async function handleChange(file: UploadFile, fileListNew: UploadFile[]) {
     if (res) {
       console.log("res.result",res.result); // 输出返回的链接
 
-      if (res.code === '000') {
-        avatar.value = res.result.trim(); // 去除可能的多余空格
+      if (res.code === '200') {
+        //avatar.value = res.result.trim(); // 去除可能的多余空格
         console.log('avatar URL:', avatar.value);
 
         // 更新 fileList 中的文件对象，添加 URL
@@ -63,8 +63,6 @@ async function handleChange(file: UploadFile, fileListNew: UploadFile[]) {
         fileList.value = fileListNew;
 
         ElMessage.success('上传成功');
-      } else {
-        ElMessage.error('上传失败，请重试');
       }
     } else {
       ElMessage.error('响应格式错误，请重试');
