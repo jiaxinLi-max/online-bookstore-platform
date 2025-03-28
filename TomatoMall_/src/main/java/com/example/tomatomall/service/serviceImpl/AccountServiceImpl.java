@@ -43,21 +43,23 @@ public class AccountServiceImpl implements AccountService {
         return true;
     }
 
-    @Override
-    public String login(String username,String password){
-    {
-            // 查找用户
-             Account account= accountRepository.findByUsername(username);
+    public String login(String username, String password) {
+        // 查找用户
+        Account account = accountRepository.findByUsername(username);
 
-            if (account != null) {
-                // 使用 passwordEncoder 比较原始密码和数据库中加密后的密码
-                passwordEncoder.matches(password,account.getPassword());
+        if (account != null) {
+            // 使用 passwordEncoder 比较原始密码和数据库中加密后的密码
+            if (passwordEncoder.matches(password, account.getPassword())) {
+                // 密码匹配，生成并返回 token
                 return tokenUtil.getToken(account);
             }
-
-            throw  TomatoMallException.usernameOrPasswordError();
         }
+
+        // 密码不匹配或用户不存在，抛出自定义异常
+        throw TomatoMallException.usernameOrPasswordError();
     }
+
+
 
     @Override
     public AccountVO getInformation(String username){
