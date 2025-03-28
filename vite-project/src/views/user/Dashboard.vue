@@ -47,7 +47,7 @@ getUserInfo()
 function getUserInfo() {
 
   userInfo(username).then(res => {
-    if (res.data.code === 200) {
+    if (res.data.code === '200') {
       console.log("获取成功");
       console.log("res", res.data);
       //username = res.data.username;
@@ -60,6 +60,8 @@ function getUserInfo() {
       email.value = res.data.result.email;
       regTime.value = parseTime(res.data.result.createTime);
       newName.value = name.value;
+    } else {
+      console.log("获取失败");
     }
 
     // 查找对应的商店名称

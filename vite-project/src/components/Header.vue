@@ -5,12 +5,13 @@ import { User, SwitchButton, Plus } from "@element-plus/icons-vue"
 import {userInfo} from "../api/user.ts";
  // 导入 Plus 图标
 import {ref,  onMounted} from 'vue';
+const username = sessionStorage.getItem("username");
 const role = sessionStorage.getItem('role')    // 登录的时候插入的
 console.log('role:', role);
 const avatar = ref('')
 getUserInfo()
 function getUserInfo() {
-  userInfo().then(res => {
+  userInfo(username).then(res => {
     console.log("res", res.data);
     avatar.value = res.data.result.avatar;
 
