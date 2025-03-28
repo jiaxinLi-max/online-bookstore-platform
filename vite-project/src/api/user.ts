@@ -18,6 +18,7 @@ type RegisterInfo = {
 }
 
 type UpdateInfo = {
+    username: string | null,
     password?: string,
     avatar?: string,
     telephone?: string,

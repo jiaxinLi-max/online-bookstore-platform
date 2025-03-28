@@ -70,6 +70,7 @@ function getUserInfo() {
 
 function updateInfo() {
   userInfoUpdate({
+    username: username,
     password: undefined,
     avatar: avatar.value,
     telephone: telephone.value,
@@ -95,6 +96,7 @@ function updateInfo() {
 
 function updatePassword() {
   userInfoUpdate({
+    username: username,
     password: password.value,
     avatar: undefined,
     telephone: undefined,
