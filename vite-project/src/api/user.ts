@@ -47,8 +47,9 @@ export const userRegister = (registerInfo: RegisterInfo) => {
 // 获取用户信息
 export const userInfo = (username: string | null) => {
     console.log(username);
-    return axios.get(`${USER_MODULE}/${username}`)
+    return axios.get(`${USER_MODULE}/${username}`, {params: username})
         .then(res => {
+            console.log(res)
             return res
         })
 }
@@ -66,7 +67,7 @@ export const userInfo = (username: string | null) => {
 
 // 更新用户信息
 export const userInfoUpdate = (updateInfo: UpdateInfo) => {
-    return axios.post(`${USER_MODULE}`, updateInfo, {headers: {'Content-Type': 'application/json'}})
+    return axios.put(`${USER_MODULE}`, updateInfo, {headers: {'Content-Type': 'application/json'}})
         .then(res => {
             return res
         })
