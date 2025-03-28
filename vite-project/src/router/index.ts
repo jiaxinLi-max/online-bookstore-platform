@@ -143,8 +143,8 @@ const router = createRouter({
                     meta: { title: '商品列表' },
                 },
                 {
-                    path: 'create-store',
-                    name: 'CreateStore',
+                    path: 'create-product',
+                    name: 'CreateProduct',
                     component: () => import('../views/product/CreateProduct.vue'), // 确保路径正确
                     meta: { title: '创建商品' },
                 },
@@ -201,12 +201,12 @@ router.beforeEach((to, _, next) => {
     }
     else {
         //用户未登录
-        if (to.path === '/login' || to.path === '/register' ) {
-            next();
-        } else {
-            next('/login');
-        }
-        //next();
+        // if (to.path === '/login' || to.path === '/register' ) {
+        //     next();
+        // } else {
+        //     next('/login');
+        // }
+        next();
     }
 });
 

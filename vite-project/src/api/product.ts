@@ -1,5 +1,6 @@
 // product.ts
-import axios from 'axios';
+//import axios from 'axios';
+import {axios} from '../utils/request'
 //import {Specification} from './specification.ts'
 // 定义商品接口
 export interface Product {

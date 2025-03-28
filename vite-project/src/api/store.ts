@@ -1,6 +1,6 @@
-import axios from 'axios';
+//import axios from 'axios';
 import { STORE_MODULE } from './_prefix';
-
+import {axios} from '../utils/request'
 type storeInfo = {
     name: string;
     location: string;

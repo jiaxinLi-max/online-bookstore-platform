@@ -14,7 +14,7 @@ const location = ref('');
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
-const avatar = ref('https://cn.bing.com/images/search?view=detailV2&ccid=1Wut6rTV&id=9B31B80562F73BE8D8E767384D64ECC5A7A4F566&thid=OIP.1Wut6rTVdRgHLAadQzGBsgHaHa&mediaurl=https%3a%2f%2fpreview.qiantucdn.com%2f58pic%2f20220301%2f00458PICz982a4w23M488_PIC2018_PIC2018.jpg!w1024_new_0_1&exph=1024&expw=1024&q=%e5%a4%b4%e5%83%8f%e6%a0%87%e5%bf%97&simid=608013507271276788&FORM=IRPRST&ck=0291D5F60F9FE1EDB538B995D8043054&selectedIndex=0&itb=0&idpp=overlayview&ajaxhist=0&ajaxserp=0');
+const avatar = ref('https://bpic.588ku.com/back_origin_min_pic/19/10/22/7d5760a4e3926576c237d950d5964db1.jpg');
 const fileList = ref<UploadFile[]>([]);
 const dialogImageUrl = ref('');
 const dialogVisible = ref(false);
