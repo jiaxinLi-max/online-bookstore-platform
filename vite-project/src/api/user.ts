@@ -51,17 +51,17 @@ export const userInfo = (username: string | null) => {
             return res
         })
 }
-// 获取用户信息
-export const userInfo_1 = () => {
-    return axios.get(`${USER_MODULE}`)
-        .then(res => {
-            return res.data; // 这里假设 res.data 包含用户信息，如 { name: '...', role: '...' }
-        })
-        .catch(error => {
-            console.error('获取用户信息失败:', error);
-            throw error; // 处理错误
-        });
-}
+// // 获取用户信息
+// export const userInfo_1 = () => {
+//     return axios.get(`${USER_MODULE}`)
+//         .then(res => {
+//             return res.data; // 这里假设 res.data 包含用户信息，如 { name: '...', role: '...' }
+//         })
+//         .catch(error => {
+//             console.error('获取用户信息失败:', error);
+//             throw error; // 处理错误
+//         });
+// }
 
 // 更新用户信息
 export const userInfoUpdate = (updateInfo: UpdateInfo) => {
