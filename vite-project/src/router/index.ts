@@ -111,10 +111,10 @@ import { createRouter, createWebHashHistory } from "vue-router";
 const router = createRouter({
     history: createWebHashHistory(),
     routes: [
-        {
-            path: '/',
-            redirect: '/home/all-products', // 保留这一个重定向规则
-        },
+        // {
+        //     path: '/',
+        //     redirect: '/home/all-products', // 保留这一个重定向规则
+        // },
         {
             path: '/login',
             component: () => import('../views/user/Login.vue'),
@@ -201,12 +201,12 @@ router.beforeEach((to, _, next) => {
     }
     else {
         //用户未登录
-        // if (to.path === '/login' || to.path === '/register' || to.path === '/home/all-products') {
-        //     next();
-        // } else {
-        //     next('/login');
-        // }
-        next();
+        if (to.path === '/login' || to.path === '/register' ) {
+            next();
+        } else {
+            next('/login');
+        }
+        //next();
     }
 });
 

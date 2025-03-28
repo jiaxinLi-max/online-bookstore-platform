@@ -162,8 +162,15 @@ async function handleRegister() {
           <el-row>
             <el-col :span="15">
               <el-form-item>
-                <label for="name">昵称</label>
-                <el-input id="name" v-model="name" placeholder="请输入昵称" />
+                <label for="username">用户名</label>
+                <el-input id="username" v-model="username" placeholder="请输入用户名" />
+              </el-form-item>
+            </el-col>
+
+            <el-col :span="15">
+              <el-form-item>
+                <label for="name">真实姓名</label>
+                <el-input id="name" v-model="name" placeholder="请输入真实姓名" />
               </el-form-item>
             </el-col>
 
@@ -192,19 +199,19 @@ async function handleRegister() {
 
             <el-col :span="1"></el-col>
 
-            <el-col :span="15" v-if="identity !== 'STAFF'">
+            <el-col :span="15" v-if="identity !== 'MANAGER'">
               <el-form-item>
                 <label for="location">地址</label>
                 <el-input id="location" v-model="location" placeholder="请输入地址"/>
               </el-form-item>
             </el-col>
 
-            <el-col :span="7" v-if="identity === 'STAFF'">
-              <el-form-item>
-                <label for="location">地址</label>
-                <el-input id="location" v-model="location" placeholder="请输入地址"/>
-              </el-form-item>
-            </el-col>
+<!--            <el-col :span="7" v-if="identity === 'STAFF'">-->
+<!--              <el-form-item>-->
+<!--                <label for="location">地址</label>-->
+<!--                <el-input id="location" v-model="location" placeholder="请输入地址"/>-->
+<!--              </el-form-item>-->
+<!--            </el-col>-->
 
 <!--            <el-col :span="1" v-if="identity === 'STAFF'"></el-col>-->
 
@@ -234,7 +241,7 @@ async function handleRegister() {
 
           <el-form-item label="头像" prop="logo">
             <el-upload
-                action="http://localhost:3000/api/images"
+                action="http://localhost:8080/api/images"
                 list-type="picture-card"
                 :auto-upload="true"
                 :file-list="fileList"

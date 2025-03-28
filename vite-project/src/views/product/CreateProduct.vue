@@ -239,7 +239,7 @@
       <!-- 商品封面 -->
       <el-form-item label="商品封面" prop="cover">
         <el-upload
-            action="http://localhost:3000/api/images"
+            action="http://localhost:8080/api/images"
             list-type="picture-card"
             :auto-upload="true"
             :file-list="fileList"
@@ -396,7 +396,7 @@ async function handleCreateProduct() {
 
 async function fetchHelloWorld() {
   try {
-    const response = await fetch('http://localhost:3000/api/products/hello', {
+    const response = await fetch('http://localhost:8080/api/products/hello', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
