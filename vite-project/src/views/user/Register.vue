@@ -33,18 +33,33 @@ const isPasswordIdentical = computed(() => password.value === confirmPassword.va
 const registerDisabled = computed(() => {
   if (!hasIdentityChosen.value) {
     return true;
+  }else if(identity.value === "CUSTOMER"){
+    return !(hasTelInput.value && hasPasswordInput.value && hasAddressInput&&hasConfirmPasswordInput.value  &&
+        telLegal.value && isPasswordIdentical.value && hasImageFile.value);
   }else {
-    return !(hasTelInput.value && hasPasswordInput.value && hasConfirmPasswordInput.value && hasAddressInput.value &&
+    return !(hasTelInput.value && hasPasswordInput.value && hasConfirmPasswordInput.value  &&
         telLegal.value && isPasswordIdentical.value && hasImageFile.value);
   }
 
 });
-
-
+const MAX_SIZE = 1024 * 1024; // 1MB
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
+const handleExceed = (files, fileList) => {
+  ElMessage.warning('最多只能上传一张头像');
+};
 async function handleChange(file: UploadFile, fileListNew: UploadFile[]) {
   const rawFile = file.raw; // 获取原始文件对象
   if (!rawFile) {
     ElMessage.error('无法获取文件');
+    return;
+  }
+  if (!ALLOWED_TYPES.includes(rawFile.type)) {
+    ElMessage.error('只允许上传 JPG/PNG/GIF 格式的文件');
+    return;
+  }
+
+  if (rawFile.size > MAX_SIZE) {
+    ElMessage.error('文件超过最大大小限制（1MB）');
     return;
   }
 
@@ -87,7 +102,6 @@ const handleRemove = (file: UploadFile) => {
 
 // 加载状态
 const loading = ref(false);
-
 // 注册按钮触发
 async function handleRegister() {
   loading.value = true;
@@ -129,26 +143,6 @@ async function handleRegister() {
   }
 }
 
-
-
- // 获取所有书籍
- // async function get_getAllProducts() {
- //   try {
- //     const res = await getAllProduct(); // 调用从后端获取商店的函数
- //     if (res.data && Array.isArray(res.data.result)) {
- //       products.value = res.data.result; // 更新商店列表
- //     } else {
- //       console.error('获取数据失败：响应格式不符合预期');
- //     }
- //   } catch (error) {
- //     console.error('获取商店列表失败:', error);
- //   }
- // }
-
- // 在组件挂载时获取商店列表
- // onMounted(() => {
- //   get_getAllProducts();
- // });
 </script>
 
 <template>
@@ -205,25 +199,6 @@ async function handleRegister() {
               </el-form-item>
             </el-col>
 
-<!--            <el-col :span="7" v-if="identity === 'STAFF'">-->
-<!--              <el-form-item>-->
-<!--                <label for="location">地址</label>-->
-<!--                <el-input id="location" v-model="location" placeholder="请输入地址"/>-->
-<!--              </el-form-item>-->
-<!--            </el-col>-->
-
-<!--            <el-col :span="1" v-if="identity === 'STAFF'"></el-col>-->
-
-<!--            &lt;!&ndash; 所属商店选择 &ndash;&gt;-->
-<!--            <el-col :span="7" v-if="identity === 'STAFF'">-->
-<!--              <el-form-item :prop="hasStoreName ? 'storeId' : ''">-->
-<!--                <label for="storeId">所属商店</label>-->
-<!--                <el-select id="storeId" v-model="storeId" placeholder="请选择" style="width: 100%;">-->
-<!--                  <el-option v-for="store in stores" :key="store.id" :value="store.id" :label="store.name" />-->
-<!--                </el-select>-->
-
-<!--              </el-form-item>-->
-<!--            </el-col>-->
           </el-row>
 
           <el-form-item>
@@ -239,6 +214,7 @@ async function handleRegister() {
           </el-form-item>
 
           <el-form-item label="头像" prop="logo">
+            <div v-if="fileList.length === 0">
             <el-upload
                 action="http://localhost:8080/api/images"
                 list-type="picture-card"
@@ -247,10 +223,30 @@ async function handleRegister() {
                 :on-change="handleChange"
                 :on-remove="handleRemove"
                 :on-preview="handlePictureCardPreview"
+                :limit="1"
+                :on-exceed="handleExceed"
             >
+
               <el-icon><Plus /></el-icon>
               <div>点击上传头像</div>
             </el-upload>
+            </div>
+
+
+<!--            <el-dialog v-model="dialogVisible">-->
+<!--              <img class="dialog-image" :src="dialogImageUrl" alt="Logo Preview" />-->
+<!--            </el-dialog>-->
+<!--          </el-form-item>-->
+            <!-- 显示已上传的头像 -->
+            <div v-else>
+              <el-image
+                  class="avatar-image"
+                  :src="fileList[0].url "
+                  fit="cover"
+                  :preview-src-list="fileList.map(file => file.url )"
+              />
+            </div>
+
             <el-dialog v-model="dialogVisible">
               <img class="dialog-image" :src="dialogImageUrl" alt="Logo Preview" />
             </el-dialog>

@@ -1,6 +1,6 @@
-import {axios} from '../utils/request'
+//import {axios} from '../utils/request'
 import {USER_MODULE} from './_prefix'
-
+import axios from 'axios';
 type LoginInfo = {
     username: string,
     password: string
@@ -46,10 +46,16 @@ export const userRegister = (registerInfo: RegisterInfo) => {
 
 // 获取用户信息
 export const userInfo = (username: string | null) => {
-    console.log(username);
-    return axios.get(`${USER_MODULE}/${username}`, {params: username})
+    console.log("username",username);
+    const token = sessionStorage.getItem('token');
+    return axios.get(`${USER_MODULE}/${username}`, {
+        params: { username }, // 使用对象形式
+        headers: {
+            'token': token // 使用 'token' 作为请求头
+        }
+    })
         .then(res => {
-            console.log(res)
+            console.log("user",res)
             return res
         })
 }

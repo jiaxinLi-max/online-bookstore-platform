@@ -22,44 +22,45 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { getAllProduct, createProduct, Product } from '../../api/product.ts';
 
-//const products = ref<Product[]>([]);
+const products = ref<Product[]>([]);
 // 定义静态假数据
-const products = ref([
-  {
-    id: 1,
-    title: '商品1',
-    cover: 'https://bpic.588ku.com/back_origin_min_pic/19/10/22/7d5760a4e3926576c237d950d5964db1.jpg',
-  },
-  {
-    id: 2,
-    title: '商品2',
-    cover: 'https://via.placeholder.com/300x200?text=Product+2',
-  },
-  {
-    id: 3,
-    title: '商品3',
-    cover: 'https://via.placeholder.com/300x200?text=Product+3',
-  },
-  {
-    id: 4,
-    title: '商品4',
-    cover: 'https://via.placeholder.com/300x200?text=Product+4',
-  },
-  {
-    id: 5,
-    title: '商品5',
-    cover: 'https://via.placeholder.com/300x200?text=Product+5',
-  },
-]);
+// const products = ref([
+//   {
+//     id: 1,
+//     title: '商品1',
+//     cover: 'https://bpic.588ku.com/back_origin_min_pic/19/10/22/7d5760a4e3926576c237d950d5964db1.jpg',
+//   },
+//   {
+//     id: 2,
+//     title: '商品2',
+//     cover: 'https://via.placeholder.com/300x200?text=Product+2',
+//   },
+//   {
+//     id: 3,
+//     title: '商品3',
+//     cover: 'https://via.placeholder.com/300x200?text=Product+3',
+//   },
+//   {
+//     id: 4,
+//     title: '商品4',
+//     cover: 'https://via.placeholder.com/300x200?text=Product+4',
+//   },
+//   {
+//     id: 5,
+//     title: '商品5',
+//     cover: 'https://via.placeholder.com/300x200?text=Product+5',
+//   },
+// ]);
 const router = useRouter();
 
 // 获取所有商店数据
 async function get_getAllproducts() {
   try {
     const res = await getAllProduct();
-    if (res.data && Array.isArray(res.data.result)) {
-      products.value = res.data.result;
-      console.log(res.data.result);
+    console.log("get_getAllproducts",res);
+    if (res.data && Array.isArray(res.data.data)) {
+      products.value = res.data.data;
+      console.log(res.data);
     } else {
       console.error('获取数据失败：响应格式不符合预期');
     }

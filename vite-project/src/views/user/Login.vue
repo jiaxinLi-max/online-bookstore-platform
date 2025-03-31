@@ -218,19 +218,14 @@ import { userInfo, userLogin } from '../../api/user.ts'
 
 // 输入框值（需要在前端拦截不合法输入：是否为空+额外规则）
 const username = ref('')
-// const tel = ref('')
+
 const password = ref('')
 
-// 电话号码是否为空
-// const hasTelInput = computed(() => tel.value != '')
 // 用户名是否为空
 const hasUsernameInput = computed(() => username.value != '')
 // 密码是否为空
 const hasPasswordInput = computed(() => password.value != '')
-// // 电话号码的规则
-// const chinaMobileRegex = /^1(3[0-9]|4[579]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[189])\d{8}$/
-// const telLegal = computed(() => chinaMobileRegex.test(tel.value))
-// 密码不设置特殊规则
+
 // 登录按钮可用性
 const loginDisabled = computed(() => {
   // return !(hasTelInput.value && telLegal.value && hasPasswordInput.value)
@@ -249,9 +244,11 @@ function handleLogin() {
         type: 'success',
         center: true,
       })
-      const token = res.data.result
+      const token = res.data.data
       sessionStorage.setItem('token', token)
+      console.log('tokenLogin', token)
       sessionStorage.setItem('username', username.value)
+      //sessionStorage.setItem('role',role.value)
 
       console.log("laile1");
       //router.push({ path: "/home/all-products" });
@@ -259,7 +256,8 @@ function handleLogin() {
       userInfo(username.value).then(res => {
         console.log("laile2");
         // sessionStorage.setItem('username', res.data.result.username)
-        sessionStorage.setItem('role', res.data.result.role)
+        sessionStorage.setItem('role', res.data.data.role)
+        console.log("role_is:",res.data.data.role)
         //router.push({path: "/dashboard"})
         console.log("laile");
         //router.push({ path: "/home/all-products" }); // 确保这条路由存在
