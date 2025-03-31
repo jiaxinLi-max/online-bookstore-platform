@@ -14,7 +14,7 @@ const location = ref('');
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
-const avatar = ref('https://bpic.588ku.com/back_origin_min_pic/19/10/22/7d5760a4e3926576c237d950d5964db1.jpg');
+const avatar = ref('');
 const fileList = ref<UploadFile[]>([]);
 const dialogImageUrl = ref('');
 const dialogVisible = ref(false);
@@ -50,12 +50,13 @@ async function handleChange(file: UploadFile, fileListNew: UploadFile[]) {
 
   try {
     const res = await getImage(rawFile); // 调用上传接口
-    console.log(res);
+    console.log("res.data",res.data);
     if (res) {
-      console.log("res.result",res.result); // 输出返回的链接
+      //console.log("res.result",res.result); // 输出返回的链接
 
-      if (res.code === '000') {
-        avatar.value = res.result.trim(); // 去除可能的多余空格
+      if (res.code === '200') {
+        //avatar.value = res.result.trim(); // 去除可能的多余空格
+        avatar.value = res.data;
         console.log('avatar URL:', avatar.value);
 
         // 更新 fileList 中的文件对象，添加 URL
@@ -63,8 +64,6 @@ async function handleChange(file: UploadFile, fileListNew: UploadFile[]) {
         fileList.value = fileListNew;
 
         ElMessage.success('上传成功');
-      } else {
-        ElMessage.error('上传失败，请重试');
       }
     } else {
       ElMessage.error('响应格式错误，请重试');

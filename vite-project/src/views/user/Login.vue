@@ -251,13 +251,22 @@ function handleLogin() {
       })
       const token = res.data.result
       sessionStorage.setItem('token', token)
+      sessionStorage.setItem('username', username.value)
 
-      userInfo().then(res => {
-        sessionStorage.setItem('username', res.data.result.username)
+      console.log("laile1");
+      //router.push({ path: "/home/all-products" });
+      console.log("7",username.value);
+      userInfo(username.value).then(res => {
+        console.log("laile2");
+        // sessionStorage.setItem('username', res.data.result.username)
         sessionStorage.setItem('role', res.data.result.role)
         //router.push({path: "/dashboard"})
-        router.push({ path: "/home/all-products" }); // 确保这条路由存在
+        console.log("laile");
+        //router.push({ path: "/home/all-products" }); // 确保这条路由存在
       })
+
+      router.push({ path: "/home/all-products" });
+
     } else if (res.data.code === '401') {
       ElMessage({
         message: res.data.msg,

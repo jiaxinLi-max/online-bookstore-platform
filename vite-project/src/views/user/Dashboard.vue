@@ -7,7 +7,7 @@ import {UserFilled} from "@element-plus/icons-vue";
 // import { getAllStore,  Store } from '../../api/store';
 
 // const stores = ref<Store[]>([]);
-const username = ref('')
+const username = sessionStorage.getItem("username")
 const role = sessionStorage.getItem("role")
 const name = ref('')
 const avatar = ref('')
@@ -45,18 +45,24 @@ const changeDisabled = computed(() => {
 
 getUserInfo()
 function getUserInfo() {
-  userInfo().then(res => {
-    console.log("res", res.data);
-    username.value = res.data.username;
-    name.value = res.data.result.name;
-    telephone.value = res.data.result.phone;
-    // storeId.value = res.data.result.storeId;
-    // address.value = res.data.result.address;
-    location.value = res.data.result.location;
-    avatar.value = res.data.result.avatar;
-    email.value = res.data.result.email;
-    regTime.value = parseTime(res.data.result.createTime);
-    newName.value = name.value;
+
+  userInfo(username).then(res => {
+    if (res.data.code === '200') {
+      console.log("获取成功");
+      console.log("res", res.data);
+      //username = res.data.username;
+      name.value = res.data.result.name;
+      telephone.value = res.data.result.phone;
+      // storeId.value = res.data.result.storeId;
+      // address.value = res.data.result.address;
+      location.value = res.data.result.location;
+      avatar.value = res.data.result.avatar;
+      email.value = res.data.result.email;
+      regTime.value = parseTime(res.data.result.createTime);
+      newName.value = name.value;
+    } else {
+      console.log("获取失败");
+    }
 
     // 查找对应的商店名称
     // const store = stores.value.find(store => store.id === storeId.value);
@@ -69,6 +75,7 @@ function getUserInfo() {
 
 function updateInfo() {
   userInfoUpdate({
+    username: username,
     password: undefined,
     avatar: avatar.value,
     telephone: telephone.value,
@@ -94,6 +101,7 @@ function updateInfo() {
 
 function updatePassword() {
   userInfoUpdate({
+    username: username,
     password: password.value,
     avatar: undefined,
     telephone: undefined,

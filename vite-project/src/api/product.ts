@@ -46,11 +46,11 @@ type productInfo = {
 
 export const createProduct = (productInfo: productInfo) => {
     // 使用反引号来构建 URL
-    const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
+    //const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
     return axios.post(`${PRODUCT_MODULE}/`, productInfo, {
         headers: {
             'Content-Type': 'application/json',
-            'token': token // 使用 'token' 作为请求头
+            //'token': token // 使用 'token' 作为请求头
         }
     }).then(res => {
         console.log("createRes:",res);
@@ -67,10 +67,10 @@ export const getAllProduct = () => {
 };
 
 export const getProductsByStoreId = (storeId: number) => {
-    const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
+    //const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
     return axios.get(`${PRODUCT_MODULE}/store/${storeId}`,  {
         headers: {
-            'token': token // 使用 'token' 作为请求头
+            //'token': token // 使用 'token' 作为请求头
         }
     }).then(res => {
         console.log("ProductsThe",res.data);

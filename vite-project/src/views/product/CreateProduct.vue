@@ -317,7 +317,7 @@ async function handleChange(file: UploadFile, fileListNew: UploadFile[]) {
 
   try {
     const res = await getImage(rawFile);
-    if (res && res.code === '000') {
+    if (res && res.code === '200') {
       cover.value = res.result.trim();
       fileListNew[0].url = cover.value;
       fileList.value = fileListNew;
@@ -365,9 +365,9 @@ async function handleCreateProduct() {
   };
 
   createProduct(payload).then((res) => {
-    if (res.data.code === '000') {
+    if (res.data.code === '200') {
       ElMessage({
-        message: '创建商店成功',
+        message: '创建商品成功',
         type: 'success',
         center: true,
       });
