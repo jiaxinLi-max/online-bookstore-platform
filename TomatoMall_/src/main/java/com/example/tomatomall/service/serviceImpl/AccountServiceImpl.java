@@ -74,9 +74,21 @@ public class AccountServiceImpl implements AccountService {
     public Boolean updateInformation(AccountVO accountVO){
         Account account=securityUtil.getCurrentUser();
        if(accountVO.getUsername()!=null){
+           Account account_temp=accountRepository.findByUsername(accountVO.getUsername());
+           if(account_temp!=null){
+               throw  TomatoMallException.usernameAlreadyExists();
+           }
            account.setUsername(accountVO.getUsername());
        }
         if(accountVO.getPassword()!=null){
+            String rawPassword = accountVO.getPassword();
+
+            // 使用 BCryptPasswordEncoder 对密码进行加密
+            String encodedPassword = passwordEncoder.encode(rawPassword);
+
+            // 将加密后的密码设置到用户对象
+            accountVO.setPassword(encodedPassword);
+
             account.setPassword(accountVO.getPassword());
         }
         if(accountVO.getName()!=null){
