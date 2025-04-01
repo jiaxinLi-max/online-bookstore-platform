@@ -179,9 +179,9 @@ onMounted(async () => {
           {{ location }}
         </el-descriptions-item>
 
-        <el-descriptions-item label="注册时间">
-          {{ regTime }}
-        </el-descriptions-item>
+<!--        <el-descriptions-item label="注册时间">-->
+<!--          {{ regTime }}-->
+<!--        </el-descriptions-item>-->
       </el-descriptions>
     </el-card>
 
