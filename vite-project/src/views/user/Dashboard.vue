@@ -19,7 +19,7 @@ const avatar = ref('')
 const telephone = ref('')
 const location = ref('')
 const email = ref('')
-const regTime = ref()
+// const regTime = ref()
 
 const newName = ref('')
 
