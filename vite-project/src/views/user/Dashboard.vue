@@ -50,13 +50,13 @@ function getUserInfo() {
       console.log("获取成功");
       console.log("res", res.data);
       //username = res.data.username;
-      name.value = res.data.name;
-      telephone.value = res.data.telephone;
+      name.value = res.data.data.name;
+      telephone.value = res.data.data.telephone;
       // storeId.value = res.data.result.storeId;
       // address.value = res.data.result.address;
-      location.value = res.data.location;
-      avatar.value = res.data.avatar;
-      email.value = res.data.email;
+      location.value = res.data.data.location;
+      avatar.value = res.data.data.avatar;
+      email.value = res.data.data.email;
       newName.value = name.value;
     } else {
       console.log("获取失败");
