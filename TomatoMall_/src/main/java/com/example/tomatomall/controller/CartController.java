@@ -2,6 +2,7 @@ package com.example.tomatomall.controller;
 
 
 import com.example.tomatomall.service.CartService;
+import com.example.tomatomall.vo.CartVO;
 import com.example.tomatomall.vo.ProductVO;
 import com.example.tomatomall.vo.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class CartController {
      * 获取购物车商品列表
      */
     @GetMapping("/")
-    Response<List<ProductVO>>getPInCart(@PathVariable Integer userId){
+    Response<List<CartVO>>getPInCart(@PathVariable Integer userId){
         return Response.buildSuccess(cartService.getPInCart(userId));
     }
 }
