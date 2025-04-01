@@ -53,6 +53,12 @@ public class Product {
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Stockpile stockpile;
 
+    public void setSpecifications(Set<Specification> specifications) {
+        for (Specification spec : specifications) {
+            spec.setProduct(this);  // 关键：让 Specification 关联 Product
+        }
+        this.specifications = specifications;
+    }
 
     public ProductVO toVO(){
         ProductVO productVO=new ProductVO();

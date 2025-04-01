@@ -1,6 +1,7 @@
 package com.example.tomatomall.po;
 
 import com.example.tomatomall.vo.SpecificationVO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,6 +29,7 @@ public class Specification {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @JsonIgnore  // 关键：防止 product 进入无限递归
     private Product product;
 
     public SpecificationVO toVO(){
@@ -35,7 +37,12 @@ public class Specification {
         specificationVO.setId(this.id);
         specificationVO.setItem(this.item);
         specificationVO.setValue(this.value);
-        specificationVO.setProductId(this.product.getId());
+        if (this.product != null) {
+            specificationVO.setProductId(this.product.getId());
+        } else {
+            specificationVO.setProductId(null);
+        }
+
         return specificationVO;
     }
 

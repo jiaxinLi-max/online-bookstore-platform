@@ -24,7 +24,7 @@ public class ProductVO {
 
     public Product toPO(){
         Product product=new Product();
-        product.setId(id);
+        product.setId(this.id);
         product.setPrice(this.price);
         product.setRate(this.rate);
         product.setDetail(this.detail);
