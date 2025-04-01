@@ -12,8 +12,8 @@ const avatar = ref('')
 getUserInfo()
 function getUserInfo() {
   userInfo(username).then(res => {
-    console.log("res", res.data);
-    avatar.value = res.data.result.avatar;
+    console.log("resUserHeader", res.data);
+    avatar.value = res.data.avatar;
 
   }).catch(error => {
     console.error('获取用户信息失败:', error);
@@ -42,10 +42,7 @@ function logout() {
     router.push({ path: "/login" })
   })
 }
-// const router = useRouter();
-// function goToCreateStore() {
-//   router.push('/home/create-store');
-// }
+
 </script>
 
 
@@ -68,13 +65,7 @@ function logout() {
       <el-col :span="16">
       </el-col>
 
-<!--      <el-col :span="1" class="header-icon">-->
-<!--        <router-link to="/home/dashboard" class="no-link">-->
-<!--          <el-icon :size="35" color="white">-->
-<!--            <User />-->
-<!--          </el-icon>-->
-<!--        </router-link>-->
-<!--      </el-col>-->
+
       <el-col :span="1" class="header-icon">
         <router-link to="/home/dashboard" class="no-link">
           <!-- 动态绑定头像路径 -->
@@ -82,20 +73,14 @@ function logout() {
         </router-link>
       </el-col>
 
-      <!-- 新增创建商品按钮 -->
-<!--      <el-col v-if="role === 'MANAGER'" :span="1" class="header-icon">-->
-<!--        <router-link to="/home/create-store" v-slot="{navigate}">-->
-<!--          <el-icon @click="navigate" :size="35" color="white">-->
-<!--            <Plus /> &lt;!&ndash; 假设您使用 Plus 图标 &ndash;&gt;-->
-<!--          </el-icon>-->
-<!--        </router-link>-->
-<!--      </el-col>-->
       <el-col :span="1" class="header-icon">
-        <router-link to="/home/create-product" v-slot="{navigate}">
-          <el-icon @click="navigate" :size="35" color="white">
-            <Plus /> <!-- 假设您使用 Plus 图标 -->
-          </el-icon>
-        </router-link>
+        <template v-if="role === 'MANAGER'">
+          <router-link to="/home/create-product" v-slot="{ navigate }">
+            <el-icon @click="navigate" :size="35" color="white">
+              <Plus /> <!-- 假设您使用 Plus 图标 -->
+            </el-icon>
+          </router-link>
+        </template>
       </el-col>
 
 

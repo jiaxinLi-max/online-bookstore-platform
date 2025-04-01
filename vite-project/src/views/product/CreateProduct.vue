@@ -304,7 +304,8 @@ const hasPriceInput = computed(() => price.value !== null && price.value >= 0);
 const hasImageFile = computed(() => cover.value !== '');
 
 const createDisabled = computed(() => {
-  return !(hasTitleInput.value && hasDescriptionInput.value && hasPriceInput.value && hasImageFile.value);
+  // return !(hasTitleInput.value && hasDescriptionInput.value && hasPriceInput.value && hasImageFile.value);
+  return false;
 
 });
 
@@ -318,14 +319,17 @@ async function handleChange(file: UploadFile, fileListNew: UploadFile[]) {
   try {
     const res = await getImage(rawFile);
     if (res && res.code === '200') {
-      cover.value = res.result.trim();
+      //cover.value = res.result.trim();
+      cover.value = res.data;
+      console.log("cover.value",cover.value);
       fileListNew[0].url = cover.value;
       fileList.value = fileListNew;
       ElMessage.success('上传成功');
     } else {
-      ElMessage.error('上传失败，请重试');
+      ElMessage.error('上传失败1，请重试');
     }
   } catch (error) {
+    console.log("post_error",error);
     ElMessage.error('上传失败，请重试');
   }
 }
