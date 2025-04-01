@@ -12,20 +12,25 @@ export interface Product {
     description: string;
     cover: string;
     detail: string;
-    //specifications:Specification[];
-    bookTitle: string,
-    subtitle: string,
-    author: string,
-    isbn: string,
-    binding: string,
-    pages: number,
-    publicationDate: string,
-    publisher: string,
+    specifications:Specification[];
+    // bookTitle: string,
+    // subtitle: string,
+    // author: string,
+    // isbn: string,
+    // binding: string,
+    // pages: number,
+    // publicationDate: string,
+    // publisher: string,
 
 }
 
 import {PRODUCT_MODULE} from './_prefix';
-
+export interface Specification {
+    id: string; // 规格的唯一标识符
+    item: string; // 规格的名称（例如 "作者" 或 "副标题"）
+    value: string; // 规格的值（例如 "Robert C. Martin" 或 "程序员的职业素养"）
+    productId: string; // 关联的产品 ID
+}
 type productInfo = {
     title: string;
     price: number;
@@ -33,15 +38,18 @@ type productInfo = {
     description: string;
     cover: string;
     detail: string;
-    //specifications:Specification[];
-    bookTitle: string,
-    subtitle: string,
-    author: string,
-    isbn: string,
-    binding: string,
-    pages: number,
-    publicationDate: string,
-    publisher: string,
+    specifications:Specification[];
+
+    // bookTitle: string,
+    // subtitle: string,
+    // author: string,
+    // isbn: string,
+    // binding: string,
+    // pages: number,
+    // publicationDate: string,
+    // publisher: string,
+    // amount: number,
+    // frozen: number,
 };
 
 
