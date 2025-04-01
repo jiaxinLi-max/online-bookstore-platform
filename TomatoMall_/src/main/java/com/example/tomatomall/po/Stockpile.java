@@ -1,6 +1,7 @@
 package com.example.tomatomall.po;
 
 import com.example.tomatomall.vo.StockpileVO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,10 +24,11 @@ public class Stockpile {
     private Integer amount; // 可卖库存数
 
     @Column(name="frozen",nullable = false)
-    private Integer frozen; // 冻结库存数（不可卖）
+    private Integer frozen=0; // 冻结库存数（不可卖）
 
     @ManyToOne
-    @JoinColumn(name = "product_id", insertable = false, updatable = false)
+    @JoinColumn(name = "product_id")
+    @JsonIgnore  // 关键：防止 product 进入无限递归
     private Product product; // 与商品类的关联，避免冗余存储 productId
 
     public StockpileVO toVO(){
@@ -34,7 +36,11 @@ public class Stockpile {
         stockpileVO.setId(this.id);
         stockpileVO.setAmount(this.amount);
         stockpileVO.setFrozen(this.frozen);
-        stockpileVO.setProductId(this.product.getId());
+        if (this.product != null) {
+            stockpileVO.setProductId(this.product.getId());
+        } else {
+            stockpileVO.setProductId(null);
+        }
         return stockpileVO;
     }
 }

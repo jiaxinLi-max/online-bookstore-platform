@@ -39,8 +39,8 @@ public class ProductController {
      * 更新商品信息
      */
     @PutMapping
-    public Response<Boolean> updateProductInfo(@RequestBody ProductVO productVO,@PathVariable Integer id){
-        return Response.buildSuccess(productService.updateProductInfo(productVO,id));
+    public Response<Boolean> updateProductInfo(@RequestBody ProductVO productVO){
+        return Response.buildSuccess(productService.updateProductInfo(productVO));
     }
 
     /**
@@ -62,12 +62,12 @@ public class ProductController {
     /**
      * 更新商品库存
      * @param productId
-     * @param stockpileVO
+     * @param amount
      * @return
      */
-    @PatchMapping("/stockpile/{productId}")
-    public Response<Boolean> updateStock(@PathVariable Integer productId, @RequestBody StockpileVO stockpileVO) {
-        return Response.buildSuccess(productService.updateStock(productId, stockpileVO));
+    @PatchMapping("/stockpile/{productId}/{amount}")
+    public Response<Boolean> updateStock(@PathVariable Integer productId, @PathVariable Integer amount) {
+        return Response.buildSuccess(productService.updateStock(productId, amount));
     }
 
 
