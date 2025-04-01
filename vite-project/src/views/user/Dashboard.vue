@@ -19,7 +19,7 @@ const avatar = ref('')
 const telephone = ref('')
 const location = ref('')
 const email = ref('')
-const regTime = ref()
+// const regTime = ref()
 
 const newName = ref('')
 
@@ -50,14 +50,13 @@ function getUserInfo() {
       console.log("获取成功");
       console.log("res", res.data);
       //username = res.data.username;
-      name.value = res.data.result.name;
-      telephone.value = res.data.result.phone;
+      name.value = res.data.data.name;
+      telephone.value = res.data.data.telephone;
       // storeId.value = res.data.result.storeId;
       // address.value = res.data.result.address;
-      location.value = res.data.result.location;
-      avatar.value = res.data.result.avatar;
-      email.value = res.data.result.email;
-      regTime.value = parseTime(res.data.result.createTime);
+      location.value = res.data.data.location;
+      avatar.value = res.data.data.avatar;
+      email.value = res.data.data.email;
       newName.value = name.value;
     } else {
       console.log("获取失败");
@@ -180,9 +179,9 @@ onMounted(async () => {
           {{ location }}
         </el-descriptions-item>
 
-        <el-descriptions-item label="注册时间">
-          {{ regTime }}
-        </el-descriptions-item>
+<!--        <el-descriptions-item label="注册时间">-->
+<!--          {{ regTime }}-->
+<!--        </el-descriptions-item>-->
       </el-descriptions>
     </el-card>
 
