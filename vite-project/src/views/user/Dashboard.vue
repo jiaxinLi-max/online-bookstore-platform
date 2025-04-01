@@ -45,7 +45,6 @@ const changeDisabled = computed(() => {
 
 getUserInfo()
 function getUserInfo() {
-
   userInfo(username).then(res => {
     if (res.data.code === '200') {
       console.log("获取成功");
