@@ -484,7 +484,7 @@ export default defineComponent({
         const response = await updateStockpile({
           productId: productId.toString(),
           amount: newStock.value,
-        }); // 假设存在updateStock API
+        });
         if (response.data.code === 200) {
           maxQuantity.value = newStock.value;
           alert('库存更新成功');
