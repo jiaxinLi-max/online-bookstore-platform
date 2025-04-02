@@ -27,11 +27,6 @@ public class AliPayController {
     private String privateKey;
     @Value("${alipay.alipay-public-key}")
     private String alipayPublicKey;
-    @Value("${alipay.server-url}")
-    private String serverUrl;
-    @Value("${alipay.charset}")
-    private String charset;
-    @Value("${alipay.sign-type}")
     private String signType;
     @Value("${alipay.notify-url}")
     private String notifyUrl;
