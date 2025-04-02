@@ -199,7 +199,7 @@ onMounted(async () => {
 
       <el-form>
         <el-form-item>
-          <label for="name">昵称</label>
+          <label for="name">真实姓名</label>
           <el-input type="text" id="name" v-model="name" disabled/>
         </el-form-item>
 
