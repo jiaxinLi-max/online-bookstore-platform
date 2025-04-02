@@ -52,6 +52,17 @@ type productInfo = {
     // frozen: number,
 };
 
+type UpdateInfo = {
+    id: string,
+    title: string,
+    price: number,
+    rate:number,
+    description?: string,
+    cover?: string,
+    detail?: string,
+    specifications?:Specification[],
+}
+
 
 export const createProduct = (productInfo: productInfo) => {
     // 使用反引号来构建 URL
@@ -118,3 +129,15 @@ export const getProduct = (productId: number) => {
     });
 
 };
+
+export const updateProductInfo = (updateInfo: UpdateInfo) => {
+    const token = sessionStorage.getItem('token');
+    return axios.put(`${PRODUCT_MODULE}`, updateInfo, {
+        headers: {
+            'token': token
+        }
+    }).then(res => {
+        console.log("Updated product:", res.data);
+        return res;
+    })
+}
