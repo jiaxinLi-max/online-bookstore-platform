@@ -19,8 +19,10 @@ type RegisterInfo = {
 
 type UpdateInfo = {
     username: string | null,
-    password?: string,
+    password: string | null,
+    name: string | null,
     avatar?: string,
+    role: string | null,
     telephone?: string,
     email?: string,
     location?: string,
@@ -73,8 +75,18 @@ export const userInfo = (username: string | null) => {
 
 // 更新用户信息
 export const userInfoUpdate = (updateInfo: UpdateInfo) => {
-    return axios.put(`${USER_MODULE}`, updateInfo, {headers: {'Content-Type': 'application/json'}})
+    console.log("updateInfo", updateInfo)
+    const token = sessionStorage.getItem('token')
+    return axios.put(`${USER_MODULE}`, updateInfo, {
+        headers: {
+            'Content-Type': 'application/json',
+            'token': token
+        },
+    })
         .then(res => {
             return res
+        })
+        .catch(err => {
+            console.log(err)
         })
 }
