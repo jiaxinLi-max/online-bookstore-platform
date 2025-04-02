@@ -3,7 +3,7 @@ import {ref, computed, onMounted} from 'vue'
 import {userInfo, userInfoUpdate} from '../../api/user.ts'
 import {parseRole} from "../../utils"
 import {router} from '../../router'
-import {UserFilled} from "@element-plus/icons-vue";
+// import {UserFilled} from "@element-plus/icons-vue";
 // import { getAllStore,  Store } from '../../api/store';
 
 // const stores = ref<Store[]>([]);
@@ -146,7 +146,7 @@ onMounted(async () => {
   <el-main class="main-container">
     <el-card class="aside-card">
       <div class="avatar-area">
-        <el-avatar :icon="UserFilled" :size="80">
+        <el-avatar :src="avatar" :size="80">
         </el-avatar>
         <span class="avatar-text"> 欢迎您，{{ name }}</span>
       </div>
