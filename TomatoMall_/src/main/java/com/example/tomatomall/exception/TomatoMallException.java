@@ -15,8 +15,11 @@ public class TomatoMallException extends RuntimeException {
   public static TomatoMallException usernameAlreadyExists(){return new TomatoMallException("用户名已存在");}
 
   public static TomatoMallException usernameOrPasswordError(){return new TomatoMallException("用户名或密码错误");}
+
   public static TomatoMallException userNotExist(){return new TomatoMallException("用户不存在");}
+
   public static TomatoMallException fileUploadFail(){return new TomatoMallException("文件上传错误");}
+
   public static TomatoMallException notLogin(){return new TomatoMallException("未登录");}
 
   public static TomatoMallException exceedAmount(){return new TomatoMallException("超出商品可卖库存数");}
@@ -24,4 +27,8 @@ public class TomatoMallException extends RuntimeException {
   public static TomatoMallException productNotExistInCart(){return new TomatoMallException("购物车中不存在该商品");}
 
   public static TomatoMallException noPermissionToDelete(){return new TomatoMallException("无权限删除该商品");}
+
+  public static TomatoMallException orderNotExist(){return new TomatoMallException("订单不存在");}
+
+  public static TomatoMallException alipayFailure(){return new TomatoMallException("支付宝签名认证失败");}
 }

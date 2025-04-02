@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 public class AccountServiceImpl implements AccountService {
     @Autowired
@@ -75,7 +77,7 @@ public class AccountServiceImpl implements AccountService {
         Account account=securityUtil.getCurrentUser();
        if(accountVO.getUsername()!=null){
            Account account_temp=accountRepository.findByUsername(accountVO.getUsername());
-           if(account_temp!=null){
+           if(account_temp!=null&& !Objects.equals(account_temp.getId(), account.getId())){
                throw  TomatoMallException.usernameAlreadyExists();
            }
            account.setUsername(accountVO.getUsername());

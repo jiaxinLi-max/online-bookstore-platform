@@ -2,7 +2,9 @@ package com.example.tomatomall.controller;
 
 
 import com.example.tomatomall.service.CartService;
+import com.example.tomatomall.service.OrderService;
 import com.example.tomatomall.vo.CartVO;
+import com.example.tomatomall.vo.OrderVO;
 import com.example.tomatomall.vo.ProductVO;
 import com.example.tomatomall.vo.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,9 @@ import java.util.List;
 public class CartController {
     @Autowired
     CartService cartService;
+
+    @Autowired
+    OrderService orderService;
     /**
      * 把商品加到购物车
      */
@@ -45,5 +50,15 @@ public class CartController {
     @GetMapping("/")
     Response<List<CartVO>>getPInCart(@RequestParam Integer userId){
         return Response.buildSuccess(cartService.getPInCart(userId));
+    }
+
+//    @PostMapping("/checkout")
+//    Response<OrderVO> createOrder(@RequestParam Integer userId,@RequestParam List<String> cartItemIds,@RequestParam Object shipping_address,@RequestParam String payment_method){
+//        return Response.buildSuccess(orderService.createOrder(userId,cartItemIds,shipping_address,payment_method));
+//    }
+
+    @PostMapping("/checkout")
+    Response<OrderVO> createOrder(@RequestBody OrderVO orderVO){
+        return Response.buildSuccess(orderService.createOrder(orderVO));
     }
 }
