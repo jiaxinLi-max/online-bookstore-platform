@@ -155,3 +155,29 @@ export const deleteProduct = (productId: string) => {
         return res;
     })
 }
+
+export const updateStockpile = (productId: string, amount: number) => {
+    const token = sessionStorage.getItem('token');
+    return axios.patch(`${PRODUCT_MODULE}/stockpile/${productId}`, null, {
+        params: { productId, amount },
+        headers: {
+            'token': token
+        }
+    }).then(res => {
+        console.log("Updated stockpile:", res.data);
+        return res;
+    })
+}
+
+export const getStockpile = (productId: string) => {
+    const token = sessionStorage.getItem('token');
+    return axios.get(`${PRODUCT_MODULE}/stockpile/${productId}`, {
+        params: { productId },
+        headers: {
+            'token': token
+        }
+    }).then(res => {
+        console.log("GetStockpile:", res.data);
+        return res;
+    })
+}
