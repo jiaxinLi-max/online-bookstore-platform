@@ -387,6 +387,9 @@ export default defineComponent({
     const role = ref(sessionStorage.getItem('role') || '');
     const newStock = ref(0);
 
+    const stockAmount = ref(0);
+    const stockFrozen = ref(0);
+
     // 商品数据
     const product = ref({
       title: '',
@@ -446,6 +449,8 @@ export default defineComponent({
     // 在组件挂载后加载产品详情
     onMounted(() => {
       loadProductDetails(productId);
+
+      getStock();
     });
 
     const updateInfo = async () => {
@@ -494,6 +499,18 @@ export default defineComponent({
       }
     };
 
+    const getStock = async () => {
+      try {
+        const response = await getStockpile(productId.toString());
+        if (response.data.code === 200) {
+          stockAmount.value = response.data.amount;
+          stockFrozen.value = response.data.frozen;
+        }
+      } catch (error) {
+        console.error('获取库存信息失败:', error);
+      }
+    }
+
     return {
       product,
       specifications,
@@ -505,6 +522,7 @@ export default defineComponent({
       updateInfo,
       deleteProduct,
       updateStock,
+      getStock,
     };
   },
 });
