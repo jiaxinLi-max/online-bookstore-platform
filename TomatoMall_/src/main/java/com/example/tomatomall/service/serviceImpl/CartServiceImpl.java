@@ -35,6 +35,9 @@ public class CartServiceImpl implements CartService {
         }
         Stockpile stockpile=stockpileRepository.findByProductId(productId);
         //超出可卖库存数
+        if(stockpile==null){
+            throw TomatoMallException.exceedAmount();
+        }
         if(quantity>stockpile.getAmount()){
             throw TomatoMallException.exceedAmount();
         }
@@ -53,6 +56,7 @@ public class CartServiceImpl implements CartService {
             }
             cart.setQuantity(newQuantity);
         }
+        cartRepository.save(cart);
         return true;
     }
 
@@ -79,10 +83,14 @@ public class CartServiceImpl implements CartService {
             throw TomatoMallException.noPermissionToDelete();
         }
         Stockpile stockpile=stockpileRepository.findByProductId(cart.getProductId());
+        if (stockpile==null){
+            throw TomatoMallException.exceedAmount();
+        }
         if(quantity>stockpile.getAmount()){
             throw TomatoMallException.exceedAmount();
         }
         cart.setQuantity(quantity);
+        cartRepository.save(cart);
         return true;
     }
 
