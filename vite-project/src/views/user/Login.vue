@@ -248,7 +248,7 @@ function handleLogin() {
       sessionStorage.setItem('token', token)
       console.log('tokenLogin', token)
       sessionStorage.setItem('username', username.value)
-      //sessionStorage.setItem('role',role.value)
+      //sessionStorage.setItem('userId',userId.value)
 
       console.log("laile1");
       //router.push({ path: "/home/all-products" });

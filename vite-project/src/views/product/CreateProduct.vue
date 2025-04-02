@@ -676,6 +676,7 @@ async function handleCreateProduct() {
       ElMessage.error(res.data.message);
     }
   } catch (error) {
+    console.log("error",error);
     ElMessage.error('创建商品失败');
   }
 }

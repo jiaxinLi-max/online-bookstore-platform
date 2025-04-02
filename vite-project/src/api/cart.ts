@@ -1,60 +1,60 @@
-// import axios from 'axios';
-// import {CART_MODULE, PRODUCT_MODULE} from './_prefix'
-//
-// // 定义购物车商品结构
-// export interface CartItem {
-//     cartItemId: number;
-//     productId: number;
-//     title: string;
-//     price: number;
-//     description: string;
-//     cover: string;
-//     details: string;
-//     quantity: number;
-// }
-//
-// export const addCart = (userId: number, productId: number, quantity: number) => {
-//     // 使用反引号来构建 URL
-//     const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
-//
-//     // 构建请求体
-//     const requestBody = {
-//         userId,
-//         productId,
-//         quantity
-//     };
-//
-//     return axios.post(`${CART_MODULE}`, requestBody, {
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'token': token // 使用 'token' 作为请求头
-//         }
-//     }).then(res => {
-//         console.log("createRes:", res);
-//         return res.data; // 返回响应数据
-//     }).catch(error => {
-//         console.error("添加商品到购物车失败:", error);
-//         throw error; // 抛出错误以便后续处理
-//     });
-// };
-// export const cartService = {
-//     // 添加商品到购物车
-//     // async addToCart(userId: number, productId: number, quantity: number): Promise<Response<boolean>> {
-//     //     return await axios.post(`/api/cart`, { userId, productId, quantity });
-//     // },
-//
-//     // 删除购物车商品
-//     async removeFromCart(userId: number, cartItemId: number): Promise<Response<boolean>> {
-//         return await axios.delete(`/api/cart/${cartItemId}`, { params: { userId } });
-//     },
-//
-//     // 修改购物车商品数量
-//     async updateCartItemQuantity(userId: number, cartItemId: number, quantity: number): Promise<Response<boolean>> {
-//         return await axios.patch(`/api/cart/${cartItemId}/quantity`, { userId, quantity });
-//     },
-//
-//     // 获取购物车商品列表
-//     async getCartItems(userId: number): Promise<Response<CartItem[]>> {
-//         return await axios.get(`/api/cart/`, { params: { userId } });
-//     },
-// };
+import axios from 'axios';
+import {CART_MODULE, PRODUCT_MODULE} from './_prefix'
+
+// 定义购物车商品结构
+export interface Cart {
+    cartItemId: number;
+    productId: number;
+    title: string;
+    price: number;
+    description: string;
+    cover: string;
+    details: string;
+    quantity: number;
+}
+
+export const addCart = (userId: number, productId: number, quantity: number) => {
+    // 使用反引号来构建 URL
+    const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
+
+    // 构建请求体
+    const requestBody = {
+        userId,
+        productId,
+        quantity
+    };
+
+    return axios.post(`${CART_MODULE}`, requestBody, {
+        headers: {
+            'Content-Type': 'application/json',
+            'token': token // 使用 'token' 作为请求头
+        }
+    }).then(res => {
+        console.log("createRes:", res);
+        return res.data; // 返回响应数据
+    }).catch(error => {
+        console.error("添加商品到购物车失败:", error);
+        throw error; // 抛出错误以便后续处理
+    });
+};
+export const cartService = {
+    // 添加商品到购物车
+    // async addToCart(userId: number, productId: number, quantity: number): Promise<Response<boolean>> {
+    //     return await axios.post(`/api/cart`, { userId, productId, quantity });
+    // },
+
+    // 删除购物车商品
+    // async removeFromCart(userId: number, cartItemId: number): Promise<Response<boolean>> {
+    //     return await axios.delete(`/api/cart/${cartItemId}`, { params: { userId } });
+    // },
+    //
+    // // 修改购物车商品数量
+    // async updateCartItemQuantity(userId: number, cartItemId: number, quantity: number): Promise<Response<boolean>> {
+    //     return await axios.patch(`/api/cart/${cartItemId}/quantity`, { userId, quantity });
+    // },
+    //
+    // // 获取购物车商品列表
+    // async getCartItems(userId: number): Promise<Response<CartItem[]>> {
+    //     return await axios.get(`/api/cart/`, { params: { userId } });
+    // },
+};

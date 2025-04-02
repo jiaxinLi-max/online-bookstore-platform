@@ -133,6 +133,7 @@ async function handleRegister() {
       });
     }
   } catch (error) {
+    console.log("errorRes",error);
     ElMessage({
       message: "注册失败，请稍后再试",
       type: 'error',

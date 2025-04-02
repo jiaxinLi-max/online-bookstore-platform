@@ -4,7 +4,8 @@ import {parseRole, parseTime} from "../utils"
 import { User, SwitchButton, Plus } from "@element-plus/icons-vue"
 import {userInfo} from "../api/user.ts";
  // 导入 Plus 图标
-import {ref,  onMounted} from 'vue';
+import {ref,  onMounted,computed} from 'vue';
+import { Cart } from '../api/cart.ts';
 const username = sessionStorage.getItem("username");
 const role = sessionStorage.getItem('role')    // 登录的时候插入的
 console.log('roleHeader:', role);
@@ -14,7 +15,8 @@ function getUserInfo() {
   userInfo(username).then(res => {
     console.log("resUserHeader", res.data);
     avatar.value = res.data.data.avatar;
-
+    sessionStorage.setItem("userId", res.data.data.id);
+    console.log("userId",res.data.data.id);
   }).catch(error => {
     console.error('获取用户信息失败:', error);
   });
@@ -23,6 +25,17 @@ function getUserInfo() {
 onMounted(() => {
   getUserInfo();
 });
+// 购物车状态
+const cart = ref<Cart[]>([]);  // 存储购物车商品
+function goToCart() {
+  router.push({ path: '/cart' }); // 确保有一个 /cart 路由
+  //console.log('goToCart',router);
+}
+// 计算购物车中商品总数
+const cartItemCount = computed(() => {
+  return cart.value.reduce((total, item) => total + item.quantity, 0);
+});
+
 // 退出登录
 function logout() {
   ElMessageBox.confirm(
@@ -43,6 +56,8 @@ function logout() {
   })
 }
 
+
+
 </script>
 
 
@@ -62,7 +77,7 @@ function logout() {
 
       </el-col>
 
-      <el-col :span="16">
+      <el-col :span="15">
       </el-col>
 
 
@@ -72,16 +87,25 @@ function logout() {
 <!--          <img :src="avatar" alt="User Avatar" class="user-avatar" />-->
 <!--        </router-link>-->
 <!--      </el-col>-->
+      <!-- 购物车按钮 -->
+<!--      <el-col :span="1" class="header-icon">-->
+<!--        <button @click="goToCart">购物车 ({{ cartItemCount }})</button>-->
+<!--      </el-col>-->
 
       <el-col :span="1" class="header-icon">
-        <template v-if="role === 'MANAGER'">
+          <router-link to="/home/cart" class="no-link">
+            <button @click="goToCart">购物车 ({{ cartItemCount }})</button>
+          </router-link>
+      </el-col>
+      <template v-if="role === 'MANAGER'">
+      <el-col :span="1" class="header-icon">
           <router-link to="/home/create-product" v-slot="{ navigate }">
             <el-icon @click="navigate" :size="35" color="white">
               <Plus /> <!-- 假设您使用 Plus 图标 -->
             </el-icon>
           </router-link>
-        </template>
       </el-col>
+      </template>
 
       <el-col :span="1" class="header-icon">
         <a @click="logout">
