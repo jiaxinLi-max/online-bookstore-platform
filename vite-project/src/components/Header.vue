@@ -7,13 +7,13 @@ import {userInfo} from "../api/user.ts";
 import {ref,  onMounted} from 'vue';
 const username = sessionStorage.getItem("username");
 const role = sessionStorage.getItem('role')    // 登录的时候插入的
-console.log('role:', role);
+console.log('roleHeader:', role);
 const avatar = ref('')
 getUserInfo()
 function getUserInfo() {
   userInfo(username).then(res => {
     console.log("resUserHeader", res.data);
-    avatar.value = res.data.avatar;
+    avatar.value = res.data.data.avatar;
 
   }).catch(error => {
     console.error('获取用户信息失败:', error);
@@ -66,12 +66,12 @@ function logout() {
       </el-col>
 
 
-      <el-col :span="1" class="header-icon">
-        <router-link to="/home/dashboard" class="no-link">
-          <!-- 动态绑定头像路径 -->
-          <img :src="avatar" alt="User Avatar" class="user-avatar" />
-        </router-link>
-      </el-col>
+<!--      <el-col :span="1" class="header-icon">-->
+<!--        <router-link to="/home/dashboard" class="no-link">-->
+<!--          &lt;!&ndash; 动态绑定头像路径 &ndash;&gt;-->
+<!--          <img :src="avatar" alt="User Avatar" class="user-avatar" />-->
+<!--        </router-link>-->
+<!--      </el-col>-->
 
       <el-col :span="1" class="header-icon">
         <template v-if="role === 'MANAGER'">
@@ -83,12 +83,16 @@ function logout() {
         </template>
       </el-col>
 
-
-
       <el-col :span="1" class="header-icon">
         <a @click="logout">
           <el-icon :size="35" color="white" ><SwitchButton /></el-icon>
         </a>
+      </el-col>
+      <el-col :span="1" class="header-icon">
+        <router-link to="/home/dashboard" class="no-link">
+          <!-- 动态绑定头像路径 -->
+          <img :src="avatar" alt="User Avatar" class="user-avatar" />
+        </router-link>
       </el-col>
     </el-row>
   </el-header>
@@ -132,5 +136,14 @@ function logout() {
   flex-direction: column;
   align-items:center;
   justify-content: center;
+}
+
+.user-avatar {
+  width: 40px; /* 设置头像宽度 */
+  height: 40px; /* 设置头像高度 */
+  border-radius: 50%; /* 设置为圆形 */
+  object-fit: cover; /* 确保图片填充整个区域 */
+  margin-top: 10px; /* 调整垂直位置 */
+  margin-bottom: 10px; /* 调整垂直位置 */
 }
 </style>

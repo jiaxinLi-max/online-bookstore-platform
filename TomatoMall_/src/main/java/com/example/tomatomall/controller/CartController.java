@@ -19,7 +19,7 @@ public class CartController {
      * 把商品加到购物车
      */
     @PostMapping
-    Response<Boolean>addPIntoCart(@PathVariable Integer userId,@PathVariable Integer productId,@PathVariable Integer quantity){
+    Response<Boolean>addPIntoCart(@RequestParam Integer userId,@RequestParam Integer productId,@RequestParam Integer quantity){
         return Response.buildSuccess(cartService.addPIntoCart(userId,productId,quantity));
     }
 
@@ -27,7 +27,7 @@ public class CartController {
      *删除购物车商品
      */
     @DeleteMapping("/{cart_item_id}")
-    Response<Boolean>deletePInCart(@PathVariable Integer userId,@PathVariable Integer cart_item_id){
+    Response<Boolean>deletePInCart(@RequestParam Integer userId,@PathVariable Integer cart_item_id){
         return Response.buildSuccess(cartService.deletePInCart(userId,cart_item_id));
     }
 
@@ -35,7 +35,7 @@ public class CartController {
      * 修改购物车商品数量
      */
     @PatchMapping("/{cart_item_id}/quantity")
-    Response<Boolean>modifyQuantity(@PathVariable Integer userId,@PathVariable Integer cart_item_id,@PathVariable Integer quantity){
+    Response<Boolean>modifyQuantity(@RequestParam Integer userId,@PathVariable Integer cart_item_id,@RequestParam Integer quantity){
         return Response.buildSuccess(cartService.modifyQuantity(userId,cart_item_id,quantity));
     }
 
@@ -43,7 +43,7 @@ public class CartController {
      * 获取购物车商品列表
      */
     @GetMapping("/")
-    Response<List<CartVO>>getPInCart(@PathVariable Integer userId){
+    Response<List<CartVO>>getPInCart(@RequestParam Integer userId){
         return Response.buildSuccess(cartService.getPInCart(userId));
     }
 }

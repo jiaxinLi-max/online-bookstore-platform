@@ -35,7 +35,7 @@ public class AccountController {
      * 更新用户信息
      */
     @PutMapping()
-    public Response<Boolean> updateUser(AccountVO accountvo) {
+    public Response<Boolean> updateUser(@RequestBody AccountVO accountvo) {
         return Response.buildSuccess(accountService.updateInformation(accountvo));
     }
 

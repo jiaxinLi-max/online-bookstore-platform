@@ -14,6 +14,7 @@ import com.example.tomatomall.vo.StockpileVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,8 +49,8 @@ public class ProductServiceImpl implements ProductService {
 
     //更新商品信息
     @Override
-    public Boolean updateProductInfo(ProductVO productVO,Integer id){
-        Product product=productRepository.findById(id).orElse(null);
+    public Boolean updateProductInfo(ProductVO productVO){
+        Product product=productRepository.findById(productVO.getId()).orElse(null);
         if(product==null){
             throw TomatoMallException.productNotExist();
         }
@@ -59,7 +60,9 @@ public class ProductServiceImpl implements ProductService {
         product.setDescription(productVO.getDescription());
         product.setCover(productVO.getCover());
         product.setDetail(productVO.getDetail());
-        product.setSpecifications(productVO.getSpecifications());
+
+        product.getSpecifications().clear(); // 先清空原集合
+        product.getSpecifications().addAll(productVO.getSpecifications()); // 逐个添加新元素
 
         productRepository.save(product);
         return true;
@@ -80,6 +83,7 @@ public class ProductServiceImpl implements ProductService {
 
     //删除商品
     @Override
+    @Transactional
     public Boolean deleteProduct(Integer id){
         Product product = productRepository.findById(id).orElse(null);
         if (product == null) {
@@ -98,7 +102,7 @@ public class ProductServiceImpl implements ProductService {
 
     //更新商品库存
     @Override
-    public Boolean updateStock(Integer productId, StockpileVO stockpileVO){
+    public Boolean updateStock(Integer productId, Integer amount){
         Product product = productRepository.findById(productId).orElse(null);
         if (product == null) {
             // 商品不存在，抛出异常
@@ -110,9 +114,7 @@ public class ProductServiceImpl implements ProductService {
             stockpile.setProduct(product);
         }
 
-        stockpile.setAmount(stockpileVO.getAmount()); // 更新库存数
-        stockpile.setFrozen(stockpileVO.getFrozen()); // 更新冻结数
-
+        stockpile.setAmount(amount); // 更新库存数
         stockpileRepository.save(stockpile);
 
         return true; // 返回操作成功
@@ -127,7 +129,10 @@ public class ProductServiceImpl implements ProductService {
         }
         Stockpile stockpile = stockpileRepository.findByProductId(id);
         if (stockpile == null) {
-            return new StockpileVO(id,0,0);
+            stockpile=new Stockpile();
+            stockpile.setAmount(0);
+            stockpile.setProduct(product);
+            stockpileRepository.save(stockpile);
         }
         return stockpile.toVO();
     }

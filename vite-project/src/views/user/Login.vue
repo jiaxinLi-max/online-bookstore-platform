@@ -255,7 +255,7 @@ function handleLogin() {
       console.log("7",username.value);
       userInfo(username.value).then(res => {
         console.log("laile2");
-        // sessionStorage.setItem('username', res.data.result.username)
+        //sessionStorage.setItem('username', res.data.result.username)
         sessionStorage.setItem('role', res.data.data.role)
         console.log("role_is:",res.data.data.role)
         //router.push({path: "/dashboard"})
