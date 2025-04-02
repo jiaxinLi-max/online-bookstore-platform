@@ -63,6 +63,11 @@ type UpdateInfo = {
     specifications?:Specification[],
 }
 
+type StockpileInfo = {
+    productId: string,
+    amount: number,
+}
+
 
 export const createProduct = (productInfo: productInfo) => {
     // 使用反引号来构建 URL
@@ -156,10 +161,9 @@ export const deleteProduct = (productId: string) => {
     })
 }
 
-export const updateStockpile = (productId: string, amount: number) => {
+export const updateStockpile = (stockPileInfo: StockpileInfo) => {
     const token = sessionStorage.getItem('token');
-    return axios.patch(`${PRODUCT_MODULE}/stockpile/${productId}`, null, {
-        params: { productId, amount },
+    return axios.patch(`${PRODUCT_MODULE}/stockpile/${stockPileInfo.productId}`, stockPileInfo, {
         headers: {
             'token': token
         }
