@@ -134,10 +134,24 @@ export const updateProductInfo = (updateInfo: UpdateInfo) => {
     const token = sessionStorage.getItem('token');
     return axios.put(`${PRODUCT_MODULE}`, updateInfo, {
         headers: {
+            'Content-Type': 'application/json',
             'token': token
         }
     }).then(res => {
         console.log("Updated product:", res.data);
+        return res;
+    })
+}
+
+export const deleteProduct = (productId: string) => {
+    const token = sessionStorage.getItem('token');
+    return axios.delete(`${PRODUCT_MODULE}/${productId}`, {
+        params: { productId },
+        headers: {
+            'token': token
+        }
+    }).then(res => {
+        console.log("Deleted product:", res.data);
         return res;
     })
 }
