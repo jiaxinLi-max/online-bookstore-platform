@@ -107,6 +107,7 @@
 // export { router };
 
 import { createRouter, createWebHashHistory } from "vue-router";
+//import CartItem from "../views/CartItem.vue";
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -162,6 +163,11 @@ const router = createRouter({
                     //     },
                     // ],
                 },
+                // {
+                //     path: '/cart',
+                //     name: 'Cart',
+                //     component: CartItem,
+                // },
             ],
         },
         {

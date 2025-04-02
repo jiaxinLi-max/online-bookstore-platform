@@ -7,7 +7,7 @@ import {userInfo} from "../api/user.ts";
 import {ref,  onMounted} from 'vue';
 const username = sessionStorage.getItem("username");
 const role = sessionStorage.getItem('role')    // 登录的时候插入的
-console.log('role:', role);
+console.log('roleHeader:', role);
 const avatar = ref('')
 getUserInfo()
 function getUserInfo() {
