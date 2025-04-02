@@ -148,7 +148,7 @@ export const updateProductInfo = (updateInfo: UpdateInfo) => {
     })
 }
 
-export const deleteProduct = (productId: string) => {
+export const deleteTheProduct = (productId: string) => {
     const token = sessionStorage.getItem('token');
     return axios.delete(`${PRODUCT_MODULE}/${productId}`, {
         params: { productId },

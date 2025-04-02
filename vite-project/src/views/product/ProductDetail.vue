@@ -345,23 +345,47 @@
         <p v-if="specifications.length === 0">没有书籍信息可显示。</p>
       </div>
     </div>
-    <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>
-    <el-button type="primary" @click="addToCart">加入购物车</el-button>
+<!--    <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>-->
+<!--    <el-button type="primary" @click="addToCart">加入购物车</el-button>-->
+    <div class="action-area">
+      <!-- 客户操作 -->
+      <div v-if="role === 'CUSTOMER'" class="customer-actions">
+        <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>
+        <el-button type="primary" @click="addToCart">加入购物车</el-button>
+      </div>
+
+      <!-- 管理员操作 -->
+      <div v-if="role === 'MANAGER'" class="manager-actions">
+        <div class="stock-control">
+          <el-input-number v-model="newStock" :min="0" label="新库存"></el-input-number>
+          <el-button type="warning" @click="updateStock">更新库存</el-button>
+        </div>
+
+        <div class="management-buttons">
+          <el-button type="primary" @click="updateInfo">更新信息</el-button>
+          <el-button type="danger" @click="deleteProduct">删除商品</el-button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { getProduct } from '../../api/product.ts';
+import {deleteTheProduct, getProduct, updateProductInfo, updateStockpile, getStockpile} from '../../api/product.ts';
 import { addCart } from '../../api/cart.ts';
 import { Specification } from "../../api/specification.ts"; // 导入 Specification 接口
 
 export default defineComponent({
   name: 'ProductDetail',
+  methods: {updateProductInfo},
   setup() {
     const route = useRoute();
     const productId = Number(route.params.productId);
+
+    const role = ref(sessionStorage.getItem('role') || '');
+    const newStock = ref(0);
 
     // 商品数据
     const product = ref({
@@ -424,12 +448,63 @@ export default defineComponent({
       loadProductDetails(productId);
     });
 
+    const updateInfo = async () => {
+      try {
+        const response = await updateProductInfo({
+          id: productId.toString(),
+          title: product.value.title,
+          price: product.value.price,
+          rate: product.value.rate,
+          description: product.value.description,
+          cover: product.value.cover,
+          detail: product.value.detail,
+          specifications: specifications.value,
+        });
+        if (response.data.code === 200) {
+          alert('商品信息更新成功');
+        }
+      } catch (error) {
+        console.error('更新商品信息失败:', error);
+      }
+    };
+
+    const deleteProduct = async () => {
+      try {
+        const response = await deleteTheProduct(productId.toString());
+        if (response.data.code === 200) {
+          alert('商品删除成功');
+        }
+      } catch (error) {
+        console.error('删除商品失败:', error);
+      }
+    };
+
+    const updateStock = async () => {
+      try {
+        const response = await updateStockpile({
+          productId: productId.toString(),
+          amount: newStock.value,
+        }); // 假设存在updateStock API
+        if (response.data.code === 200) {
+          maxQuantity.value = newStock.value;
+          alert('库存更新成功');
+        }
+      } catch (error) {
+        console.error('更新库存失败:', error);
+      }
+    };
+
     return {
       product,
       specifications,
       quantity,
       maxQuantity,
       addToCart,
+      role,
+      newStock,
+      updateInfo,
+      deleteProduct,
+      updateStock,
     };
   },
 });
