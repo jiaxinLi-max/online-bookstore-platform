@@ -52,6 +52,22 @@ type productInfo = {
     // frozen: number,
 };
 
+type UpdateInfo = {
+    id: string,
+    title: string,
+    price: number,
+    rate:number,
+    description?: string,
+    cover?: string,
+    detail?: string,
+    specifications?:Specification[],
+}
+
+type StockpileInfo = {
+    productId: string,
+    amount: number,
+}
+
 
 export const createProduct = (productInfo: productInfo) => {
     // 使用反引号来构建 URL
@@ -118,3 +134,54 @@ export const getProduct = (productId: number) => {
     });
 
 };
+
+export const updateProductInfo = (updateInfo: UpdateInfo) => {
+    const token = sessionStorage.getItem('token');
+    return axios.put(`${PRODUCT_MODULE}`, updateInfo, {
+        headers: {
+            'Content-Type': 'application/json',
+            'token': token
+        }
+    }).then(res => {
+        console.log("Updated product:", res.data);
+        return res;
+    })
+}
+
+export const deleteProduct = (productId: string) => {
+    const token = sessionStorage.getItem('token');
+    return axios.delete(`${PRODUCT_MODULE}/${productId}`, {
+        params: { productId },
+        headers: {
+            'token': token
+        }
+    }).then(res => {
+        console.log("Deleted product:", res.data);
+        return res;
+    })
+}
+
+export const updateStockpile = (stockPileInfo: StockpileInfo) => {
+    const token = sessionStorage.getItem('token');
+    return axios.patch(`${PRODUCT_MODULE}/stockpile/${stockPileInfo.productId}`, stockPileInfo, {
+        headers: {
+            'token': token
+        }
+    }).then(res => {
+        console.log("Updated stockpile:", res.data);
+        return res;
+    })
+}
+
+export const getStockpile = (productId: string) => {
+    const token = sessionStorage.getItem('token');
+    return axios.get(`${PRODUCT_MODULE}/stockpile/${productId}`, {
+        params: { productId },
+        headers: {
+            'token': token
+        }
+    }).then(res => {
+        console.log("GetStockpile:", res.data);
+        return res;
+    })
+}

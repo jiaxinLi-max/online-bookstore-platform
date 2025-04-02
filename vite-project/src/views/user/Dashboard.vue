@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref, computed, onMounted} from 'vue'
 import {userInfo, userInfoUpdate} from '../../api/user.ts'
-import {parseRole, parseTime} from "../../utils"
+import {parseRole} from "../../utils"
 import {router} from '../../router'
 import {UserFilled} from "@element-plus/icons-vue";
 // import { getAllStore,  Store } from '../../api/store';
@@ -21,7 +21,7 @@ const location = ref('')
 const email = ref('')
 // const regTime = ref()
 
-const newName = ref('')
+// const newName = ref('')
 
 const displayInfoCard = ref(false)
 
@@ -57,7 +57,7 @@ function getUserInfo() {
       location.value = res.data.data.location;
       avatar.value = res.data.data.avatar;
       email.value = res.data.data.email;
-      newName.value = name.value;
+      // newName.value = name.value;
     } else {
       console.log("获取失败");
     }
@@ -74,8 +74,10 @@ function getUserInfo() {
 function updateInfo() {
   userInfoUpdate({
     username: username,
-    password: undefined,
+    password: password.value,
+    name: name.value,
     avatar: avatar.value,
+    role: role,
     telephone: telephone.value,
     email: email.value,
     location: location.value,
@@ -101,7 +103,9 @@ function updatePassword() {
   userInfoUpdate({
     username: username,
     password: password.value,
+    name: name.value,
     avatar: undefined,
+    role: role,
     telephone: undefined,
     email: undefined,
     location: undefined,
@@ -194,14 +198,14 @@ onMounted(async () => {
       </template>
 
       <el-form>
-<!--        <el-form-item>-->
-<!--          <label for="name">昵称</label>-->
-<!--          <el-input type="text" id="name" v-model="newName"/>-->
-<!--        </el-form-item>-->
+        <el-form-item>
+          <label for="name">昵称</label>
+          <el-input type="text" id="name" v-model="name" disabled/>
+        </el-form-item>
 
         <el-form-item>
           <label for="telephone">手机号</label>
-          <el-input id="telephone" v-model="telephone" disabled/>
+          <el-input id="telephone" v-model="telephone"/>
         </el-form-item>
 
         <el-form-item v-if="role === 'CUSTOMER'">
@@ -213,7 +217,7 @@ onMounted(async () => {
 
         <el-form-item>
           <label for="email">邮箱</label>
-          <el-input id="email" v-model="email" disabled/>
+          <el-input id="email" v-model="email"/>
         </el-form-item>
       </el-form>
     </el-card>

@@ -94,7 +94,8 @@ function logout() {
 
       <el-col :span="1" class="header-icon">
           <router-link to="/home/cart" class="no-link">
-            <button @click="goToCart">购物车 ({{ cartItemCount }})</button>
+<!--            <button @click="goToCart">购物车 ({{ cartItemCount }})</button>-->
+            <button @click="goToCart">购物车 </button>
           </router-link>
       </el-col>
       <template v-if="role === 'MANAGER'">
