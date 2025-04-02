@@ -138,6 +138,12 @@ const router = createRouter({
                     meta: { title: '个人信息' },
                 },
                 {
+                    path: 'cart', // 子路由路径，去掉前导斜杠
+                    name: 'Cart',
+                    component: () => import('../views/cart/CartView.vue'),
+                    meta: { title: '购物车' },
+                },
+                {
                     path: 'all-products', // 添加商店列表页面
                     name: 'AllProducts',
                     component: () => import('../views/product/AllProduct.vue'), // 确保路径正确
