@@ -80,16 +80,10 @@ public class AccountServiceImpl implements AccountService {
 //           }
 //           account.setUsername(accountVO.getUsername());
 //       }
-        if(accountVO.getPassword()!=null){
+        if (accountVO.getPassword() != null && !passwordEncoder.matches(accountVO.getPassword(), account.getPassword())) {
             String rawPassword = accountVO.getPassword();
-
-            // 使用 BCryptPasswordEncoder 对密码进行加密
-            String encodedPassword = passwordEncoder.encode(rawPassword);
-
-            // 将加密后的密码设置到用户对象
-            accountVO.setPassword(encodedPassword);
-
-            account.setPassword(accountVO.getPassword());
+            String encodedPassword = passwordEncoder.encode(rawPassword);  // 使用 Spring Security 加密
+            account.setPassword(encodedPassword);
         }
         if(accountVO.getName()!=null){
             account.setName(accountVO.getName());

@@ -1,8 +1,6 @@
 package com.example.tomatomall.configure;
 
 import com.example.tomatomall.exception.TomatoMallException;
-import com.example.tomatomall.po.Account;
-import com.example.tomatomall.util.SecurityUtil;
 import com.example.tomatomall.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,18 +20,11 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String token = request.getHeader("token");
         if (token != null && tokenUtil.verifyToken(token)) {
-            Account user = tokenUtil.getUser(token);
-            SecurityUtil.setCurrentUser(user); // 存到 ThreadLocal
+            request.getSession().setAttribute("currentUser",tokenUtil.getUser(token));
             return true;
-        } else {
+        }else {
             throw TomatoMallException.notLogin();
         }
     }
-
-    @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        SecurityUtil.clear();
-    }
-
 
 }

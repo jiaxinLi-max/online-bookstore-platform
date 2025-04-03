@@ -16,19 +16,19 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class SecurityUtil {
 
-    private static final ThreadLocal<Account> currentUser = new ThreadLocal<>();
-
-    public static void setCurrentUser(Account account) {
-        currentUser.set(account);
-        System.out.println("从 session 获取用户s: " + currentUser.get());
-    }
-
-    public static Account getCurrentUser() {
-        System.out.println("从 session 获取用户g: " + currentUser.get());
-        return currentUser.get();
-    }
-
-    public static void clear() {
-        currentUser.remove();
-    }
+//    private static final ThreadLocal<Account> currentUser = new ThreadLocal<>();
+//
+//    public static void setCurrentUser(Account account) {
+//        currentUser.set(account);
+//        System.out.println("从 session 获取用户s: " + currentUser.get());
+//    }
+//
+//    public static Account getCurrentUser() {
+//        System.out.println("从 session 获取用户g: " + currentUser.get());
+//        return currentUser.get();
+//    }
+//
+//    public static void clear() {
+//        currentUser.remove();
+//    }
 }
