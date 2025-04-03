@@ -15,6 +15,9 @@ function getUserInfo() {
   userInfo(username).then(res => {
     console.log("resUserHeader", res.data);
     avatar.value = res.data.data.avatar;
+    if(!avatar.value){
+      avatar.value = 'https://bpic.588ku.com/back_origin_min_pic/19/10/22/7d5760a4e3926576c237d950d5964db1.jpg';
+    }
     sessionStorage.setItem("userId", res.data.data.id);
     console.log("userId",res.data.data.id);
   }).catch(error => {
