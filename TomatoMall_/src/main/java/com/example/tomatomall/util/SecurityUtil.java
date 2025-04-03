@@ -3,6 +3,8 @@ package com.example.tomatomall.util;
 import com.example.tomatomall.po.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -14,10 +16,19 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class SecurityUtil {
 
-    @Autowired
-    HttpServletRequest httpServletRequest;
+    private static final ThreadLocal<Account> currentUser = new ThreadLocal<>();
 
-    public Account getCurrentUser(){
-        return (Account)httpServletRequest.getSession().getAttribute("currentUser");
+    public static void setCurrentUser(Account account) {
+        currentUser.set(account);
+        System.out.println("从 session 获取用户s: " + currentUser.get());
+    }
+
+    public static Account getCurrentUser() {
+        System.out.println("从 session 获取用户g: " + currentUser.get());
+        return currentUser.get();
+    }
+
+    public static void clear() {
+        currentUser.remove();
     }
 }

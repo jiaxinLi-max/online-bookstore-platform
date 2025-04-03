@@ -24,8 +24,6 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     AccountRepository accountRepository;
 
-    @Autowired
-    SecurityUtil securityUtil;
 
     @Override
     public Boolean register(AccountVO accountVO){
@@ -74,14 +72,14 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Boolean updateInformation(AccountVO accountVO){
-        Account account=securityUtil.getCurrentUser();
-       if(accountVO.getUsername()!=null){
-           Account account_temp=accountRepository.findByUsername(accountVO.getUsername());
-           if(account_temp!=null&& !Objects.equals(account_temp.getId(), account.getId())){
-               throw  TomatoMallException.usernameAlreadyExists();
-           }
-           account.setUsername(accountVO.getUsername());
-       }
+        Account account= accountRepository.findByUsername(accountVO.getUsername());
+//       if(accountVO.getUsername()!=null){
+//           Account account_temp=accountRepository.findByUsername(accountVO.getUsername());
+//           if(account_temp!=null&& !Objects.equals(account_temp.getId(), account.getId())){
+//               throw  TomatoMallException.usernameAlreadyExists();
+//           }
+//           account.setUsername(accountVO.getUsername());
+//       }
         if(accountVO.getPassword()!=null){
             String rawPassword = accountVO.getPassword();
 

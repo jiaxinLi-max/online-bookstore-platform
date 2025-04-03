@@ -38,7 +38,10 @@ public class TokenUtil {
     }
 
     public Account getUser(String token){
-        Integer accountId=Integer.parseInt(JWT.decode(token).getAudience().get(0));
-        return accountRepository.findById(accountId).get();
+        Integer accountId = Integer.parseInt(JWT.decode(token).getAudience().get(0));
+        System.out.println("解析到的用户 ID: " + accountId);
+
+        return accountRepository.findById(accountId)
+                .orElseThrow(() -> new RuntimeException("用户 ID " + accountId + " 不存在"));
     }
 }
