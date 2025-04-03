@@ -379,6 +379,7 @@ onMounted(async () => {
 
 .change-card {
   width: 66%;
+  background: rgba(255, 215, 0, 0.8);
 }
 
 .avatar-area {
@@ -399,10 +400,6 @@ onMounted(async () => {
 }
 
 .aside-card {
-  background: rgba(255, 215, 0, 0.8);
-}
-
-.change-card {
   background: rgba(255, 215, 0, 0.8);
 }
 
