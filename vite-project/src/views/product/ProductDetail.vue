@@ -356,6 +356,7 @@
 
       <!-- 管理员操作 -->
       <div v-if="role === 'MANAGER'" class="manager-actions">
+        <div>库存: {{ stockAmount }}</div>
         <div class="stock-control">
           <el-input-number v-model="newStock" :min="0" label="新库存"></el-input-number>
           <el-button type="warning" @click="updateStock">更新库存</el-button>
@@ -375,7 +376,8 @@ import { defineComponent, ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import {deleteTheProduct, getProduct, updateProductInfo, updateStockpile, getStockpile} from '../../api/product.ts';
 import { addCart } from '../../api/cart.ts';
-import { Specification } from "../../api/specification.ts"; // 导入 Specification 接口
+import { Specification } from "../../api/specification.ts";
+import {ElMessage} from "element-plus"; // 导入 Specification 接口
 
 export default defineComponent({
   name: 'ProductDetail',
@@ -423,6 +425,7 @@ export default defineComponent({
 
         // 更新规格数据，直接使用返回的规格数组
         specifications.value = productData.specifications || []; // 赋值为数组
+
       } catch (error) {
         console.error('Error loading product details:', error);
       }
@@ -465,8 +468,9 @@ export default defineComponent({
           detail: product.value.detail,
           specifications: specifications.value,
         });
-        if (response.data.code === 200) {
-          alert('商品信息更新成功');
+        if (response.data.code === '200') {
+          ElMessage.success('商品信息更新成功');
+          console.log(response.data);
         }
       } catch (error) {
         console.error('更新商品信息失败:', error);
@@ -476,8 +480,9 @@ export default defineComponent({
     const deleteProduct = async () => {
       try {
         const response = await deleteTheProduct(productId.toString());
-        if (response.data.code === 200) {
-          alert('商品删除成功');
+        if (response.data.code === '200') {
+          ElMessage.success('商品删除成功');
+          console.log(response.data);
         }
       } catch (error) {
         console.error('删除商品失败:', error);
@@ -490,9 +495,10 @@ export default defineComponent({
           productId: productId.toString(),
           amount: newStock.value,
         });
-        if (response.data.code === 200) {
+        if (response.data.code === '200') {
           maxQuantity.value = newStock.value;
-          alert('库存更新成功');
+          ElMessage.success('库存更新成功');
+          console.log(response.data);
         }
       } catch (error) {
         console.error('更新库存失败:', error);
@@ -502,9 +508,11 @@ export default defineComponent({
     const getStock = async () => {
       try {
         const response = await getStockpile(productId.toString());
-        if (response.data.code === 200) {
-          stockAmount.value = response.data.amount;
-          stockFrozen.value = response.data.frozen;
+        if (response.data.code === '200') {
+          stockAmount.value = response.data.data.amount;
+          stockFrozen.value = response.data.data.frozen;
+          console.log("StockAmount:" + response.data.data.amount);
+          console.log("StockFrozen:" + response.data.data.frozen);
         }
       } catch (error) {
         console.error('获取库存信息失败:', error);
@@ -523,6 +531,7 @@ export default defineComponent({
       deleteProduct,
       updateStock,
       getStock,
+      stockAmount,
     };
   },
 });
@@ -573,5 +582,19 @@ export default defineComponent({
 
 .description, .detail {
   margin: 10px 0;
+}
+
+.action-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.manager-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 </style>
