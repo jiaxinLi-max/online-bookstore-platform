@@ -21,6 +21,8 @@ const dialogVisible = ref(false);
 
 // const products = ref<Product[]>([]);
 // 各种输入验证
+const hasUserNameInput = computed(() => username.value !== '');
+const hasNameInput = computed(() => name.value !== '');
 const hasTelInput = computed(() => tel.value !== '');
 const hasIdentityChosen = computed(() => identity.value !== '');
 const hasPasswordInput = computed(() => password.value !== '');
@@ -34,11 +36,9 @@ const registerDisabled = computed(() => {
   if (!hasIdentityChosen.value) {
     return true;
   }else if(identity.value === "CUSTOMER"){
-    return !(hasTelInput.value && hasPasswordInput.value && hasAddressInput&&hasConfirmPasswordInput.value  &&
-        telLegal.value && isPasswordIdentical.value && hasImageFile.value);
+    return !( hasUserNameInput.value &&hasNameInput.value &&hasPasswordInput.value &&hasConfirmPasswordInput.value  && isPasswordIdentical.value );
   }else {
-    return !(hasTelInput.value && hasPasswordInput.value && hasConfirmPasswordInput.value  &&
-        telLegal.value && isPasswordIdentical.value && hasImageFile.value);
+    return !( hasUserNameInput.value &&hasNameInput.value &&hasPasswordInput.value && hasConfirmPasswordInput.value  && isPasswordIdentical.value );
   }
 
 });
@@ -98,8 +98,8 @@ const handlePictureCardPreview = (file: UploadFile) => {
 // 处理文件删除
 const handleRemove = (file: UploadFile) => {
   fileList.value = fileList.value.filter(item => item.uid !== file.uid); // 从文件列表中移除
+  avatar.value = ''; // 清空头像 URL
 };
-
 // 加载状态
 const loading = ref(false);
 // 注册按钮触发
@@ -168,6 +168,13 @@ async function handleRegister() {
               </el-form-item>
             </el-col>
 
+            <el-col :span="15">
+              <el-form-item>
+                <label for="email">邮箱</label>
+                <el-input id="email" v-model="email" placeholder="请输入邮箱（可选）" />
+              </el-form-item>
+            </el-col>
+
             <el-col :span="1"></el-col>
 
             <el-col :span="8">
@@ -187,7 +194,7 @@ async function handleRegister() {
                 <label v-if="!hasTelInput" for="tel">注册手机号</label>
                 <label v-else-if="!telLegal" for="tel" class="error-warn">手机号不合法</label>
                 <label v-else for="tel">注册手机号</label>
-                <el-input id="tel" v-model="tel" :class="{'error-warn-input': (hasTelInput && !telLegal)}" placeholder="请输入手机号"/>
+                <el-input id="tel" v-model="tel" :class="{'error-warn-input': (hasTelInput && !telLegal)}" placeholder="请输入手机号（可选）"/>
               </el-form-item>
             </el-col>
 
@@ -196,7 +203,7 @@ async function handleRegister() {
             <el-col :span="15" v-if="identity !== 'MANAGER'">
               <el-form-item>
                 <label for="location">地址</label>
-                <el-input id="location" v-model="location" placeholder="请输入地址"/>
+                <el-input id="location" v-model="location" placeholder="请输入地址（可选）"/>
               </el-form-item>
             </el-col>
 
@@ -242,10 +249,13 @@ async function handleRegister() {
             <div v-else>
               <el-image
                   class="avatar-image"
-                  :src="fileList[0].url "
+                  :src="fileList[0].url"
                   fit="cover"
-                  :preview-src-list="fileList.map(file => file.url )"
+                  style="width: 150px; height: 150px;"
               />
+              <el-button @click="handleRemove(fileList[0])" type="danger" size="small" style="margin-top: 5px;">
+                删除头像
+              </el-button>
             </div>
 
             <el-dialog v-model="dialogVisible">
