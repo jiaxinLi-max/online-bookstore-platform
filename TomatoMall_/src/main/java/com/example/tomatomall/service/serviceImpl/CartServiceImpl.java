@@ -8,11 +8,14 @@ import com.example.tomatomall.repository.CartRepository;
 import com.example.tomatomall.repository.ProductRepository;
 import com.example.tomatomall.repository.StockpileRepository;
 import com.example.tomatomall.service.CartService;
+import com.example.tomatomall.vo.CartResponseVO;
 import com.example.tomatomall.vo.CartVO;
 import com.example.tomatomall.vo.ProductVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +31,7 @@ public class CartServiceImpl implements CartService {
     CartRepository cartRepository;
 
     @Override
-    public Boolean addPIntoCart(Integer userId,Integer productId,Integer quantity){
+    public CartVO addPIntoCart(Integer userId,Integer productId,Integer quantity){
         Product product=productRepository.findById(productId).orElse(null);
         if(product==null){
             throw TomatoMallException.productNotExist();
@@ -57,7 +60,16 @@ public class CartServiceImpl implements CartService {
             cart.setQuantity(newQuantity);
         }
         cartRepository.save(cart);
-        return true;
+
+        // **构造 CartVO**
+        CartVO cartVO = cart.toVO();
+        cartVO.setTitle(product.getTitle());
+        cartVO.setPrice(product.getPrice());
+        cartVO.setDescription(product.getDescription());
+        cartVO.setCover(product.getCover());
+        cartVO.setDetail(product.getDetail());
+
+        return cartVO;
     }
 
     @Override
@@ -95,8 +107,37 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public List<CartVO> getPInCart(Integer userId){
-        return cartRepository.findByUserId(userId).stream().map(Cart::toVO).collect(Collectors.toList());
+    public CartResponseVO getPInCart(Integer userId){
+        // 查询用户购物车中的商品列表
+        List<Cart> cartList = cartRepository.findByUserId(userId);
 
+        // 转换为 CartVO 列表，并计算总价
+        List<CartVO> cartVOList = new ArrayList<>();
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        for (Cart cart : cartList) {
+            Product product = productRepository.findById(cart.getProductId())
+                    .orElseThrow(() -> new RuntimeException("商品不存在"));
+
+            CartVO cartVO = cart.toVO();
+            cartVO.setTitle(product.getTitle());
+            cartVO.setPrice(product.getPrice());
+            cartVO.setDescription(product.getDescription());
+            cartVO.setCover(product.getCover());
+            cartVO.setDetail(product.getDetail());
+
+            cartVOList.add(cartVO);
+
+            // 计算购物车总金额
+            totalAmount = totalAmount.add(product.getPrice().multiply(BigDecimal.valueOf(cart.getQuantity())));
+        }
+
+        // 组装返回对象
+        CartResponseVO response = new CartResponseVO();
+        response.setItems(cartVOList);
+        response.setTotal(cartVOList.size()); // 计算购物车不同商品种类的数量
+        response.setTotalAmount(totalAmount);
+
+        return response;
     }
 }
