@@ -54,13 +54,13 @@ type productInfo = {
 
 type UpdateInfo = {
     id: string,
-    title: string,
-    price: number,
-    rate:number,
+    title?: string,
+    price?: number,
+    rate?: number,
     description?: string,
     cover?: string,
     detail?: string,
-    specifications?:Specification[],
+    specifications?: Specification[],
 }
 
 export const createProduct = (productInfo: productInfo) => {
