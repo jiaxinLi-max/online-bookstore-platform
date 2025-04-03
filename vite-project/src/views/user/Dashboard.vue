@@ -3,6 +3,8 @@ import {ref, computed, onMounted} from 'vue'
 import {userInfo, userInfoUpdate} from '../../api/user.ts'
 import {parseRole} from "../../utils"
 import {router} from '../../router'
+import {ElMessage, UploadFile} from "element-plus";
+import {getImage} from "../../api/tools.ts";
 // import {UserFilled} from "@element-plus/icons-vue";
 // import { getAllStore,  Store } from '../../api/store';
 
@@ -27,12 +29,22 @@ const displayInfoCard = ref(false)
 
 const password = ref('')
 const confirmPassword = ref('')
+const fileList = ref<UploadFile[]>([]);
+const dialogImageUrl = ref('');
+const dialogVisible = ref(false);
 
 const hasConfirmPasswordInput = computed(() => confirmPassword.value != '')
 const isPasswordIdentical = computed(() => password.value == confirmPassword.value)
 const changeDisabled = computed(() => {
   return !(hasConfirmPasswordInput.value && isPasswordIdentical.value)
 })
+
+const hasImageFile = computed(() => avatar.value !== '');
+const MAX_SIZE = 1024 * 1024; // 1MB
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
+const handleExceed = (files, fileList) => {
+  ElMessage.warning('最多只能上传一张头像');
+};
 
 // async function fetchStores() {
 //   try {
@@ -74,10 +86,10 @@ function getUserInfo() {
 function updateInfo() {
   userInfoUpdate({
     username: username,
-    password: password.value,
+    password: undefined,
     name: name.value,
     avatar: avatar.value,
-    role: role,
+    role: undefined,
     telephone: telephone.value,
     email: email.value,
     location: location.value,
@@ -103,9 +115,9 @@ function updatePassword() {
   userInfoUpdate({
     username: username,
     password: password.value,
-    name: name.value,
+    name: undefined,
     avatar: undefined,
-    role: role,
+    role: undefined,
     telephone: undefined,
     email: undefined,
     location: undefined,
@@ -135,6 +147,60 @@ function updatePassword() {
     }
   })
 }
+
+async function handleChange(file: UploadFile, fileListNew: UploadFile[]) {
+  const rawFile = file.raw; // 获取原始文件对象
+  if (!rawFile) {
+    ElMessage.error('无法获取文件');
+    return;
+  }
+  if (!ALLOWED_TYPES.includes(rawFile.type)) {
+    ElMessage.error('只允许上传 JPG/PNG/GIF 格式的文件');
+    return;
+  }
+
+  if (rawFile.size > MAX_SIZE) {
+    ElMessage.error('文件超过最大大小限制（1MB）');
+    return;
+  }
+
+  try {
+    const res = await getImage(rawFile); // 调用上传接口
+    console.log("res.data",res.data);
+    if (res) {
+      //console.log("res.result",res.result); // 输出返回的链接
+
+      if (res.code === '200') {
+        //avatar.value = res.result.trim(); // 去除可能的多余空格
+        avatar.value = res.data;
+        console.log('avatar URL:', avatar.value);
+
+        // 更新 fileList 中的文件对象，添加 URL
+        fileListNew[0].url = avatar.value;
+        fileList.value = fileListNew;
+
+        ElMessage.success('上传成功');
+      }
+    } else {
+      ElMessage.error('响应格式错误，请重试');
+    }
+  } catch (error) {
+    console.error('上传失败:', error);
+    ElMessage.error('上传失败，请重试');
+  }
+}
+
+// 处理图片预览
+const handlePictureCardPreview = (file: UploadFile) => {
+  dialogImageUrl.value = file.url || ''; // 使用 file.url 进行预览
+  dialogVisible.value = true;
+};
+
+// 处理文件删除
+const handleRemove = (file: UploadFile) => {
+  fileList.value = fileList.value.filter(item => item.uid !== file.uid); // 从文件列表中移除
+};
+
 onMounted(async () => {
   // await fetchStores(); // 首先获取商店列表
   await getUserInfo(); // 然后获取用户信息
@@ -148,7 +214,7 @@ onMounted(async () => {
       <div class="avatar-area">
         <el-avatar :src="avatar" :size="80">
         </el-avatar>
-        <span class="avatar-text"> 欢迎您，{{ name }}</span>
+        <span class="avatar-text"> 欢迎您，{{ username }}</span>
       </div>
 
       <el-divider></el-divider>
@@ -170,6 +236,14 @@ onMounted(async () => {
           <el-tag>{{ parseRole(role) }}</el-tag>
         </el-descriptions-item>
 
+        <el-descriptions-item label="用户名">
+          <el-tag>{{ username }}</el-tag>
+        </el-descriptions-item>
+
+        <el-descriptions-item label="真实姓名">
+          <el-tag>{{ name }}</el-tag>
+        </el-descriptions-item>
+
 <!--        <el-descriptions-item label="所属商店" v-if="role === 'STAFF'">-->
 <!--          {{ storeName }}-->
 <!--&lt;!&ndash;          {{ storeId }}&ndash;&gt;-->
@@ -186,6 +260,11 @@ onMounted(async () => {
 <!--        <el-descriptions-item label="注册时间">-->
 <!--          {{ regTime }}-->
 <!--        </el-descriptions-item>-->
+
+        <el-descriptions-item label="电子邮箱">
+          {{ email }}
+        </el-descriptions-item>
+
       </el-descriptions>
     </el-card>
 
@@ -218,6 +297,26 @@ onMounted(async () => {
         <el-form-item>
           <label for="email">邮箱</label>
           <el-input id="email" v-model="email"/>
+        </el-form-item>
+
+        <el-form-item label="头像" prop="logo">
+          <div v-if="fileList.length === 0">
+            <el-upload
+                action="http://localhost:8080/api/images"
+                list-type="picture-card"
+                :auto-upload="true"
+                :file-list="fileList"
+                :on-change="handleChange"
+                :on-remove="handleRemove"
+                :on-preview="handlePictureCardPreview"
+                :limit="1"
+                :on-exceed="handleExceed"
+            >
+
+              <el-icon><Plus /></el-icon>
+              <div>点击上传头像</div>
+            </el-upload>
+          </div>
         </el-form-item>
       </el-form>
     </el-card>
@@ -295,5 +394,16 @@ onMounted(async () => {
   padding-right: 40px;
 }
 
+.main-container {
+  background-image: url("../../assets/login.png");
+}
+
+.aside-card {
+  background: rgba(255, 215, 0, 0.8);
+}
+
+.change-card {
+  background: rgba(255, 215, 0, 0.8);
+}
 
 </style>
