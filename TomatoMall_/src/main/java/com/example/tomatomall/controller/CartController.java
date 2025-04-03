@@ -3,10 +3,7 @@ package com.example.tomatomall.controller;
 
 import com.example.tomatomall.service.CartService;
 import com.example.tomatomall.service.OrderService;
-import com.example.tomatomall.vo.CartVO;
-import com.example.tomatomall.vo.OrderVO;
-import com.example.tomatomall.vo.ProductVO;
-import com.example.tomatomall.vo.Response;
+import com.example.tomatomall.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +21,7 @@ public class CartController {
      * 把商品加到购物车
      */
     @PostMapping
-    Response<Boolean>addPIntoCart(@RequestParam Integer userId,@RequestParam Integer productId,@RequestParam Integer quantity){
+    Response<CartVO>addPIntoCart(@RequestParam Integer userId,@RequestParam Integer productId,@RequestParam Integer quantity){
         return Response.buildSuccess(cartService.addPIntoCart(userId,productId,quantity));
     }
 
@@ -48,7 +45,7 @@ public class CartController {
      * 获取购物车商品列表
      */
     @GetMapping("/")
-    Response<List<CartVO>>getPInCart(@RequestParam Integer userId){
+    Response<CartResponseVO>getPInCart(@RequestParam Integer userId){
         return Response.buildSuccess(cartService.getPInCart(userId));
     }
 

@@ -6,18 +6,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class CartVO {
-    private Integer id;//购物车记录
+    private Integer cartItemId;//购物车记录
     private Integer userId;//关联用户id
     private Integer productId;//关联商品id
+    private String title;//书名
+    private BigDecimal price;
+    private String description;
+    private String cover;
+    private String detail;
     private Integer quantity;//商品数量
+
     public Cart toPO(){
         Cart cart=new Cart();
-        cart.setId(this.id);
+        cart.setCartItemId(this.cartItemId);
         cart.setUserId(this.userId);
         cart.setProductId(this.productId);
         cart.setQuantity(this.quantity);

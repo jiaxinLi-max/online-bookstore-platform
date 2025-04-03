@@ -15,7 +15,7 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name="id",nullable = false)
-    private Integer id;//购物车记录
+    private Integer cartItemId;//购物车记录
 
     @Basic
     @Column(name="user_id",nullable = false)
@@ -31,7 +31,7 @@ public class Cart {
 
     public CartVO toVO(){
         CartVO cartVO=new CartVO();
-        cartVO.setId(this.id);
+        cartVO.setCartItemId(this.cartItemId);
         cartVO.setProductId(this.productId);
         cartVO.setUserId(this.userId);
         cartVO.setQuantity(this.quantity);
