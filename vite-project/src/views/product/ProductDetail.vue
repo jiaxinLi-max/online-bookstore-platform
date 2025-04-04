@@ -586,6 +586,7 @@ export default defineComponent({
         return;
       }
 
+      console.log("TrueSpec:" + specifications.value[0].value)
       try {
         const res = await updateProductInfo({
           id: productId.toString(),
@@ -598,12 +599,19 @@ export default defineComponent({
           specifications: newSpecifications.value,
         });
         if (res.data.code === '200') {
-          console.log("Edit Cover:" + editForm.value.cover)
-          console.log("True Cover:" + product.value.cover)
+          console.log("NewSpec:" + newSpecifications.value[0].value)
+          console.log("TrueSpec:" + specifications.value[0].value)
           ElMessage.success('更新商品成功');
           await loadProductDetails(productId);
-          console.log("Edit Cover:" + editForm.value.cover)
-          console.log("True Cover:" + product.value.cover)
+          console.log("TrueSpecLength:" + specifications.value.length)
+          editForm.value.title = product.value.title;
+          editForm.value.description = product.value.description;
+          editForm.value.detail = product.value.detail;
+          editForm.value.price = product.value.price;
+          editForm.value.rate = product.value.rate;
+          editForm.value.cover = product.value.cover;
+          fileList.value = [];
+          newSpecifications.value = specifications.value;
         } else {
           ElMessage.error(res.data.message);
           editForm.value.title = product.value.title;
