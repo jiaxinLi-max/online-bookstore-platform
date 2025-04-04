@@ -558,10 +558,10 @@ export default defineComponent({
       try {
         const res = await getImage(rawFile);
         if (res && res.code === '200') {
-          product.value.cover = res.data; // 设置封面
-          fileListNew[0].url = product.value.cover; // 更新文件列表的URL
+          editForm.value.cover = res.data;
+          fileListNew[0].url = editForm.value.cover; // 更新文件列表的URL
           fileList.value = fileListNew; // 更新文件列表
-          ElMessage.success('上传成功');
+          ElMessage.success('封面上传成功');
         } else {
           ElMessage.error('上传失败，请重试');
         }
@@ -598,7 +598,12 @@ export default defineComponent({
           specifications: newSpecifications.value,
         });
         if (res.data.code === '200') {
+          console.log("Edit Cover:" + editForm.value.cover)
+          console.log("True Cover:" + product.value.cover)
           ElMessage.success('更新商品成功');
+          await loadProductDetails(productId);
+          console.log("Edit Cover:" + editForm.value.cover)
+          console.log("True Cover:" + product.value.cover)
         } else {
           ElMessage.error(res.data.message);
           editForm.value.title = product.value.title;
