@@ -373,6 +373,7 @@
       v-model="showEditDialog"
       title="修改商品信息"
       width="40%"
+      class="edit-dialog"
   >
     <el-form ref="form" label-width="120px" class="product-form">
       <!-- 基本信息 -->
@@ -398,7 +399,7 @@
 
       <!-- 规格说明类 -->
       <el-form-item label="规格说明" prop="specifications">
-        <div v-for="(spec, index) in editForm.specifications" :key="index" class="specification-item">
+        <div v-for="(spec, index) in newSpecifications" :key="index" class="specification-item">
           <el-input
               v-model="spec.item"
               placeholder="规格名称（如 作者、副标题）"
@@ -496,17 +497,17 @@ export default defineComponent({
 
     // 规格信息
     const specifications = ref<Specification[]>([]);
+    const newSpecifications = ref<Specification[]>([]);
     const quantity = ref(1);
     const maxQuantity = ref(10); // 这里可以根据实际库存动态设置
 
     const editForm = ref({
-      title: '',
-      price: 0,
-      rate: 0,
-      description: '',
-      cover: '',
-      detail: '',
-      specifications: ref<Specification[]>([]),
+      title: product.value.title,
+      price: product.value.price,
+      rate: product.value.rate,
+      description: product.value.description,
+      cover: product.value.cover,
+      detail: product.value.detail,
     });
 
     // 加载产品详情
@@ -535,6 +536,16 @@ export default defineComponent({
 
     const openEditDialog = () => {
       showEditDialog.value = true;
+      editForm.value = {
+        title: product.value.title,
+        price: product.value.price,
+        rate: product.value.rate,
+        description: product.value.description,
+        cover: product.value.cover,
+        detail: product.value.detail,
+      };
+      fileList.value = [];
+      newSpecifications.value = specifications.value;
     };
 
     async function handleChange(file: UploadFile, fileListNew: UploadFile[]) {
@@ -584,20 +595,20 @@ export default defineComponent({
           description: editForm.value.description,
           cover: editForm.value.cover,
           detail: editForm.value.detail,
-          specifications: editForm.value.specifications,
+          specifications: newSpecifications.value,
         });
         if (res.data.code === '200') {
           ElMessage.success('更新商品成功');
         } else {
           ElMessage.error(res.data.message);
-          editForm.value.title = '';
-          editForm.value.description = '';
-          editForm.value.detail = '';
-          editForm.value.price = 0;
-          editForm.value.rate = 0;
-          editForm.value.cover = '';
+          editForm.value.title = product.value.title;
+          editForm.value.description = product.value.description;
+          editForm.value.detail = product.value.detail;
+          editForm.value.price = product.value.price;
+          editForm.value.rate = product.value.rate;
+          editForm.value.cover = product.value.cover;
           fileList.value = [];
-          editForm.value.specifications = [];
+          newSpecifications.value = specifications.value;
         }
         showEditDialog.value = false;
       } catch (error) {
@@ -607,14 +618,14 @@ export default defineComponent({
     }
 
     function addSpecification() {
-      editForm.value.specifications.push({
+      newSpecifications.value.push({
         item: '',     // 新规格的名称
         value: '',    // 新规格的值
       });
     }
 
     function removeSpecification(index: number) {
-      editForm.value.specifications.splice(index, 1);
+      newSpecifications.value.splice(index, 1);
     }
 
     // 添加到购物车
@@ -729,6 +740,7 @@ export default defineComponent({
       editForm,
       addSpecification,
       removeSpecification,
+      newSpecifications,
     };
   },
 });
