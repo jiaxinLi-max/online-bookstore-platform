@@ -157,7 +157,7 @@ export const deleteTheProduct = (productId: string) => {
 
 export const updateStockpile = (productId: string, amount: number) => {
     const token = sessionStorage.getItem('token');
-    return axios.patch(`${PRODUCT_MODULE}/stockpile/${productId}`, null, {
+    return axios.patch(`${PRODUCT_MODULE}/stockpile/${productId}/${amount}`, null, {
         params: { productId, amount },
         headers: {
             'token': token
