@@ -6,9 +6,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
     @ExceptionHandler(value = TomatoMallException.class)
-    public Response<String> handleAIExternalException(TomatoMallException e) {
+    public Response<String> handleTomatoMallException(TomatoMallException e) {
         e.printStackTrace();
-        return Response.buildFailure(e.getMessage(),"000");
+        return Response.buildFailure(e.getMessage(), e.getCode());
     }
+
 }
