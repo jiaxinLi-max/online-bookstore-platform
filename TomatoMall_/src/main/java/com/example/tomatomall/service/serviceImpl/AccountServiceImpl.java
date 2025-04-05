@@ -24,11 +24,9 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     AccountRepository accountRepository;
 
-    @Autowired
-    SecurityUtil securityUtil;
 
     @Override
-    public Boolean register(AccountVO accountVO){
+    public String register(AccountVO accountVO){
         Account account=accountRepository.findByUsername(accountVO.getUsername());
         if(account!=null){
             throw  TomatoMallException.usernameAlreadyExists();
@@ -42,9 +40,10 @@ public class AccountServiceImpl implements AccountService {
         accountVO.setPassword(encodedPassword);
         Account newaccount=accountVO.toPO();
         accountRepository.save(newaccount);
-        return true;
+        return "注册成功";
     }
 
+    @Override
     public String login(String username, String password) {
         // 查找用户
         Account account = accountRepository.findByUsername(username);
@@ -55,10 +54,16 @@ public class AccountServiceImpl implements AccountService {
                 // 密码匹配，生成并返回 token
                 return tokenUtil.getToken(account);
             }
+            else {
+                throw TomatoMallException.usernameOrPasswordError();
+            }
         }
 
         // 密码不匹配或用户不存在，抛出自定义异常
-        throw TomatoMallException.usernameOrPasswordError();
+        else {
+            throw TomatoMallException.usernameOrPasswordError();
+        }
+
     }
 
 
@@ -74,24 +79,18 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Boolean updateInformation(AccountVO accountVO){
-        Account account=securityUtil.getCurrentUser();
-       if(accountVO.getUsername()!=null){
-           Account account_temp=accountRepository.findByUsername(accountVO.getUsername());
-           if(account_temp!=null&& !Objects.equals(account_temp.getId(), account.getId())){
-               throw  TomatoMallException.usernameAlreadyExists();
-           }
-           account.setUsername(accountVO.getUsername());
-       }
-        if(accountVO.getPassword()!=null){
+        Account account= accountRepository.findByUsername(accountVO.getUsername());
+//       if(accountVO.getUsername()!=null){
+//           Account account_temp=accountRepository.findByUsername(accountVO.getUsername());
+//           if(account_temp!=null&& !Objects.equals(account_temp.getId(), account.getId())){
+//               throw  TomatoMallException.usernameAlreadyExists();
+//           }
+//           account.setUsername(accountVO.getUsername());
+//       }
+        if (accountVO.getPassword() != null && !passwordEncoder.matches(accountVO.getPassword(), account.getPassword())) {
             String rawPassword = accountVO.getPassword();
-
-            // 使用 BCryptPasswordEncoder 对密码进行加密
-            String encodedPassword = passwordEncoder.encode(rawPassword);
-
-            // 将加密后的密码设置到用户对象
-            accountVO.setPassword(encodedPassword);
-
-            account.setPassword(accountVO.getPassword());
+            String encodedPassword = passwordEncoder.encode(rawPassword);  // 使用 Spring Security 加密
+            account.setPassword(encodedPassword);
         }
         if(accountVO.getName()!=null){
             account.setName(accountVO.getName());

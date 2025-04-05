@@ -15,6 +15,9 @@ function getUserInfo() {
   userInfo(username).then(res => {
     console.log("resUserHeader", res.data);
     avatar.value = res.data.data.avatar;
+    if(!avatar.value){
+      avatar.value = 'https://bpic.588ku.com/back_origin_min_pic/19/10/22/7d5760a4e3926576c237d950d5964db1.jpg';
+    }
     sessionStorage.setItem("userId", res.data.data.id);
     console.log("userId",res.data.data.id);
   }).catch(error => {
@@ -56,8 +59,6 @@ function logout() {
   })
 }
 
-
-
 </script>
 
 
@@ -67,7 +68,7 @@ function logout() {
     <el-row :gutter="10">
 
       <el-col :span="3" class="header-icon">
-        <router-link to="/dashboard" v-slot="{navigate}" class="no-link">
+        <router-link to="/home/all-products" v-slot="{navigate}" class="no-link">
           <h1 @click="navigate" class="header-text"> 番茄侦探小说城</h1>
         </router-link>
       </el-col>

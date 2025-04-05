@@ -356,29 +356,118 @@
 
       <!-- 管理员操作 -->
       <div v-if="role === 'MANAGER'" class="manager-actions">
+        <div>库存: {{ stockAmount }}</div>
         <div class="stock-control">
           <el-input-number v-model="newStock" :min="0" label="新库存"></el-input-number>
           <el-button type="warning" @click="updateStock">更新库存</el-button>
         </div>
 
         <div class="management-buttons">
-          <el-button type="primary" @click="updateInfo">更新信息</el-button>
+          <el-button type="primary" @click="openEditDialog">更新信息</el-button>
           <el-button type="danger" @click="deleteProduct">删除商品</el-button>
         </div>
       </div>
     </div>
   </div>
+  <el-dialog
+      v-model="showEditDialog"
+      title="修改商品信息"
+      width="40%"
+      class="edit-dialog"
+  >
+    <el-form ref="form" label-width="120px" class="product-form">
+      <!-- 基本信息 -->
+      <el-form-item label="商品名称" prop="productName">
+        <el-input v-model="editForm.title" placeholder="请输入商品名称"></el-input>
+      </el-form-item>
+
+      <el-form-item label="商品价格" prop="productPrice">
+        <el-input v-model="editForm.price" placeholder="请输入商品价格" type="number"></el-input>
+      </el-form-item>
+
+      <el-form-item label="商品评分" prop="productRate">
+        <el-input v-model="editForm.rate" placeholder="请输入商品评分" type="number"></el-input>
+      </el-form-item>
+
+      <el-form-item label="商品描述" prop="productDescription">
+        <el-input v-model="editForm.description" placeholder="请输入商品描述"></el-input>
+      </el-form-item>
+
+      <el-form-item label="商品详细说明" prop="productDetail">
+        <el-input v-model="editForm.detail" placeholder="请输入商品详细说明"></el-input>
+      </el-form-item>
+
+      <!-- 规格说明类 -->
+      <el-form-item label="规格说明" prop="specifications">
+        <div v-for="(spec, index) in newSpecifications" :key="index" class="specification-item">
+          <el-input
+              v-model="spec.item"
+              placeholder="规格名称（如 作者、副标题）"
+              style="width: 200px; margin-right: 10px;"
+          ></el-input>
+          <el-input
+              v-model="spec.value"
+              placeholder="规格值（如 Robert C. Martin）"
+              style="width: 200px; margin-right: 10px;"
+          ></el-input>
+          <el-button type="danger" @click="removeSpecification(index)">删除</el-button>
+        </div>
+        <!--        <el-button type="primary" @click="addSpecification">添加规格</el-button>-->
+      </el-form-item>
+
+      <!-- 添加规格按钮另起一行 -->
+      <el-form-item>
+        <el-button type="primary" @click="addSpecification">添加规格</el-button>
+      </el-form-item>
+
+      <!-- 商品封面 -->
+      <el-form-item label="商品封面" prop="cover">
+        <el-upload
+            action="http://localhost:8080/api/images"
+            list-type="picture-card"
+            :auto-upload="true"
+            :file-list="fileList"
+            :on-change="handleChange"
+            :on-remove="handleRemove"
+            :on-preview="handlePictureCardPreview"
+        >
+          <el-icon><Plus /></el-icon>
+          <div>点击上传商品封面</div>
+        </el-upload>
+        <el-dialog v-model="dialogVisible">
+          <img class="dialog-image" :src="dialogImageUrl" alt="Logo Preview" />
+        </el-dialog>
+      </el-form-item>
+
+      <!-- 按钮 -->
+      <el-form-item>
+        <el-button @click.prevent="handleUpdateProduct" type="primary" plain>
+          更新商品
+        </el-button>
+      </el-form-item>
+    </el-form>
+  </el-dialog>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import {defineComponent, ref, onMounted} from 'vue';
 import { useRoute } from 'vue-router';
-import {deleteTheProduct, getProduct, updateProductInfo, updateStockpile, getStockpile} from '../../api/product.ts';
+import {
+  deleteTheProduct,
+  getProduct,
+  updateProductInfo,
+  updateStockpile,
+  getStockpile,
+} from '../../api/product.ts';
 import { addCart } from '../../api/cart.ts';
-import { Specification } from "../../api/specification.ts"; // 导入 Specification 接口
+import { Specification } from "../../api/specification.ts";
+import {ElMessage, type UploadFile} from "element-plus";
+import {Plus} from "@element-plus/icons-vue";
+import {getImage} from "../../api/tools.ts"; // 导入 Specification 接口
 
 export default defineComponent({
   name: 'ProductDetail',
+  components: {Plus},
   methods: {updateProductInfo},
   setup() {
     const route = useRoute();
@@ -389,6 +478,12 @@ export default defineComponent({
 
     const stockAmount = ref(0);
     const stockFrozen = ref(0);
+
+    const showEditDialog = ref(false);
+
+    const fileList = ref<UploadFile[]>([]);
+    const dialogImageUrl = ref('');
+    const dialogVisible = ref(false);
 
     // 商品数据
     const product = ref({
@@ -402,8 +497,18 @@ export default defineComponent({
 
     // 规格信息
     const specifications = ref<Specification[]>([]);
+    const newSpecifications = ref<Specification[]>([]);
     const quantity = ref(1);
     const maxQuantity = ref(10); // 这里可以根据实际库存动态设置
+
+    const editForm = ref({
+      title: product.value.title,
+      price: product.value.price,
+      rate: product.value.rate,
+      description: product.value.description,
+      cover: product.value.cover,
+      detail: product.value.detail,
+    });
 
     // 加载产品详情
     const loadProductDetails = async (productId: number) => {
@@ -423,10 +528,118 @@ export default defineComponent({
 
         // 更新规格数据，直接使用返回的规格数组
         specifications.value = productData.specifications || []; // 赋值为数组
+
       } catch (error) {
         console.error('Error loading product details:', error);
       }
     };
+
+    const openEditDialog = () => {
+      showEditDialog.value = true;
+      editForm.value = {
+        title: product.value.title,
+        price: product.value.price,
+        rate: product.value.rate,
+        description: product.value.description,
+        cover: product.value.cover,
+        detail: product.value.detail,
+      };
+      fileList.value = [];
+      newSpecifications.value = specifications.value;
+    };
+
+    async function handleChange(file: UploadFile, fileListNew: UploadFile[]) {
+      const rawFile = file.raw;
+      if (!rawFile) {
+        ElMessage.error('无法获取文件');
+        return;
+      }
+
+      try {
+        const res = await getImage(rawFile);
+        if (res && res.code === '200') {
+          editForm.value.cover = res.data;
+          fileListNew[0].url = editForm.value.cover; // 更新文件列表的URL
+          fileList.value = fileListNew; // 更新文件列表
+          ElMessage.success('封面上传成功');
+        } else {
+          ElMessage.error('上传失败，请重试');
+        }
+      } catch (error) {
+        ElMessage.error('上传失败，请重试');
+      }
+    }
+
+    const handlePictureCardPreview = (file: UploadFile) => {
+      dialogImageUrl.value = file.url || '';
+      dialogVisible.value = true;
+    };
+
+    const handleRemove = (file: UploadFile) => {
+      fileList.value = fileList.value.filter(item => item.uid !== file.uid);
+    };
+
+    async function handleUpdateProduct() {
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        ElMessage.error('请先登录!');
+        return;
+      }
+
+      console.log("TrueSpec:" + specifications.value[0].value)
+      try {
+        const res = await updateProductInfo({
+          id: productId.toString(),
+          title: editForm.value.title,
+          price: editForm.value.price,
+          rate: editForm.value.rate,
+          description: editForm.value.description,
+          cover: editForm.value.cover,
+          detail: editForm.value.detail,
+          specifications: newSpecifications.value,
+        });
+        if (res.data.code === '200') {
+          console.log("NewSpec:" + newSpecifications.value[0].value)
+          console.log("TrueSpec:" + specifications.value[0].value)
+          ElMessage.success('更新商品成功');
+          await loadProductDetails(productId);
+          console.log("TrueSpecLength:" + specifications.value.length)
+          editForm.value.title = product.value.title;
+          editForm.value.description = product.value.description;
+          editForm.value.detail = product.value.detail;
+          editForm.value.price = product.value.price;
+          editForm.value.rate = product.value.rate;
+          editForm.value.cover = product.value.cover;
+          fileList.value = [];
+          newSpecifications.value = specifications.value;
+        } else {
+          ElMessage.error(res.data.message);
+          editForm.value.title = product.value.title;
+          editForm.value.description = product.value.description;
+          editForm.value.detail = product.value.detail;
+          editForm.value.price = product.value.price;
+          editForm.value.rate = product.value.rate;
+          editForm.value.cover = product.value.cover;
+          fileList.value = [];
+          newSpecifications.value = specifications.value;
+        }
+        showEditDialog.value = false;
+      } catch (error) {
+        console.log("error",error);
+        ElMessage.error('更新商品失败');
+      }
+    }
+
+    function addSpecification() {
+      newSpecifications.value.push({
+        item: '',     // 新规格的名称
+        value: '',    // 新规格的值
+      });
+    }
+
+    function removeSpecification(index: number) {
+      newSpecifications.value.splice(index, 1);
+    }
 
     // 添加到购物车
     const addToCart = async () => {
@@ -453,31 +666,33 @@ export default defineComponent({
       getStock();
     });
 
-    const updateInfo = async () => {
-      try {
-        const response = await updateProductInfo({
-          id: productId.toString(),
-          title: product.value.title,
-          price: product.value.price,
-          rate: product.value.rate,
-          description: product.value.description,
-          cover: product.value.cover,
-          detail: product.value.detail,
-          specifications: specifications.value,
-        });
-        if (response.data.code === 200) {
-          alert('商品信息更新成功');
-        }
-      } catch (error) {
-        console.error('更新商品信息失败:', error);
-      }
-    };
+    // const updateInfo = async () => {
+    //   try {
+    //     const response = await updateProductInfo({
+    //       id: productId.toString(),
+    //       title: product.value.title,
+    //       price: product.value.price,
+    //       rate: product.value.rate,
+    //       description: product.value.description,
+    //       cover: product.value.cover,
+    //       detail: product.value.detail,
+    //       specifications: specifications.value,
+    //     });
+    //     if (response.data.code === '200') {
+    //       ElMessage.success('商品信息更新成功');
+    //       console.log(response.data);
+    //     }
+    //   } catch (error) {
+    //     console.error('更新商品信息失败:', error);
+    //   }
+    // };
 
     const deleteProduct = async () => {
       try {
         const response = await deleteTheProduct(productId.toString());
-        if (response.data.code === 200) {
-          alert('商品删除成功');
+        if (response.data.code === '200') {
+          ElMessage.success('商品删除成功');
+          console.log(response.data);
         }
       } catch (error) {
         console.error('删除商品失败:', error);
@@ -486,13 +701,14 @@ export default defineComponent({
 
     const updateStock = async () => {
       try {
-        const response = await updateStockpile({
-          productId: productId.toString(),
-          amount: newStock.value,
-        });
-        if (response.data.code === 200) {
-          maxQuantity.value = newStock.value;
-          alert('库存更新成功');
+        const response = await updateStockpile(
+          productId.toString(),
+          newStock.value
+        );
+        if (response.data.code === '200') {
+          stockAmount.value = newStock.value;
+          ElMessage.success('库存更新成功');
+          console.log(response.data);
         }
       } catch (error) {
         console.error('更新库存失败:', error);
@@ -502,9 +718,11 @@ export default defineComponent({
     const getStock = async () => {
       try {
         const response = await getStockpile(productId.toString());
-        if (response.data.code === 200) {
-          stockAmount.value = response.data.amount;
-          stockFrozen.value = response.data.frozen;
+        if (response.data.code === '200') {
+          stockAmount.value = response.data.data.amount;
+          stockFrozen.value = response.data.data.frozen;
+          console.log("StockAmount:" + response.data.data.amount);
+          console.log("StockFrozen:" + response.data.data.frozen);
         }
       } catch (error) {
         console.error('获取库存信息失败:', error);
@@ -519,10 +737,23 @@ export default defineComponent({
       addToCart,
       role,
       newStock,
-      updateInfo,
       deleteProduct,
       updateStock,
       getStock,
+      stockAmount,
+      showEditDialog,
+      fileList,
+      dialogImageUrl,
+      dialogVisible,
+      openEditDialog,
+      handleChange,
+      handlePictureCardPreview,
+      handleRemove,
+      handleUpdateProduct,
+      editForm,
+      addSpecification,
+      removeSpecification,
+      newSpecifications,
     };
   },
 });
@@ -573,5 +804,19 @@ export default defineComponent({
 
 .description, .detail {
   margin: 10px 0;
+}
+
+.action-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.manager-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 </style>
