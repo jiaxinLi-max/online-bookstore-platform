@@ -50,7 +50,7 @@ public class Product {
     private Set<Specification> specifications; // 关联规格
 
     //和库存的关联
-    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Stockpile stockpile;
 
     public void setSpecifications(Set<Specification> specifications) {

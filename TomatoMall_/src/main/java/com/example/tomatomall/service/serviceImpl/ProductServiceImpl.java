@@ -4,6 +4,7 @@ package com.example.tomatomall.service.serviceImpl;
 import com.example.tomatomall.TomatoMallApplication;
 import com.example.tomatomall.exception.TomatoMallException;
 import com.example.tomatomall.po.Product;
+import com.example.tomatomall.po.Specification;
 import com.example.tomatomall.po.Stockpile;
 import com.example.tomatomall.repository.ProductRepository;
 import com.example.tomatomall.repository.SpecificationRepository;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,6 +51,7 @@ public class ProductServiceImpl implements ProductService {
 
     //更新商品信息
     @Override
+    @Transactional
     public Boolean updateProductInfo(ProductVO productVO){
         Product product=productRepository.findById(productVO.getId()).orElse(null);
         if(product==null){
@@ -60,12 +63,19 @@ public class ProductServiceImpl implements ProductService {
         product.setDescription(productVO.getDescription());
         product.setCover(productVO.getCover());
         product.setDetail(productVO.getDetail());
+        // 操作原有集合，而非替换引用
+        Set<Specification> specifications = product.getSpecifications();
+        specifications.clear(); // 清空现有集合
 
-        product.getSpecifications().clear(); // 先清空原集合
-        product.getSpecifications().addAll(productVO.getSpecifications()); // 逐个添加新元素
+        // 添加新的 Specification 到原集合中
+        for (Specification spec : productVO.getSpecifications()) {
+            spec.setProduct(product); // 确保关联关系
+            specifications.add(spec); // 添加到原有集合
+        }
 
         productRepository.save(product);
         return true;
+
 
     }
 
