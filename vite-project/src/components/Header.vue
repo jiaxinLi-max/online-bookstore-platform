@@ -59,8 +59,6 @@ function logout() {
   })
 }
 
-
-
 </script>
 
 
@@ -70,7 +68,7 @@ function logout() {
     <el-row :gutter="10">
 
       <el-col :span="3" class="header-icon">
-        <router-link to="/dashboard" v-slot="{navigate}" class="no-link">
+        <router-link to="/home/all-products" v-slot="{navigate}" class="no-link">
           <h1 @click="navigate" class="header-text"> 番茄侦探小说城</h1>
         </router-link>
       </el-col>
