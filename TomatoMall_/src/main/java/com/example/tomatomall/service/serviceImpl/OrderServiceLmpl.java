@@ -7,14 +7,8 @@ import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.example.tomatomall.exception.TomatoMallException;
-import com.example.tomatomall.po.Cart;
-import com.example.tomatomall.po.Order;
-import com.example.tomatomall.po.Product;
-import com.example.tomatomall.po.Stockpile;
-import com.example.tomatomall.repository.CartRepository;
-import com.example.tomatomall.repository.OrderRepository;
-import com.example.tomatomall.repository.ProductRepository;
-import com.example.tomatomall.repository.StockpileRepository;
+import com.example.tomatomall.po.*;
+import com.example.tomatomall.repository.*;
 import com.example.tomatomall.service.OrderService;
 import com.example.tomatomall.vo.OrderVO;
 
@@ -25,10 +19,12 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceLmpl implements OrderService {
@@ -45,6 +41,8 @@ public class OrderServiceLmpl implements OrderService {
     @Autowired
     StockpileRepository stockpileRepository;
 
+    @Autowired
+    CartsOrdersRelationRepository cartsOrdersRelationRepository;
 
 
     @Value("${alipay.serverUrl}")
@@ -72,6 +70,7 @@ public class OrderServiceLmpl implements OrderService {
         order.setTotalAmount(calculateTotalAmount(orderVO.getCartItemIds()));
         order.setStatus("PENDING");
         orderRepository.save(order);
+        order.setExpireTime(LocalDateTime.now().plusMinutes(30));
         return order.toVO();
     }
 
@@ -111,21 +110,32 @@ public class OrderServiceLmpl implements OrderService {
     }
 
     @Override
-    public OrderVO payNotify(HttpServletRequest request){
+    public OrderVO payNotify(HttpServletRequest request, HttpServletResponse response){
         try{
-            Map<String, String> params = new HashMap<>();
-            Map<String, String[]> requestParams = request.getParameterMap();
-            for (String name : requestParams.keySet()) {
-                params.put(name, request.getParameter(name));
-                // System.out.println(name + " = " + request.getParameter(name));
-            }
-            String sign = params.get("sign");
-            String content = AlipaySignature.getSignCheckContentV1(params);
-            boolean checkSignature = AlipaySignature.rsa256CheckContent(content, sign, alipayPublicKey, "UTF-8"); // 验证签名
+//            Map<String, String> params = new HashMap<>();
+//            Map<String, String[]> requestParams = request.getParameterMap();
+//            for (String name : requestParams.keySet()) {i
+//                params.put(name, request.getParameter(name));
+//                // System.out.println(name + " = " + request.getParameter(name));
+//            }
+//            String sign = params.get("sign");
+//            String content = AlipaySignature.getSignCheckContentV1(params);
+//            boolean checkSignature = AlipaySignature.rsa256CheckContent(content, sign, alipayPublicKey, "UTF-8"); // 验证签名
+            Map<String, String> params = request.getParameterMap().entrySet().stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue()[0]));
 
-            if(checkSignature){
+            // 2. 验证支付宝签名（防止伪造请求）
+            boolean signVerified = AlipaySignature.rsaCheckV1(params, alipayPublicKey, "UTF-8", "RSA2");
+
+//            boolean signVerified=true;
+            if (!signVerified) {
+//                response.getWriter().print("fail"); // 签名验证失败，返回 fail
+                throw TomatoMallException.alipayFailure();
+            }
+
                 String tradeStatus = params.get("trade_status");
                 String orderId = params.get("out_trade_no");
+                Integer id = Integer.valueOf(orderId);
                 Order order = orderRepository.findById(Integer.parseInt(orderId))
                         .orElseThrow(TomatoMallException::orderNotExist);
                 if ("TRADE_SUCCESS".equals(tradeStatus)) {
@@ -140,7 +150,8 @@ public class OrderServiceLmpl implements OrderService {
                     order.setPaymentTime(new Date());
                     orderRepository.save(order);
 
-                    decreaseStockpile(order.getCartItemIds());
+                    decreaseStockpile(order.getCartItemIds(),id);
+//                    response.getWriter().print("success");
 
 
                 } else if ("TRADE_CLOSED".equals(tradeStatus)) {
@@ -149,12 +160,12 @@ public class OrderServiceLmpl implements OrderService {
                     // - 记录关闭原因
                     // - 解除库存锁定
                     order.setStatus("TRADE_CLOSED");
+                    orderRepository.save(order);
+                    releaseFrozenStock(order.getCartItemIds());
                 }
                 return order.toVO();
-            }
-            else {
-                throw TomatoMallException.alipayFailure();
-            }
+
+
         } catch(Exception e){
             System.out.println("支付回调处理失败: " + e.getMessage());
             return null; // 或者返回错误的 OrderVO
@@ -178,6 +189,9 @@ public class OrderServiceLmpl implements OrderService {
                 if(cartItem.getQuantity()>stockpile.getAmount()){
                     throw TomatoMallException.exceedAmount();
                 }
+                stockpile.setAmount(stockpile.getAmount()-cartItem.getQuantity());
+                stockpile.setFrozen(stockpile.getFrozen()+cartItem.getQuantity());
+                stockpileRepository.save(stockpile);
                 Product product= productRepository.findById(productId).orElse(null);
                 BigDecimal itemTotal = product.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
                 totalAmount = totalAmount.add(itemTotal);
@@ -188,7 +202,7 @@ public class OrderServiceLmpl implements OrderService {
     }
 
 
-    private void decreaseStockpile(List<Integer> cartItemIds){
+    private void decreaseStockpile(List<Integer> cartItemIds,Integer orderId){
         for(Integer cartItemId:cartItemIds){
             Cart cartItem = cartRepository.findById(cartItemId).orElse(null);
             if (cartItem != null) {
@@ -201,7 +215,27 @@ public class OrderServiceLmpl implements OrderService {
                 if(cartItem.getQuantity()>stockpile.getAmount()){
                     throw TomatoMallException.exceedAmount();
                 }
-                stockpile.setAmount(stockpile.getAmount()-cartItem.getQuantity());
+                stockpile.setFrozen(stockpile.getFrozen()-cartItem.getQuantity());
+                CartsOrdersRelation cartsOrdersRelation_new=new CartsOrdersRelation();
+                cartsOrdersRelation_new.setOrderId(orderId);
+                cartsOrdersRelation_new.setCartitemId(cartItemId);
+                cartsOrdersRelationRepository.save(cartsOrdersRelation_new);
+                stockpileRepository.save(stockpile);
+            }
+        }
+    }
+
+    //如果支付失败的话
+    private void releaseFrozenStock(List<Integer> cartItemIds) {
+        for (Integer cartItemId : cartItemIds) {
+            Cart cartItem = cartRepository.findById(cartItemId).orElse(null);
+            if (cartItem != null) {
+                Stockpile stockpile = stockpileRepository.findByProductId(cartItem.getProductId());
+                if (stockpile != null) {
+                    stockpile.setAmount(stockpile.getAmount() + cartItem.getQuantity());
+                    stockpile.setFrozen(stockpile.getFrozen() - cartItem.getQuantity());
+                    stockpileRepository.save(stockpile);
+                }
             }
         }
     }
