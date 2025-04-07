@@ -40,4 +40,6 @@ public class TomatoMallException extends RuntimeException {
   public static TomatoMallException alipayFailure(){return new TomatoMallException("支付宝签名认证失败","000");}
 
   public static TomatoMallException invalidProductId(){return new TomatoMallException("无效的商品id","400");}
+
+  public static TomatoMallException advertisementNotExist(){return new TomatoMallException("广告不存在","400");}
 }
