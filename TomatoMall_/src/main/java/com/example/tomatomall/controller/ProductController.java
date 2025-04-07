@@ -1,6 +1,7 @@
 package com.example.tomatomall.controller;
 
 
+import com.example.tomatomall.po.Stockpile;
 import com.example.tomatomall.service.ProductService;
 import com.example.tomatomall.vo.ProductVO;
 import com.example.tomatomall.vo.Response;
@@ -31,7 +32,7 @@ public class ProductController {
      * 获取特定商品信息
      */
     @GetMapping("/{id}")
-    public Response<ProductVO> getProductInfo(@PathVariable Integer id){
+    public Response<ProductVO> getProductInfo(@PathVariable String id){
         return Response.buildSuccess(productService.getProductInfo(id));
     }
 
@@ -39,7 +40,7 @@ public class ProductController {
      * 更新商品信息
      */
     @PutMapping
-    public Response<Boolean> updateProductInfo(@RequestBody ProductVO productVO){
+    public Response<String> updateProductInfo(@RequestBody ProductVO productVO){
         return Response.buildSuccess(productService.updateProductInfo(productVO));
     }
 
@@ -47,7 +48,7 @@ public class ProductController {
      * 增加商品
      */
     @PostMapping
-    public Response<Boolean> addProduct(@RequestBody ProductVO productVO){
+    public Response<ProductVO> addProduct(@RequestBody ProductVO productVO){
         return Response.buildSuccess(productService.addProduct(productVO));
     }
 
@@ -55,19 +56,19 @@ public class ProductController {
      * 删除商品
      */
     @DeleteMapping("/{id}")
-    public Response<Boolean> deleteProduct(@PathVariable Integer id){
+    public Response<String> deleteProduct(@PathVariable String id){
         return Response.buildSuccess(productService.deleteProduct(id));
     }
 
     /**
      * 更新商品库存
      * @param productId
-     * @param amount
+     * @param stockpileVO
      * @return
      */
-    @PatchMapping("/stockpile/{productId}/{amount}")
-    public Response<Boolean> updateStock(@PathVariable Integer productId, @PathVariable Integer amount) {
-        return Response.buildSuccess(productService.updateStock(productId, amount));
+    @PatchMapping("/stockpile/{productId}")
+    public Response<String> updateStock(@PathVariable String productId, @RequestBody StockpileVO stockpileVO) {
+        return Response.buildSuccess(productService.updateStock(productId, stockpileVO));
     }
 
 
@@ -77,7 +78,7 @@ public class ProductController {
      * @return
      */
     @GetMapping("/stockpile/{productId}")
-    public Response<StockpileVO> getStock(@PathVariable Integer productId){
+    public Response<StockpileVO> getStock(@PathVariable String productId){
         return Response.buildSuccess(productService.getStock(productId));
     }
 

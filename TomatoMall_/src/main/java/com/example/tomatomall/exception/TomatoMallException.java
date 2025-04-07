@@ -15,7 +15,7 @@ public class TomatoMallException extends RuntimeException {
     return code;
   }
 
-  public static TomatoMallException productNotExist(){return new TomatoMallException("商品不存在","000");}
+  public static TomatoMallException productNotExist(){return new TomatoMallException("商品不存在","400");}
 
   public static TomatoMallException titleAlreadyExist(){return new TomatoMallException("该商品名已经存在","000");}
 
@@ -38,4 +38,6 @@ public class TomatoMallException extends RuntimeException {
   public static TomatoMallException orderNotExist(){return new TomatoMallException("订单不存在","000");}
 
   public static TomatoMallException alipayFailure(){return new TomatoMallException("支付宝签名认证失败","000");}
+
+  public static TomatoMallException invalidProductId(){return new TomatoMallException("无效的商品id","400");}
 }
