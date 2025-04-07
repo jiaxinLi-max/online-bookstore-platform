@@ -27,7 +27,7 @@ public class AccountController {
      * 创建新的用户
      */
     @PostMapping()
-    public Response<Boolean> createUser(@RequestBody AccountVO accountVO) {
+    public Response<String> createUser(@RequestBody AccountVO accountVO) {
         return Response.buildSuccess(accountService.register(accountVO));
     }
 
@@ -43,7 +43,7 @@ public class AccountController {
      * 登录
      */
     @PostMapping("/login")
-    public Response<String> login(@RequestParam("username") String username, @RequestParam("password") String password) {
-        return Response.buildSuccess(accountService.login(username,password));
+    public Response<String> login(@RequestBody AccountVO accountVO) {
+        return Response.buildSuccess(accountService.login(accountVO.getUsername(), accountVO.getPassword()));
     }
 }

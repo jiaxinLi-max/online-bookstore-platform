@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -75,6 +76,11 @@ public class Order {
     @Basic
     @Column(name = "payment_form", length = 1024)
     private String paymentForm;
+
+    @Basic
+    @Column(name = "expire_time")
+    private LocalDateTime expireTime;
+
 
 
     public OrderVO toVO(){

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -20,7 +21,7 @@ public class ProductVO {
     private String description; // 商品描述
     private String cover;       // 商品封面URL
     private String detail;      // 商品详情
-    private Set<Specification> specifications; // 商品规格信息
+    private Set<Specification> specifications = new HashSet<>();; // 商品规格信息
 
     public Product toPO(){
         Product product=new Product();

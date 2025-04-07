@@ -425,7 +425,7 @@
         <el-upload
             action="http://localhost:8080/api/images"
             list-type="picture-card"
-            :auto-upload="true"
+            :auto-upload="false"
             :file-list="fileList"
             :on-change="handleChange"
             :on-remove="handleRemove"
@@ -559,8 +559,6 @@ export default defineComponent({
         const res = await getImage(rawFile);
         if (res && res.code === '200') {
           editForm.value.cover = res.data;
-          fileListNew[0].url = editForm.value.cover; // 更新文件列表的URL
-          fileList.value = fileListNew; // 更新文件列表
           ElMessage.success('封面上传成功');
         } else {
           ElMessage.error('上传失败，请重试');
@@ -586,7 +584,6 @@ export default defineComponent({
         return;
       }
 
-      console.log("TrueSpec:" + specifications.value[0].value)
       try {
         const res = await updateProductInfo({
           id: productId,
@@ -599,11 +596,8 @@ export default defineComponent({
           specifications: newSpecifications.value,
         });
         if (res.data.code === '200') {
-          console.log("NewSpec:" + newSpecifications.value[0].value)
-          console.log("TrueSpec:" + specifications.value[0].value)
           ElMessage.success('更新商品成功');
           await loadProductDetails(productId);
-          console.log("TrueSpecLength:" + specifications.value.length)
           editForm.value.title = product.value.title;
           editForm.value.description = product.value.description;
           editForm.value.detail = product.value.detail;
