@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { router } from '../router'
 import {parseRole, parseTime} from "../utils"
-import { User, SwitchButton, Plus } from "@element-plus/icons-vue"
+import { User, SwitchButton, Plus,ShoppingCart } from "@element-plus/icons-vue"
 import {userInfo} from "../api/user.ts";
  // 导入 Plus 图标
 import {ref,  onMounted,computed} from 'vue';
@@ -78,8 +78,17 @@ function logout() {
 
       </el-col>
 
+      <!-- 新增按钮，跳转到所有广告页面 -->
+      <el-col :span="1" class="header-icon">
+        <router-link to="/home/all-advertisements" class="no-link">
+          <div style="color:white; font-size: small;">获取所有广告</div> <!-- 添加文本标签 -->
+        </router-link>
+      </el-col>
+
       <el-col :span="15">
       </el-col>
+
+
 
 
 <!--      <el-col :span="1" class="header-icon">-->
@@ -92,13 +101,19 @@ function logout() {
 <!--      <el-col :span="1" class="header-icon">-->
 <!--        <button @click="goToCart">购物车 ({{ cartItemCount }})</button>-->
 <!--      </el-col>-->
-
       <el-col :span="1" class="header-icon">
-          <router-link to="/home/cart" class="no-link">
-<!--            <button @click="goToCart">购物车 ({{ cartItemCount }})</button>-->
-            <button @click="goToCart">购物车 </button>
-          </router-link>
+        <router-link to="/home/cart" class="no-link">
+          <el-icon @click="goToCart" :size="35" color="white">
+            <ShoppingCart /> <!-- 使用 Element Plus 的购物车图标 -->
+          </el-icon>
+        </router-link>
       </el-col>
+<!--      <el-col :span="1" class="header-icon">-->
+<!--          <router-link to="/home/cart" class="no-link">-->
+<!--&lt;!&ndash;            <button @click="goToCart">购物车 ({{ cartItemCount }})</button>&ndash;&gt;-->
+<!--            <button @click="goToCart">购物车 </button>-->
+<!--          </router-link>-->
+<!--      </el-col>-->
       <template v-if="role === 'MANAGER'">
       <el-col :span="1" class="header-icon">
           <router-link to="/home/create-product" v-slot="{ navigate }">

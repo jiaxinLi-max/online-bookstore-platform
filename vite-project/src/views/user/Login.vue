@@ -265,7 +265,8 @@ function handleLogin() {
 
       router.push({ path: "/home/all-products" });
 
-    } else if (res.data.code === '401') {
+    } else  {
+      //console.log("error");
       ElMessage({
         message: res.data.msg,
         type: 'error',

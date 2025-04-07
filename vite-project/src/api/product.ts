@@ -5,7 +5,7 @@ import {axios} from '../utils/request'
 //import {Specification} from './specification.ts'
 // 定义商品接口
 export interface Product {
-    id: number;
+    id: string;
     title: string;
     price: number;
     rate:number;
@@ -116,7 +116,7 @@ export const getAllProduct = () => {
 //     }
 // };
 
-export const getProduct = (productId: number) => {
+export const getProduct = (productId: string) => {
     const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
     return axios.get(`${PRODUCT_MODULE}/${productId}`,  {
         headers: {
