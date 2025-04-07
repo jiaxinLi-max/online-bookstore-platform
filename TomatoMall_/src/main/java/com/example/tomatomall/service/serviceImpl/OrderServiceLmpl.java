@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +73,7 @@ public class OrderServiceLmpl implements OrderService {
         order.setTotalAmount(calculateTotalAmount(orderVO.getCartItemIds()));
         order.setStatus("PENDING");
         orderRepository.save(order);
+        order.setExpireTime(LocalDateTime.now().plusMinutes(30));
         return order.toVO();
     }
 
@@ -149,6 +151,8 @@ public class OrderServiceLmpl implements OrderService {
                     // - 记录关闭原因
                     // - 解除库存锁定
                     order.setStatus("TRADE_CLOSED");
+                    orderRepository.save(order);
+                    releaseFrozenStock(order.getCartItemIds());
                 }
                 return order.toVO();
             }
@@ -178,6 +182,9 @@ public class OrderServiceLmpl implements OrderService {
                 if(cartItem.getQuantity()>stockpile.getAmount()){
                     throw TomatoMallException.exceedAmount();
                 }
+                stockpile.setAmount(stockpile.getAmount()-cartItem.getQuantity());
+                stockpile.setFrozen(stockpile.getFrozen()+cartItem.getQuantity());
+                stockpileRepository.save(stockpile);
                 Product product= productRepository.findById(productId).orElse(null);
                 BigDecimal itemTotal = product.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
                 totalAmount = totalAmount.add(itemTotal);
@@ -201,7 +208,23 @@ public class OrderServiceLmpl implements OrderService {
                 if(cartItem.getQuantity()>stockpile.getAmount()){
                     throw TomatoMallException.exceedAmount();
                 }
-                stockpile.setAmount(stockpile.getAmount()-cartItem.getQuantity());
+                stockpile.setFrozen(stockpile.getFrozen()-cartItem.getQuantity());
+                stockpileRepository.save(stockpile);
+            }
+        }
+    }
+
+    //如果支付失败的话
+    private void releaseFrozenStock(List<Integer> cartItemIds) {
+        for (Integer cartItemId : cartItemIds) {
+            Cart cartItem = cartRepository.findById(cartItemId).orElse(null);
+            if (cartItem != null) {
+                Stockpile stockpile = stockpileRepository.findByProductId(cartItem.getProductId());
+                if (stockpile != null) {
+                    stockpile.setAmount(stockpile.getAmount() + cartItem.getQuantity());
+                    stockpile.setFrozen(stockpile.getFrozen() - cartItem.getQuantity());
+                    stockpileRepository.save(stockpile);
+                }
             }
         }
     }
