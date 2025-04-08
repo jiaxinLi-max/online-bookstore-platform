@@ -87,21 +87,46 @@ export const removeItemFromCart = (userId: number, cartItemId: number) => {
 };
 
 // 修改购物车商品数量
+// export const updateCartItemQuantity = (userId: number, cartItemId: number, quantity: number) => {
+//     const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
+//
+//     // 构建请求的 URL
+//     const url = `${CART_MODULE}/${cartItemId}/quantity`; // 使用 cartItemId 作为路径参数
+//
+//     return axios.patch(url, {
+//         quantity: quantity // 使用 JSON 格式的请求体传递 quantity
+//     }, {
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'token': token, // 使用 'token' 作为请求头
+//         },
+//         params: {
+//             userId: userId // 将 userId 作为查询参数传递
+//         }
+//     }).then(res => {
+//         console.log("更新数量响应:", res);
+//         return res; // 返回响应数据
+//     }).catch(error => {
+//         console.error("修改数量失败:", error);
+//         throw error; // 抛出错误以便后续处理
+//     });
+// };
+
+//不是json
 export const updateCartItemQuantity = (userId: number, cartItemId: number, quantity: number) => {
     const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
 
     // 构建请求的 URL
     const url = `${CART_MODULE}/${cartItemId}/quantity`; // 使用 cartItemId 作为路径参数
 
-    return axios.patch(url, {
-        quantity: quantity // 使用 JSON 格式的请求体传递 quantity
-    }, {
+    return axios.patch(url, null, { // 不需要请求体，因此传递 null
         headers: {
             'Content-Type': 'application/json',
             'token': token, // 使用 'token' 作为请求头
         },
         params: {
-            userId: userId // 将 userId 作为查询参数传递
+            userId: userId, // 将 userId 作为查询参数传递
+            quantity: quantity // 将 quantity 作为查询参数传递
         }
     }).then(res => {
         console.log("更新数量响应:", res);

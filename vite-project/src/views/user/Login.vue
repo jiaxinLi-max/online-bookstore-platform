@@ -265,7 +265,8 @@ function handleLogin() {
 
       router.push({ path: "/home/all-products" });
 
-    } else {
+    } else  {
+      //console.log("error");
       ElMessage({
         message: res.data.msg,
         type: 'error',

@@ -150,10 +150,22 @@ const router = createRouter({
                     meta: { title: '商品列表' },
                 },
                 {
+                    path: 'all-advertisements', // 子路由路径，去掉前导斜杠
+                    name: 'AllAdvertisements',
+                    component: () => import('../views/advertisement/AllAdvertisement.vue'),
+                    meta: { title: '广告列表' },
+                },
+                {
                     path: 'create-product',
                     name: 'CreateProduct',
                     component: () => import('../views/product/CreateProduct.vue'), // 确保路径正确
                     meta: { title: '创建商品' },
+                },
+                {
+                    path: 'create-advertisement',
+                    name: 'CreateAdvertisement',
+                    component: () => import('../views/advertisement/CreateAdvertisement.vue'), // 确保路径正确
+                    meta: { title: '创建广告' },
                 },
                 {
                     path: 'product/:productId', // 动态路由，用于商品详情

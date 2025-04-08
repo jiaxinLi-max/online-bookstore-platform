@@ -471,7 +471,7 @@ export default defineComponent({
   methods: {updateProductInfo},
   setup() {
     const route = useRoute();
-    const productId = Number(route.params.productId);
+    const productId = Number(route.params.productId).toString();
 
     const role = ref(sessionStorage.getItem('role') || '');
     const newStock = ref(0);
@@ -511,7 +511,7 @@ export default defineComponent({
     });
 
     // 加载产品详情
-    const loadProductDetails = async (productId: number) => {
+    const loadProductDetails = async (productId: string) => {
       try {
         const response = await getProduct(productId);
         const productData = response.data.data; // 假设响应的结构是 { code: 200, data: {...} }
@@ -587,7 +587,7 @@ export default defineComponent({
 
       try {
         const res = await updateProductInfo({
-          id: productId.toString(),
+          id: productId,
           title: editForm.value.title,
           price: editForm.value.price,
           rate: editForm.value.rate,

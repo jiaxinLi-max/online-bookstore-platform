@@ -11,8 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class StockpileVO {
     private Integer id;        // 库存ID
-    private Integer amount;       // 剩余库存数量
-    private Integer frozen;       // 已冻结库存（可能用于订单未支付状态）
+    private Integer amount=0;       // 剩余库存数量
+    private Integer frozen=0;       // 已冻结库存（可能用于订单未支付状态）
     private Integer productId; // 关联的商品ID
 
     public Stockpile toPO(){
