@@ -696,10 +696,10 @@ export default defineComponent({
 
     const updateStock = async () => {
       try {
-        const response = await updateStockpile(
-          productId.toString(),
-          newStock.value
-        );
+        const response = await updateStockpile({
+          productId: productId.toString(),
+          amount: newStock.value,
+        });
         if (response.data.code === '200') {
           stockAmount.value = newStock.value;
           ElMessage.success('库存更新成功');
