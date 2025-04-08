@@ -578,6 +578,7 @@ export default defineComponent({
     };
 
     async function handleUpdateProduct() {
+      console.log("Update product!");
       const token = sessionStorage.getItem('token');
       if (!token) {
         ElMessage.error('请先登录!');
