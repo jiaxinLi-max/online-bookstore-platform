@@ -1,19 +1,4 @@
-<!--<template>-->
-<!--  <el-main class="advertisement-list bgimage">-->
-<!--    <el-card-->
-<!--        v-for="advertisement in advertisements"-->
-<!--        :key="advertisement.id"-->
-<!--        class="advertisement-card"-->
-<!--        @click="goToProductDetail(advertisement.product_id)"-->
-<!--    >-->
-<!--      <div class="product-image">-->
-<!--        <img :src='advertisement.image_url' alt="Product Cover" />-->
-<!--      </div>-->
-<!--      <h3>{{ advertisement.title }}</h3>-->
-<!--      <p>点击查看详情</p>-->
-<!--    </el-card>-->
-<!--  </el-main>-->
-<!--</template>-->
+
 <template>
   <el-main class="advertisement-list bgimage">
     <!-- 创建广告按钮 -->
@@ -30,12 +15,13 @@
         v-for="advertisement in advertisements"
         :key="advertisement.id"
         class="advertisement-card"
-        @click="goToProductDetail(advertisement.product_id)"
+        @click="goToProductDetail(advertisement.productId)"
     >
-      <div class="product-image">
-        <img :src="advertisement.image_url" alt="Product Cover" />
+      <div class="advertisement-image">
+        <img :src="advertisement.imgUrl" alt="Advertisement Cover" />
       </div>
       <h3>{{ advertisement.title }}</h3>
+      <p class="advertisement-content">{{ advertisement.content }}</p>
       <p>点击查看详情</p>
     </el-card>
   </el-main>
@@ -55,7 +41,8 @@ async function get_getAlladvertisements() {
     console.log("get_getAllAdvertisements",res);
     if (res.data && Array.isArray(res.data.data)) {
       advertisements.value = res.data.data;
-      console.log(res.data);
+      console.log("res.data.data",res.data.data);
+      console.log(advertisements.value[0]);
     } else {
       console.error('获取数据失败：响应格式不符合预期');
     }
@@ -83,7 +70,7 @@ onMounted(() => {
 
 <style scoped>
 
-.product-list {
+.advertisement-list {
   min-height: 800px;
   display: flex;
   flex-wrap: wrap; /* 允许子元素换行 */
@@ -91,7 +78,7 @@ onMounted(() => {
   gap: 20px; /* 设置子元素之间的间距 */
 }
 
-.product-card {
+.advertisement-card {
   width: calc((100% / 4) - 20px); /* 每行三个卡片，减去间距 */
   padding: 20px;
   margin: 10px;
@@ -100,11 +87,11 @@ onMounted(() => {
   box-sizing: border-box; /* 确保 padding 和 border 不影响宽度 */
 }
 
-.product-card:hover {
+.advertisement-card:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.product-image img {
+.advertisement-image img {
   width: 100%; /* 确保图片宽度充满容器 */
   height: auto; /* 高度自适应 */
   border-radius: 8px; /* 圆角效果 */

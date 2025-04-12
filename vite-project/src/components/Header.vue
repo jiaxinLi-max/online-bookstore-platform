@@ -85,7 +85,7 @@ function logout() {
         </router-link>
       </el-col>
 
-      <el-col :span="15">
+      <el-col :span="14">
       </el-col>
 
 

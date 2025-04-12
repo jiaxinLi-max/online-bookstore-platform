@@ -5,8 +5,8 @@ export interface Advertisement {
     id: number;
     title: string;
     content: string;
-    image_url: string;
-    product_id: number;
+    imageUrl: string;
+    productId: number;
 }
 type advertisementInfo = {
     title: string;

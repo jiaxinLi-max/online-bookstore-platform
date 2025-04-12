@@ -754,12 +754,20 @@ export default defineComponent({
 </script>
 
 <style scoped>
+html, body {
+  height: 100%;
+}
 .product-detail {
   padding: 20px;
   display: flex;
   justify-content: center; /* 水平居中 */
   align-items: center; /* 垂直居中 */
   flex-direction: column; /* 使内容垂直排列 */
+  background-image: url("../../assets/kenan.png");
+  background-size: cover;
+  background-position: center top;
+  min-height: 100vh;
+  color: black; /* 设置文字颜色为白色，确保可读性 */
 }
 
 .product-info {
@@ -768,7 +776,8 @@ export default defineComponent({
   align-items: flex-start; /* 垂直起始对齐 */
   width: 100%;
   max-width: 1200px; /* 限制最大宽度 */
-  margin: 0 auto; /* 水平居中 */
+  margin: 0 auto;
+  background-color: rgba(255,255, 255, 0.6); /* 可以给商品信息部分添加白色背景，以提升可读性 */
 }
 
 .product-image {

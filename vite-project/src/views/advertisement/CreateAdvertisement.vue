@@ -14,8 +14,19 @@
       </el-form-item>
 
       <!-- 商品 ID -->
-      <el-form-item label="商品 ID" prop="productId">
-        <el-input v-model="productId" placeholder="请输入商品 ID"></el-input>
+<!--      <el-form-item label="商品 ID" prop="productId">-->
+<!--        <el-input v-model="productId" placeholder="请输入商品 ID"></el-input>-->
+<!--      </el-form-item>-->
+      <!-- 商品选择下拉框 -->
+      <el-form-item label="选择商品" prop="productId">
+        <el-select v-model="selectedProductId" placeholder="请选择商品" style="width: 200px; margin-bottom: 20px;">
+          <el-option
+              v-for="product in products"
+              :key="product.id"
+              :label="product.title"
+              :value="product.id"
+          />
+        </el-select>
       </el-form-item>
 
 
@@ -60,10 +71,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { ref, computed,onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import type { UploadFile } from 'element-plus';
 import { createAdvertisement} from "../../api/advertisement.ts";
+import {getAllProduct,Product} from "../../api/product.ts";
 import { Plus } from '@element-plus/icons-vue';
 import { getImage } from '../../api/tools';
 
@@ -74,11 +86,12 @@ const fileList = ref<UploadFile[]>([]);
 const dialogImageUrl = ref('');
 const dialogVisible = ref(false);
 const productId = ref('');
-
+const products = ref<Product[]>([]); // 存储商品列表
+const selectedProductId = ref<number | null>(null); // 修改为对应的类型
 
 // 计算属性，检查输入状态
 const createDisabled = computed(() => {
-  return !title.value || !content.value  || !imgUrl.value||!productId.value;
+  return !title.value || !content.value  || !imgUrl.value;
 });
 
 
@@ -124,17 +137,19 @@ async function handleCreateAdvertisement() {
     title: title.value,
     content: content.value,
     imgUrl: imgUrl.value,
-    productId: productId.value,
+    //productId: productId.value,
+    productId: selectedProductId.value, // 使用选中的商品 ID
   };
 
   try {
     const res = await createAdvertisement(payload);
     if (res.data.code === '200') {
-      ElMessage.success('创建商品成功');
+      ElMessage.success('创建广告成功');
       // 重置输入框
       title.value = '';
       imgUrl.value = '';
       fileList.value = [];
+      selectedProductId.value = null; // 重置已选择的商品
     } else {
       ElMessage.error(res.data.message);
     }
@@ -143,6 +158,22 @@ async function handleCreateAdvertisement() {
     ElMessage.error('创建广告失败');
   }
 }
+// 获取所有商品数据
+async function getAllProductsData() {
+  try {
+    const res = await getAllProduct();
+    if (res.data && Array.isArray(res.data.data)) {
+      products.value = res.data.data;
+    } else {
+      console.error('获取商品数据失败：响应格式不符合预期');
+    }
+  } catch (error) {
+    console.error('获取商品列表失败:', error);
+  }
+}
+onMounted(() => {
+  getAllProductsData();
+});
 </script>
 
 <style scoped>
