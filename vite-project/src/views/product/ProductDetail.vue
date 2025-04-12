@@ -578,6 +578,7 @@ export default defineComponent({
     };
 
     async function handleUpdateProduct() {
+      console.log("Update product!");
       const token = sessionStorage.getItem('token');
       if (!token) {
         ElMessage.error('请先登录!');
@@ -695,10 +696,10 @@ export default defineComponent({
 
     const updateStock = async () => {
       try {
-        const response = await updateStockpile(
-          productId.toString(),
-          newStock.value
-        );
+        const response = await updateStockpile({
+          productId: productId.toString(),
+          amount: newStock.value,
+        });
         if (response.data.code === '200') {
           stockAmount.value = newStock.value;
           ElMessage.success('库存更新成功');
