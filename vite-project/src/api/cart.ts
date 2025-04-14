@@ -22,7 +22,6 @@ export interface Cart {
 export interface shippingAddress {
     name: string,
     telephone: string,
-    email: string,
     location: string,
 }
 
@@ -257,28 +256,4 @@ export const postOrder = (order: number) => {
         console.error("发起支付失败:", error);
         throw error; // 抛出错误以便后续处理
     });
-}
-
-export const notifyOrder = (order: string, status: string, time: string, trade: string, total: number) => {
-    const token = sessionStorage.getItem('token');
-
-    const url = `${ORDER_MODULE}/notify`;
-
-    return axios.post(url, {
-        headers: {
-            'token': token,
-        },
-        params: {
-            orderId: order,
-            paymentStatus: status,
-            paymentTime: time,
-            tradeNo: trade,
-            totalAmount: total
-        }
-    }).then(res => {
-        console.log('支付回调成功, Response:', res);
-    }).catch(error => {
-        console.error('支付回调失败:', error);
-        throw error;
-    })
 }
