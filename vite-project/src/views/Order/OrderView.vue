@@ -40,6 +40,8 @@ export default {
         if (response.data.code === '200') {
           console.log("支付成功！:", response.data.data.OrderId, response.data.data.TotalAmount);
           payFormHtml.value = response.data.data.paymentForm;
+        } else {
+          console.error("支付失败！:", response.data);
         }
       } catch (error) {
         ElMessage.error('支付失败，请稍后再试');
