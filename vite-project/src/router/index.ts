@@ -144,7 +144,7 @@ const router = createRouter({
                     meta: { title: '购物车' },
                 },
                 {
-                    path: 'order/:orderId',
+                    path: 'order/:orderId/:totalAmount/:createTime',
                     name: 'Order',
                     component: () => import('../views/Order/OrderView.vue'),
                     meta: {title: '订单'},

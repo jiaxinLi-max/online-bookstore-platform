@@ -270,6 +270,8 @@ export default {
 
     const generateOrder = async () => {
       let orderId: number;
+      let totalAmount: number = 0;
+      let createTime: string;
       const cartIds: string[] = [];
 
       for (const product of products.value) {
@@ -290,12 +292,16 @@ export default {
         });
         if (res.data.code === '200') {
           orderId = res.data.data.orderId;
+          totalAmount = res.data.data.totalAmount;
+          createTime = res.data.data.createTime;
           console.log("订单ID:", res.data.data.orderId);
 
           await router.push({
             name: 'order',
             params: {
-              orderId: orderId
+              orderId: orderId,
+              totalAmount: totalAmount,
+              createTime: createTime,
             }
           });
         } else {
