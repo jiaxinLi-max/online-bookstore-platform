@@ -88,8 +88,8 @@ public class Order {
         orderVO.setId(this.id);
         orderVO.setUserId(this.userId);
         orderVO.setCartItemIds(this.cartItemIds);
-        orderVO.setShippingAddress(this.shippingAddress);
-        orderVO.setPaymentMethod(this.paymentMethod);
+        orderVO.setShipping_address(this.shippingAddress);
+        orderVO.setPayment_method(this.paymentMethod);
         orderVO.setTotalAmount(this.totalAmount);
         orderVO.setCreateTime(this.createTime);
         orderVO.setStatus(this.status);

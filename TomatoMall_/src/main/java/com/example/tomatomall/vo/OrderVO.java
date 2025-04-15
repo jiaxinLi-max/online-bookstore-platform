@@ -23,9 +23,9 @@ public class OrderVO {
 
     private List<Integer> cartItemIds;
 
-    private Address shippingAddress;
+    private Address shipping_address;
 
-    private String paymentMethod;
+    private String payment_method;
 
     private BigDecimal totalAmount;
 
@@ -44,8 +44,8 @@ public class OrderVO {
         order.setId(this.id);
         order.setUserId(this.userId);
         order.setCartItemIds(this.cartItemIds);
-        order.setShippingAddress(this.shippingAddress);
-        order.setPaymentMethod(this.paymentMethod);
+        order.setShippingAddress(this.shipping_address);
+        order.setPaymentMethod(this.payment_method);
         order.setTotalAmount(this.totalAmount);
         order.setCreateTime(this.createTime);
         order.setStatus(this.status);
