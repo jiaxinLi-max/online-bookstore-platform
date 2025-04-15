@@ -25,6 +25,12 @@ export interface shippingAddress {
     address: string,
 }
 
+type form = {
+    cartItemIds: number[];
+    shipping_address: shippingAddress;
+    payment_method: string;
+}
+
 const paymentMethod = 'ALIPAY'
 
 export const addCart = (userId: number, productId: number, quantity: number) => {
@@ -214,17 +220,13 @@ export const cartService = {
     // },
 };
 
-export const placeOrder = (cartItems: number[], address: shippingAddress) => {
+export const placeOrder = (Form: form) => {
     const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
 
     // 构建请求的 URL
     const url = `${CART_MODULE}/checkout`; // 只需 cartItemId 作为路径参数
 
-    return axios.post(url, {
-        cartItems,
-        address,
-        paymentMethod,
-    },{
+    return axios.post(url, Form,{
         headers: {
             'token': token, // 使用 'token' 作为请求头
             'Content-Type': 'application/json',
