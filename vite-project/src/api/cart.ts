@@ -22,8 +22,10 @@ export interface Cart {
 export interface shippingAddress {
     name: string,
     telephone: string,
-    location: string,
+    address: string,
 }
+
+const paymentMethod = 'ALIPAY'
 
 export const addCart = (userId: number, productId: number, quantity: number) => {
     const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
@@ -212,21 +214,21 @@ export const cartService = {
     // },
 };
 
-export const placeOrder = (cartItems: string[], address: shippingAddress) => {
+export const placeOrder = (cartItems: number[], address: shippingAddress) => {
     const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
 
     // 构建请求的 URL
     const url = `${CART_MODULE}/checkout`; // 只需 cartItemId 作为路径参数
 
     return axios.post(url, {
+        cartItems,
+        address,
+        paymentMethod,
+    },{
         headers: {
             'token': token, // 使用 'token' 作为请求头
+            'Content-Type': 'application/json',
         },
-        params: {
-            cartItemIds: cartItems,
-            shipping_address: address,
-            payment_method: 'ALIPAY'
-        }
     }).then(res => {
         console.log("发起订单成功, Response:", res);
         return res; // 返回响应数据

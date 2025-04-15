@@ -272,10 +272,10 @@ export default {
       let orderId: number;
       let totalAmount: number = 0;
       let createTime: string;
-      const cartIds: string[] = [];
+      const cartIds: number[] = [];
 
       for (const product of products.value) {
-        cartIds.push(product.cartItemId.toString());
+        cartIds.push(product.cartItemId);
       }
       console.log("商品信息:", cartIds);
 
@@ -288,7 +288,7 @@ export default {
         const res = await placeOrder(cartIds, {
           name: name.value,
           telephone: telephone.value,
-          location: location.value,
+          address: location.value,
         });
         if (res.data.code === '200') {
           orderId = res.data.data.orderId;
