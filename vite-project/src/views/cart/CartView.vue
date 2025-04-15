@@ -297,10 +297,10 @@ export default {
       try {
         const res = await placeOrder(formData);
         if (res.data.code === '200') {
-          orderId = res.data.data.orderId;
+          orderId = res.data.data.id;
           totalAmount = res.data.data.totalAmount;
           createTime = res.data.data.createTime;
-          console.log("订单ID:", res.data.data.orderId);
+          console.log("订单ID:", res.data.data.id);
 
           await router.push({
             name: 'order',
