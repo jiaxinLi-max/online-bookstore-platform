@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { getAllProduct, createProduct, Product } from '../../api/product.ts';
+import { getAllProduct, Product } from '../../api/product.ts';
 
 const products = ref<Product[]>([]);
 // 定义静态假数据
@@ -99,6 +99,8 @@ onMounted(() => {
   cursor: pointer;
   transition: box-shadow 0.3s;
   box-sizing: border-box; /* 确保 padding 和 border 不影响宽度 */
+  background-color: rgba(255, 255, 255, 0.6); /* 透明白色背景 */
+  border: 1px solid rgba(255, 255, 255, 0.5); /* 半透明边框 */
 }
 
 .product-card:hover {
@@ -114,7 +116,11 @@ onMounted(() => {
   object-fit: cover; /* 裁剪图片以适应容器 */
 }
 .bgimage {
-  background-color: rgba(0, 0, 0, 0.3);
+  //background-color: rgba(0, 0, 0, 0.3);
+  //background-image: url("../../assets/kenan.png");
   background-image: url("../../assets/kenan.png");
+  background-size: cover;
+  background-position: center top;
+  min-height: 100vh;
 }
 </style>

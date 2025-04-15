@@ -297,13 +297,13 @@ export default {
       try {
         const res = await placeOrder(formData);
         if (res.data.code === '200') {
-          orderId = res.data.data.orderId;
+          orderId = res.data.data.id;
           totalAmount = res.data.data.totalAmount;
           createTime = res.data.data.createTime;
-          console.log("订单ID:", res.data.data.orderId);
+          console.log("订单ID:", res.data.data.id);
 
           await router.push({
-            name: 'order',
+            name: 'Order',
             params: {
               orderId: orderId,
               totalAmount: totalAmount,
@@ -393,5 +393,12 @@ export default {
   flex-direction: column;
   gap: 20px;
   margin-top: 10px;
+}
+.bgimage {
+
+  background-image: url("../../assets/kenan.png");
+  background-size: cover;
+  background-position: center top;
+  min-height: 100vh;
 }
 </style>
