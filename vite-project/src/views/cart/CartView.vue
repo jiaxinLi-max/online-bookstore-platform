@@ -303,7 +303,7 @@ export default {
           console.log("订单ID:", res.data.data.id);
 
           await router.push({
-            name: 'order',
+            name: 'Order',
             params: {
               orderId: orderId,
               totalAmount: totalAmount,
