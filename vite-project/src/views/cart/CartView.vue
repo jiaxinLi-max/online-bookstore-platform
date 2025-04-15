@@ -120,13 +120,51 @@
       </div>
     <el-button type="danger" @click="removeFromCart(userIdNumber, product.cartItemId)">删除</el-button> <!-- 删除按钮 -->
     </el-card>
-    <el-button type="primary" @click="BackToAllProducts" class="go-to-products-button">返回所有商品</el-button>
+    <div class="button-group">
+      <el-button type="primary" @click="BackToAllProducts" class="go-to-products-button">返回所有商品</el-button>
+      <el-button type="primary" @click="dialogVisible = true" class="order-button">结算</el-button>
+    </div>
+    <el-dialog
+        title="填写订单信息"
+        class="order-form"
+        v-model="dialogVisible"
+        width="500px"
+        :before-close="handleCancel"
+    >
+      <el-form>
+        <el-row>
+          <el-form-item>
+            <label for="username">收货姓名</label>
+            <el-input id="username" v-model="name" placeholder="请输入姓名" />
+          </el-form-item>
+        </el-row>
+
+        <el-row>
+          <el-form-item>
+            <label v-if="!hasTelInput" for="tel">收货手机号</label>
+            <label v-else-if="!telLegal" for="tel" class="error-warn">手机号不合法</label>
+            <label v-else for="tel">收货手机号</label>
+            <el-input id="tel" v-model="telephone" :class="{'error-warn-input': (hasTelInput && !telLegal)}" placeholder="请输入手机号"/>
+          </el-form-item>
+        </el-row>
+
+        <el-row>
+          <el-form-item>
+            <label for="location">收货地址</label>
+            <el-input id="location" v-model="location" placeholder="请输入地址"/>
+          </el-form-item>
+        </el-row>
+      </el-form>
+
+      <el-button @click="handleCancel">取消</el-button>
+      <el-button type="primary" @click="generateOrder">支付</el-button>
+    </el-dialog>
   </el-main>
 </template>
 
 <script lang="ts">
-import { onMounted, ref } from 'vue';
-import { Cart, getCartItems, removeItemFromCart,updateCartItemQuantity } from '../../api/cart.ts';
+import {computed, onMounted, ref} from 'vue';
+import {Cart, getCartItems, removeItemFromCart, updateCartItemQuantity, placeOrder} from '../../api/cart.ts';
 import {ElMessage} from "element-plus";
 import { useRoute, useRouter } from 'vue-router'; // 引入路由相关
 // 定义组件
@@ -136,6 +174,16 @@ export default {
     const userId = sessionStorage.getItem('userId'); // 获取用户 ID
     const userIdNumber = Number(userId); // 将用户 ID 转换为数字
     const router = useRouter(); // 获取路由实例
+
+    const dialogVisible = ref(false);
+
+    const name = ref<string>('');
+    const telephone = ref<string>('');
+    const location = ref<string>('');
+
+    const hasTelInput = computed(() => telephone.value !== '');
+    const chinaMobileRegex = /^1(3[0-9]|4[579]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[189])\d{8}$/;
+    const telLegal = computed(() => chinaMobileRegex.test(telephone.value));
 
     // 获取购物车中的商品
     async function getAllInCart() {
@@ -220,6 +268,54 @@ export default {
       router.push('/home/all-products'); // 使用路由跳转
     };
 
+    const generateOrder = async () => {
+      let orderId: number;
+      let totalAmount: number = 0;
+      let createTime: string;
+      const cartIds: string[] = [];
+
+      for (const product of products.value) {
+        cartIds.push(product.cartItemId.toString());
+      }
+      console.log("商品信息:", cartIds);
+
+      if (!userId) {
+        console.error('用户未登录, 支付订单时');
+        return;
+      }
+
+      try {
+        const res = await placeOrder(cartIds, {
+          name: name.value,
+          telephone: telephone.value,
+          location: location.value,
+        });
+        if (res.data.code === '200') {
+          orderId = res.data.data.orderId;
+          totalAmount = res.data.data.totalAmount;
+          createTime = res.data.data.createTime;
+          console.log("订单ID:", res.data.data.orderId);
+
+          await router.push({
+            name: 'order',
+            params: {
+              orderId: orderId,
+              totalAmount: totalAmount,
+              createTime: createTime,
+            }
+          });
+        } else {
+          console.error('获取订单ID失败');
+        }
+      } catch (error) {
+        console.error('生成订单失败:', error);
+      }
+    };
+
+    const handleCancel = () => {
+      dialogVisible.value = false;
+    }
+
     // 在组件挂载时获取购物车中的商品
     onMounted(() => {
       getAllInCart();
@@ -231,7 +327,15 @@ export default {
       updateQuantity,
       removeFromCart,
       BackToAllProducts,
-      userIdNumber
+      userIdNumber,
+      generateOrder,
+      handleCancel,
+      dialogVisible,
+      name,
+      telephone,
+      location,
+      hasTelInput,
+      telLegal,
     };
   }
 };
@@ -243,17 +347,20 @@ export default {
   align-items: center;
   margin-bottom: 10px;
 }
+
 .product-item img {
   width: 100px;
   height: 100px;
   margin-right: 10px;
 }
+
 .product-image-style {
   width: 200px; /* 设置图片宽度 */
   height: 100px; /* 设置图片高度 */
   object-fit: cover; /* 确保图片填充整个区域 */
   border-radius: 5px; /* 可选：添加圆角效果 */
 }
+
 .product-card {
   width: 500px; /* 设置卡片宽度 */
   max-height: 300px; /* 设置卡片最大高度 */
@@ -265,5 +372,20 @@ export default {
   padding: 10px;
   box-sizing: border-box;
   margin: 0 auto; /* 添加这行使卡片在父元素中水平居中 */
+}
+
+.button-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.order-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 10px;
 }
 </style>

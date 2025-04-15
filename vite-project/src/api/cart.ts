@@ -1,5 +1,5 @@
 import axios,{ AxiosResponse }  from 'axios';
-import {CART_MODULE} from './_prefix'
+import {CART_MODULE, ORDER_MODULE} from './_prefix'
 
 // 定义 API 响应的接口
 interface ApiResponse<T> {
@@ -18,6 +18,13 @@ export interface Cart {
     details: string;
     quantity: number;
 }
+
+export interface shippingAddress {
+    name: string,
+    telephone: string,
+    location: string,
+}
+
 export const addCart = (userId: number, productId: number, quantity: number) => {
     const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
 
@@ -204,3 +211,49 @@ export const cartService = {
     //     return await axios.get(`/api/cart/`, { params: { userId } });
     // },
 };
+
+export const placeOrder = (cartItems: string[], address: shippingAddress) => {
+    const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
+
+    // 构建请求的 URL
+    const url = `${CART_MODULE}/checkout`; // 只需 cartItemId 作为路径参数
+
+    return axios.post(url, {
+        headers: {
+            'token': token, // 使用 'token' 作为请求头
+        },
+        params: {
+            cartItemIds: cartItems,
+            shipping_address: address,
+            payment_method: 'ALIPAY'
+        }
+    }).then(res => {
+        console.log("发起订单成功, Response:", res);
+        return res; // 返回响应数据
+    }).catch(error => {
+        console.error("发起订单失败", error);
+        throw error; // 抛出错误以便后续处理
+    });
+}
+
+export const postOrder = (order: number) => {
+    const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
+
+    // 构建请求的 URL
+    const url = `${ORDER_MODULE}/${order}/pay`; // 只需 cartItemId 作为路径参数
+
+    return axios.post(url, {
+        headers: {
+            'token': token, // 使用 'token' 作为请求头
+        },
+        params: {
+            orderId: order,
+        }
+    }).then(res => {
+        console.log("发起支付成功, Response:", res);
+        return res; // 返回响应数据
+    }).catch(error => {
+        console.error("发起支付失败:", error);
+        throw error; // 抛出错误以便后续处理
+    });
+}

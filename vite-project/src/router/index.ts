@@ -144,6 +144,12 @@ const router = createRouter({
                     meta: { title: '购物车' },
                 },
                 {
+                    path: 'order/:orderId/:totalAmount/:createTime',
+                    name: 'Order',
+                    component: () => import('../views/Order/OrderView.vue'),
+                    meta: {title: '订单'},
+                },
+                {
                     path: 'all-products', // 添加商店列表页面
                     name: 'AllProducts',
                     component: () => import('../views/product/AllProduct.vue'), // 确保路径正确
