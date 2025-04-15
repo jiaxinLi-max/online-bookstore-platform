@@ -388,4 +388,11 @@ export default {
   gap: 20px;
   margin-top: 10px;
 }
+.bgimage {
+
+  background-image: url("../../assets/kenan.png");
+  background-size: cover;
+  background-position: center top;
+  min-height: 100vh;
+}
 </style>
