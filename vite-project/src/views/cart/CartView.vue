@@ -272,10 +272,10 @@ export default {
       let orderId: number;
       let totalAmount: number = 0;
       let createTime: string;
-      const cartIds: string[] = [];
+      const cartIds: number[] = [];
 
       for (const product of products.value) {
-        cartIds.push(product.cartItemId.toString());
+        cartIds.push(product.cartItemId);
       }
       console.log("商品信息:", cartIds);
 
@@ -284,12 +284,18 @@ export default {
         return;
       }
 
-      try {
-        const res = await placeOrder(cartIds, {
+      const formData = {
+        cartItemIds: cartIds,
+        shipping_address: {
           name: name.value,
           telephone: telephone.value,
-          location: location.value,
-        });
+          address: location.value,
+        },
+        payment_method: 'ALIPAY',
+      }
+
+      try {
+        const res = await placeOrder(formData);
         if (res.data.code === '200') {
           orderId = res.data.data.orderId;
           totalAmount = res.data.data.totalAmount;
