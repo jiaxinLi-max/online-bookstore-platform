@@ -27,7 +27,7 @@ public class Order {
     private Integer userId;
 
     @ElementCollection
-    @CollectionTable(name = "order_cart_items", joinColumns = @JoinColumn(name = "order_id"))
+    @CollectionTable(name = "orders_cart_items", joinColumns = @JoinColumn(name = "orders_id"))
     @Column(name = "cart_item_id")
     private List<Integer> cartItemIds;
 
@@ -71,7 +71,6 @@ public class Order {
     @Basic
     @Column(name = "trade_no")
     private String tradeNo;
-
 
     @Basic
     @Column(name = "payment_form", length = 1024)

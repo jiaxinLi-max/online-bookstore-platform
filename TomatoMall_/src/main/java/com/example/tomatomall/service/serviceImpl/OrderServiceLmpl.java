@@ -83,9 +83,10 @@ public class OrderServiceLmpl implements OrderService {
             request.setNotifyUrl(notifyUrl);
             Order order = orderRepository.findById(order_id).orElseThrow(TomatoMallException::orderNotExist);
             JSONObject bizContent = new JSONObject();
-            bizContent.put("out_trade_no", order_id);  // 我们自己生成的订单编号
-            bizContent.put("total_amount", order.getTotalAmount()); // 订单的总金额
-            bizContent.put("subject", null);   // 支付的名称
+            bizContent.put("out_trade_no", String.valueOf(order_id));
+            bizContent.put("total_amount", String.valueOf(order.getTotalAmount()));
+
+            bizContent.put("subject", "番茄书城订单 #" + order_id); // 商品标题（必填）
             bizContent.put("product_code", "FAST_INSTANT_TRADE_PAY");  // 固定配置
             request.setBizContent(bizContent.toString());
             String form = "";
@@ -94,11 +95,11 @@ public class OrderServiceLmpl implements OrderService {
             } catch (AlipayApiException e) {
                 e.printStackTrace();
             }
-//        order.setPaymentForm(form);
-            httpResponse.setContentType("text/html;charset=" + "utf-8");
-            httpResponse.getWriter().write(form);// 直接将完整的表单html输出到页面
-            httpResponse.getWriter().flush();
-            httpResponse.getWriter().close();
+            order.setPaymentForm(form);
+//            httpResponse.setContentType("text/html;charset=" + "utf-8");
+//            httpResponse.getWriter().write(form);// 直接将完整的表单html输出到页面
+//            httpResponse.getWriter().flush();
+//            httpResponse.getWriter().close();
 
             orderRepository.save(order);
             return order.toVO();
@@ -162,7 +163,9 @@ public class OrderServiceLmpl implements OrderService {
                     order.setStatus("TRADE_CLOSED");
                     orderRepository.save(order);
                     releaseFrozenStock(order.getCartItemIds());
+
                 }
+                System.out.println("支付回调处理成功: ");
                 return order.toVO();
 
 
@@ -193,6 +196,9 @@ public class OrderServiceLmpl implements OrderService {
                 stockpile.setFrozen(stockpile.getFrozen()+cartItem.getQuantity());
                 stockpileRepository.save(stockpile);
                 Product product= productRepository.findById(productId).orElse(null);
+                if(product==null){
+                    throw TomatoMallException.productNotExist();
+                }
                 BigDecimal itemTotal = product.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
                 totalAmount = totalAmount.add(itemTotal);
             }

@@ -33,8 +33,8 @@ public class OrderController {
 //        return Response.buildSuccess(orderService.sendPay(order_id));
 //    }
     @PostMapping("/notify")
-    public Response<OrderVO> payNotify(HttpServletRequest request,HttpServletResponse response){
-        return Response.buildSuccess(orderService.payNotify(request,response));
+    public void payNotify(HttpServletRequest request,HttpServletResponse response){
+        Response.buildSuccess(orderService.payNotify(request,response));
     }
 
 }
