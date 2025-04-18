@@ -10,7 +10,7 @@
     </div>
 
     <el-button type="primary" @click="confirmOrder">确认支付</el-button>
-    <div v-if="payFormHtml" ref="formContainer" v-html="payFormHtml"></div>
+<!--    <div v-if="payFormHtml" ref="formContainer" v-html="payFormHtml"></div>-->
   </div>
 </template>
 
@@ -26,29 +26,37 @@ export default {
     const userIdNumber = Number(userId); // 将用户 ID 转换为数字
     const router = useRouter(); // 获取路由实例
     const route = useRoute();
-    const payFormHtml = ref<string>(''); // 用来存储 Alipay 返回的 HTML 表单
+    // const payFormHtml = ref<string>(''); // 用来存储 Alipay 返回的 HTML 表单
 
     const orderId: string = route.params.orderId;
     const totalAmount: number = route.params.totalAmount;
     const createTime: string = route.params.createTime;
 
-    const formContainer = ref<HTMLElement | null>(null);
+    // const formContainer = ref<HTMLElement | null>(null);
 
     const confirmOrder = async () => {
       try {
         const response = await postOrder(Number(orderId));
         if (response.data.code === '200') {
+          console.log(response.data.data);
           // 设置 HTML 表单
-          payFormHtml.value = response.data.data.paymentForm;
+          // payFormHtml.value = response.data.data.paymentForm;
+          //
+          // // 等待 DOM 渲染完成后触发表单提交
+          // await nextTick(); // 确保 HTML 被插入页面
+          // const formEl = formContainer.value?.querySelector('form') as HTMLFormElement;
+          // if (formEl) {
+          //   formEl.submit(); // 自动提交表单，跳转到支付宝
+          // } else {
+          //   console.warn('找不到表单元素');
+          // }
 
-          // 等待 DOM 渲染完成后触发表单提交
-          await nextTick(); // 确保 HTML 被插入页面
-          const formEl = formContainer.value?.querySelector('form') as HTMLFormElement;
-          if (formEl) {
-            formEl.submit(); // 自动提交表单，跳转到支付宝
-          } else {
-            console.warn('找不到表单元素');
-          }
+          const paymentForm = response.data.data.paymentForm;
+
+          const payWindow = window.open('', '_blank');
+          payWindow.document.open();
+          payWindow.document.write(paymentForm);
+          payWindow.document.close();
         } else {
           ElMessage.error("支付失败！");
           console.error("支付失败！:", response.data);
@@ -65,8 +73,8 @@ export default {
       totalAmount,
       createTime,
       confirmOrder,
-      payFormHtml,
-      formContainer, // ✅ 别忘了 return 出来
+      // payFormHtml,
+      // formContainer, // ✅ 别忘了 return 出来
     };
   }
 };

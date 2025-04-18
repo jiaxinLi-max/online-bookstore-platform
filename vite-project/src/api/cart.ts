@@ -249,7 +249,6 @@ export const postOrder = (orderId: number) => {
     return axios.post(url, { orderId },{
         headers: {
             'token': token, // 使用 'token' 作为请求头
-            'Content-Type': 'application/json',
         },
         // params: {
         //     orderId: order,
