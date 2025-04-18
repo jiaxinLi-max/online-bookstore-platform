@@ -175,6 +175,13 @@ public class OrderServiceLmpl implements OrderService {
         }
     }
 
+    @Override
+    public OrderVO getOrderById(Integer order_id){
+        return orderRepository.findById(order_id)
+                .orElseThrow(TomatoMallException::orderNotExist)
+                .toVO();
+    }
+
     private BigDecimal calculateTotalAmount(List<Integer> cartItemIds) {
         BigDecimal totalAmount = BigDecimal.ZERO;
 

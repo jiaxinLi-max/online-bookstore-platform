@@ -37,4 +37,8 @@ public class OrderController {
         Response.buildSuccess(orderService.payNotify(request,response));
     }
 
+    @GetMapping("/status")
+    public Response<OrderVO> getOrderStatus(@RequestParam("orderId") Integer orderId){
+        return Response.buildSuccess(orderService.getOrderById(orderId));
+    }
 }

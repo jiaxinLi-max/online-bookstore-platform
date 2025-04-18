@@ -261,3 +261,24 @@ export const postOrder = (orderId: number) => {
         throw error; // 抛出错误以便后续处理
     });
 }
+
+export const getStatus = (order_id: number) => {
+    const token = sessionStorage.getItem('token');
+
+    const url = `${ORDER_MODULE}/status`;
+
+    return axios.get(url, {
+        headers: {
+            'token': token,
+        },
+        params: {
+            orderId: order_id
+        }
+    }).then(res => {
+        console.log("获取订单状态成功:", res);
+        return res;
+    }).catch(error => {
+        console.error("获取订单状态失败:", error);
+        throw error;
+    })
+}

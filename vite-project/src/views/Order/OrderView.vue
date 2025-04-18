@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import { onMounted, ref ,nextTick} from 'vue';
-import { postOrder } from '../../api/cart.ts';
+import { postOrder, getStatus } from '../../api/cart.ts';
 import { ElMessage } from "element-plus";
 import { useRoute, useRouter } from 'vue-router'; // 引入路由相关
 // 定义组件
@@ -31,6 +31,7 @@ export default {
     const orderId: string = route.params.orderId;
     const totalAmount: number = route.params.totalAmount;
     const createTime: string = route.params.createTime;
+    let pollingTimer: ReturnType<typeof setInterval> | null = null;
 
     // const formContainer = ref<HTMLElement | null>(null);
 
@@ -56,6 +57,7 @@ export default {
           const payWindow = window.open('', '_blank');
           payWindow.document.open();
           payWindow.document.write(paymentForm);
+          startPolling();
           payWindow.document.close();
         } else {
           ElMessage.error("支付失败！");
@@ -66,6 +68,28 @@ export default {
         console.error('支付失败', error);
       }
     };
+
+    const startPolling = () => {
+      pollingTimer = setInterval(async () => {
+        const res = await getStatus(Number(orderId));
+        if (res.data.code === '200') {
+          console.log(res.data.data);
+
+          if (res.data.data.status === 'TRADE_SUCCESS') {
+            clearInterval(pollingTimer);
+            ElMessage.success("支付成功！");
+            console.log('success');
+          }
+          else if (res.data.status === 'TRADE_CLOSED') {
+            clearInterval(pollingTimer);
+            ElMessage.error('支付关闭');
+            console.log('closing order');
+          }
+        } else {
+          console.error('获取失败:', res.data);
+        }
+      }, 3000);
+    }
 
     return {
       userIdNumber,

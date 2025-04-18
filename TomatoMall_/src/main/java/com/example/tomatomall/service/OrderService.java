@@ -14,4 +14,5 @@ public interface OrderService {
 
     OrderVO payNotify(HttpServletRequest request,HttpServletResponse httpServletResponse);
 
+    OrderVO getOrderById(Integer order_id);
 }
