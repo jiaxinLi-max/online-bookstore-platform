@@ -8,13 +8,22 @@ export interface Advertisement {
     imageUrl: string;
     productId: number;
 }
+
 type advertisementInfo = {
     title: string;
     content: string;
     imgUrl: string;
     productId: string;
-
 };
+
+type updateInfo = {
+    id: string;
+    title: string;
+    content: string;
+    imgUrl: string;
+    productId: string;
+};
+
 export const createAdvertisement = (advertisementInfo: advertisementInfo) => {
     // 使用反引号来构建 URL
     const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
@@ -47,3 +56,33 @@ export const getAllAdvertisement = () => {
             throw error; // 将错误抛出以便其他处理
         });
 };
+
+export const deleteAdvertisement = (id: number) => {
+    const token = sessionStorage.getItem('token');
+
+    return axios.delete(`${ADVERTISEMENT_MODULE}/${id}`, {
+        headers: { 'token': token },
+        params: { id }
+    }) .then(res => {
+        console.log("deleteAdvertisement, res:", res.data);
+        return res;
+    })
+}
+
+export const updateAdvertisement = (newInfo: updateInfo) => {
+    const token = sessionStorage.getItem('token');
+
+    return axios.put(`${ADVERTISEMENT_MODULE}`, {
+        headers: { 'token': token},
+        params: {
+            id: newInfo.id,
+            title: newInfo.title,
+            content: newInfo.content,
+            imgUrl: newInfo.imgUrl,
+            productId: newInfo.productId,
+        }
+    }) .then (res => {
+        console.log("updateAdvertisement:", res.data);
+        return res;
+    })
+}
