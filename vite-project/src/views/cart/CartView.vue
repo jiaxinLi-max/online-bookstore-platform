@@ -157,7 +157,7 @@
       </el-form>
 
       <el-button @click="handleCancel">取消</el-button>
-      <el-button type="primary" @click="generateOrder">支付</el-button>
+      <el-button type="primary" @click="generateOrder" :disabled="!ableToOrder">支付</el-button>
     </el-dialog>
   </el-main>
 </template>
@@ -184,6 +184,11 @@ export default {
     const hasTelInput = computed(() => telephone.value !== '');
     const chinaMobileRegex = /^1(3[0-9]|4[579]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[189])\d{8}$/;
     const telLegal = computed(() => chinaMobileRegex.test(telephone.value));
+    const hasNameInput = computed(() => name.value !== '');
+    const hasLocationInput = computed(() => location.value !== '');
+    const ableToOrder = computed(() => {
+      return hasTelInput.value && telLegal.value && hasNameInput.value && hasLocationInput.value;
+    });
 
     // 获取购物车中的商品
     async function getAllInCart() {
@@ -342,6 +347,7 @@ export default {
       location,
       hasTelInput,
       telLegal,
+      ableToOrder
     };
   }
 };

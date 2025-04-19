@@ -72,15 +72,15 @@ export const deleteAdvertisement = (id: number) => {
 export const updateAdvertisement = (newInfo: updateInfo) => {
     const token = sessionStorage.getItem('token');
 
-    return axios.put(`${ADVERTISEMENT_MODULE}`, {
+    return axios.put(`${ADVERTISEMENT_MODULE}`, newInfo, {
         headers: { 'token': token},
-        params: {
-            id: newInfo.id,
-            title: newInfo.title,
-            content: newInfo.content,
-            imgUrl: newInfo.imgUrl,
-            productId: newInfo.productId,
-        }
+        // params: {
+        //     id: newInfo.id,
+        //     title: newInfo.title,
+        //     content: newInfo.content,
+        //     imgUrl: newInfo.imgUrl,
+        //     productId: newInfo.productId,
+        // }
     }) .then (res => {
         console.log("updateAdvertisement:", res.data);
         return res;
