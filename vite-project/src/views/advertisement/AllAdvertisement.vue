@@ -24,7 +24,7 @@
       <p>点击查看详情</p>
       <div v-if="role === 'MANAGER'" class="manager-actions">
         <div class="management-buttons">
-          <el-button type="primary" @click="openEditDialog">编辑广告</el-button>
+          <el-button type="primary" @click="openEditDialog(advertisement.id)">编辑广告</el-button>
           <el-button type="danger" @click="deleteAd(advertisement.id)">删除广告</el-button>
         </div>
       </div>
@@ -76,7 +76,7 @@
 
           <!-- 按钮 -->
           <el-form-item>
-            <el-button @click.prevent="updateAd(advertisement.id)" type="primary" plain>
+            <el-button @click.prevent="updateAd" type="primary" plain>
               更新广告
             </el-button>
           </el-form-item>
@@ -141,11 +141,15 @@ async function handleCancel() {
   updateContent.value = '';
   updateImgUrl.value = '';
   updateProductId.value = '';
+  dialogVisible.value = false;
+  dialogImageUrl.value = '';
+  fileList.value = [];
 }
 
-async function updateAd(advertisementId: number) {
+async function updateAd() {
   try {
-    updateId.value = advertisementId;
+    console.log("Updating ad:", updateId.value);
+
     const response = await updateAdvertisement({
       id: updateId.value.toString(),
       title: updateTitle.value,
@@ -157,8 +161,8 @@ async function updateAd(advertisementId: number) {
       ElMessage.success('广告更新成功');
       console.log(response.data);
 
-      await get_getAlladvertisements();
       handleCancel();
+      await get_getAlladvertisements();
     }
   } catch (error) {
     console.error('广告更新失败:', error);
@@ -208,13 +212,18 @@ const handleRemove = (file: UploadFile) => {
   fileList.value = fileList.value.filter(item => item.uid !== file.uid);
 };
 
-const openEditDialog = () => {
+const openEditDialog = (advertisementId: number) => {
+  console.log("Editing:", advertisementId);
+
+  updateId.value = advertisementId;
   showEditDialog.value = true;
-  updateId.value = 0;
   updateTitle.value = '';
   updateContent.value = '';
   updateImgUrl.value = '';
   updateProductId.value = '';
+  dialogVisible.value = false;
+  dialogImageUrl.value = '';
+  fileList.value = [];
 }
 
 // 获取所有商品数据

@@ -7,7 +7,7 @@ import {userInfo} from "../api/user.ts";
 import {ref,  onMounted,computed} from 'vue';
 import { Cart } from '../api/cart.ts';
 const username = sessionStorage.getItem("username");
-const role = sessionStorage.getItem('role')    // 登录的时候插入的
+const role = ref<string>('');
 console.log('roleHeader:', role);
 const avatar = ref('')
 getUserInfo()
@@ -15,6 +15,7 @@ function getUserInfo() {
   userInfo(username).then(res => {
     console.log("resUserHeader", res.data);
     avatar.value = res.data.data.avatar;
+    role.value = res.data.data.role;
     if(!avatar.value){
       avatar.value = 'https://bpic.588ku.com/back_origin_min_pic/19/10/22/7d5760a4e3926576c237d950d5964db1.jpg';
     }
@@ -101,13 +102,15 @@ function logout() {
 <!--      <el-col :span="1" class="header-icon">-->
 <!--        <button @click="goToCart">购物车 ({{ cartItemCount }})</button>-->
 <!--      </el-col>-->
-      <el-col :span="1" class="header-icon">
-        <router-link to="/home/cart" class="no-link">
-          <el-icon @click="goToCart" :size="35" color="white">
-            <ShoppingCart /> <!-- 使用 Element Plus 的购物车图标 -->
-          </el-icon>
-        </router-link>
-      </el-col>
+      <template v-if="role === 'CUSTOMER'">
+        <el-col :span="1" class="header-icon">
+          <router-link to="/home/cart" class="no-link">
+            <el-icon @click="goToCart" :size="35" color="white">
+              <ShoppingCart /> <!-- 使用 Element Plus 的购物车图标 -->
+            </el-icon>
+          </router-link>
+        </el-col>
+      </template>
 <!--      <el-col :span="1" class="header-icon">-->
 <!--          <router-link to="/home/cart" class="no-link">-->
 <!--&lt;!&ndash;            <button @click="goToCart">购物车 ({{ cartItemCount }})</button>&ndash;&gt;-->
@@ -115,13 +118,13 @@ function logout() {
 <!--          </router-link>-->
 <!--      </el-col>-->
       <template v-if="role === 'MANAGER'">
-      <el-col :span="1" class="header-icon">
-          <router-link to="/home/create-product" v-slot="{ navigate }">
-            <el-icon @click="navigate" :size="35" color="white">
-              <Plus /> <!-- 假设您使用 Plus 图标 -->
-            </el-icon>
-          </router-link>
-      </el-col>
+        <el-col :span="1" class="header-icon">
+            <router-link to="/home/create-product" v-slot="{ navigate }">
+              <el-icon @click="navigate" :size="35" color="white">
+                <Plus />
+              </el-icon>
+            </router-link>
+        </el-col>
       </template>
 
       <el-col :span="1" class="header-icon">
