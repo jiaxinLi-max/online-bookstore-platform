@@ -349,6 +349,7 @@
 <!--    <el-button type="primary" @click="addToCart">加入购物车</el-button>-->
     <div class="action-area">
       <!-- 客户操作 -->
+      <div>库存: {{ stockAmount }}</div>
       <div v-if="role === 'CUSTOMER'" class="customer-actions">
         <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>
         <el-button type="primary" @click="addToCart">加入购物车</el-button>
