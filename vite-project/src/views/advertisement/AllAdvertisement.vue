@@ -258,6 +258,8 @@ onMounted(() => {
 }
 
 .advertisement-card {
+  background-color: rgba(255, 255, 255, 0.6); /* 透明白色背景 */
+  border: 1px solid rgba(255, 255, 255, 0.5); /* 半透明边框 */
   width: calc((100% / 4) - 20px); /* 每行三个卡片，减去间距 */
   padding: 20px;
   margin: 10px;

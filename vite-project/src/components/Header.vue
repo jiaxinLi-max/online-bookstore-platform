@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { router } from '../router'
 import {parseRole, parseTime} from "../utils"
-import { User, SwitchButton, Plus,ShoppingCart } from "@element-plus/icons-vue"
+import { User, SwitchButton, Plus,ShoppingCart,Promotion } from "@element-plus/icons-vue"
 import {userInfo} from "../api/user.ts";
  // 导入 Plus 图标
 import {ref,  onMounted,computed} from 'vue';
@@ -80,11 +80,19 @@ function logout() {
       </el-col>
 
       <!-- 新增按钮，跳转到所有广告页面 -->
+<!--      <el-col :span="1" class="header-icon">-->
+<!--        <router-link to="/home/all-advertisements" class="no-link">-->
+<!--          <div style="color:white; font-size: small;">获取所有广告</div> &lt;!&ndash; 添加文本标签 &ndash;&gt;-->
+<!--        </router-link>-->
+<!--      </el-col>-->
       <el-col :span="1" class="header-icon">
         <router-link to="/home/all-advertisements" class="no-link">
-          <div style="color:white; font-size: small;">获取所有广告</div> <!-- 添加文本标签 -->
+          <el-icon :size="35" color="white">
+            <Promotion />
+          </el-icon>
         </router-link>
       </el-col>
+
 
       <el-col :span="14">
       </el-col>

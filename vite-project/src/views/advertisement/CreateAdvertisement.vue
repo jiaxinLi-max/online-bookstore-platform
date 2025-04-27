@@ -1,12 +1,12 @@
 
 
 <template>
-  <div class="create_product">
+  <div class="create_product bgimage">
     <h1 class="create-product-title">创建广告</h1>
     <el-form ref="form" label-width="120px" class="product-form">
       <!-- 基本信息 -->
-      <el-form-item label="广告标题" prop="advertisementName">
-        <el-input v-model="title" placeholder="请输入广告标题"></el-input>
+      <el-form-item label="广告标题" prop="advertisementName" >
+        <el-input v-model="title" placeholder="请输入广告标题" ></el-input>
       </el-form-item>
 
       <el-form-item label="广告内容" prop="advertisementDescription">
@@ -198,5 +198,22 @@ onMounted(() => {
   background-color: #333333 !important; /* 鼠标悬停时的背景颜色 */
   border-color: #333333 !important; /* 鼠标悬停时的边框颜色 */
   color: white !important; /* 鼠标悬停时的文字颜色 */
+}
+.bgimage {
+  background-color: rgba(0, 0, 0, 0.3);
+  background-image: url("../../assets/kenan.png");
+
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    min-height: 100vh;
+
+}
+.create-product-title {
+  margin-left: 25%;
+  color: white; /* ← 加上这一句 */
+}
+::v-deep(.el-form-item__label) {
+  color: white;
 }
 </style>
