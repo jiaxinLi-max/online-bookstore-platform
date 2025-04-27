@@ -28,7 +28,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     }
 
     @Override
-    public AdvertisementVO updateAdvertisement(AdvertisementVO advertisementVO){
+    public String updateAdvertisement(AdvertisementVO advertisementVO){
         Product product=productRepository.findById(advertisementVO.getProductId()).orElse(null);
         Advertisement advertisement=advertisementRepository.findById(advertisementVO.getId()).orElse(null);
         if(advertisement==null){
@@ -50,7 +50,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
         advertisement.setProduct(product);
 
         advertisementRepository.save(advertisement);
-        return advertisement.toVO();
+        return "更新成功";
     }
 
     @Override

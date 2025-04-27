@@ -27,7 +27,7 @@ public class AdvertisementController {
      * 更新广告信息
      */
     @PutMapping
-    public Response<AdvertisementVO>updateAdvertisement(@RequestBody AdvertisementVO advertisementVO){
+    public Response<String>updateAdvertisement(@RequestBody AdvertisementVO advertisementVO){
         return Response.buildSuccess(advertisementService.updateAdvertisement(advertisementVO));
     }
 

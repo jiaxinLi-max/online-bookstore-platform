@@ -9,7 +9,7 @@ import java.util.List;
 public interface AdvertisementService {
     List<AdvertisementVO> getAllAdvertisements();
 
-    AdvertisementVO updateAdvertisement(AdvertisementVO advertisementVO);
+    String updateAdvertisement(AdvertisementVO advertisementVO);
 
     AdvertisementVO createAdvertisement(AdvertisementVO advertisementVO);
 
