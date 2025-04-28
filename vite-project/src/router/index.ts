@@ -162,6 +162,12 @@ const router = createRouter({
                     meta: { title: '广告列表' },
                 },
                 {
+                    path: 'all-postings', // 子路由路径，去掉前导斜杠
+                    name: 'AllPostings',
+                    component: () => import('../views/posting/AllPosting.vue'),
+                    meta: { title: '帖子列表' },
+                },
+                {
                     path: 'create-product',
                     name: 'CreateProduct',
                     component: () => import('../views/product/CreateProduct.vue'), // 确保路径正确
@@ -172,6 +178,12 @@ const router = createRouter({
                     name: 'CreateAdvertisement',
                     component: () => import('../views/advertisement/CreateAdvertisement.vue'), // 确保路径正确
                     meta: { title: '创建广告' },
+                },
+                {
+                    path: 'create-posting',
+                    name: 'CreatePosting',
+                    component: () => import('../views/posting/CreatePosting.vue'), // 确保路径正确
+                    meta: { title: '创建帖子' },
                 },
                 {
                     path: 'product/:productId', // 动态路由，用于商品详情
