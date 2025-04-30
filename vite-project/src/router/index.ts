@@ -204,6 +204,12 @@ const router = createRouter({
                 //     name: 'Cart',
                 //     component: CartItem,
                 // },
+                {
+                    path: 'postings/:id',
+                    name: 'PostingDetail',
+                    component: () => import('../views/posting/PostingDetail.vue'),
+                    meta: { title: '帖子详情' },
+                },
             ],
         },
         {

@@ -60,7 +60,83 @@ export const getAllPosting = () => {
         });
 };
 
+export const getPostingDetail = (id: number) => {
+    console.log("Fetching postingDetail:", id);
+    const token = sessionStorage.getItem('token');
+    console.log("token:",token);
+    return axios.get(`${POSTING_MODULE}/${id}`, {
+        headers: {
+            'token': token
+        },
+        params: {
+            id: id
+        }
+    }).then(res => {
+        console.log("Res data:", res.data);
+        return res;
+    })
+    .catch(error => {
+        console.error("Error fetching postingDetail:", error);
+        throw error;
+    })
+}
 
+export const deletePost = (id: number) => {
+    console.log("Deleting post:", id);
+    const token = sessionStorage.getItem('token');
+    console.log("token:",token);
+    return axios.delete(`${POSTING_MODULE}`, {
+        headers: {
+            'token': token
+        },
+        params: {
+            id: id
+        }
+    }).then(res => {
+            console.log('Res data:', res.data);
+            return res;
+        })
+    .catch(error => {
+        console.error("Error deleting post:", error);
+        throw error;
+    })
+}
+
+export const likePost = (id: number) => {
+    console.log("Liked post:", id);
+    const token = sessionStorage.getItem('token');
+    console.log("token:",token);
+    return axios.post(`${POSTING_MODULE}/like`, id, {
+        headers: {
+            'token': token
+        }
+    }).then(res => {
+            console.log("Res:", res.data);
+            return res;
+        })
+    .catch(error => {
+        console.error("Error when like post:", error);
+        throw error;
+    })
+}
+
+export const dislikePost = (id: number) => {
+    console.log("Disliked post:", id);
+    const token = sessionStorage.getItem('token');
+    console.log("token:",token);
+    return axios.post(`${POSTING_MODULE}/dislike`, id, {
+        headers: {
+            'token': token
+        }
+    }).then(res => {
+        console.log("Res:", res.data);
+        return res;
+    })
+        .catch(error => {
+            console.error("Error when dislike post:", error);
+            throw error;
+        })
+}
 
 export const getProduct = (productId: string) => {
     const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token

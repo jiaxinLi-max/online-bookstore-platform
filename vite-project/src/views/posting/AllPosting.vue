@@ -20,7 +20,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { getAllPosting, Posting } from '../../api/posting.ts';
+import { getAllPosting, Posting} from '../../api/posting.ts';
+import {ElMessage} from "element-plus";
 
 const postings = ref<Posting[]>([]);
 
@@ -44,10 +45,8 @@ async function get_getAllpostings() {
 
 // 导航到商店详情
 function goToPostingDetail(postingId: number) {
-  router.push({ path: `/home/product/${postingId}` });
+  router.push({ name: 'PostingDetail', params: { id: postingId } });
 }
-
-
 
 // 在组件挂载时获取商店数据
 onMounted(() => {
