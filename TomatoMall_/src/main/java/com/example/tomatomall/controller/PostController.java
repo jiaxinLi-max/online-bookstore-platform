@@ -60,7 +60,7 @@ public class PostController {
     /**
      * 删除帖子
      */
-    @PostMapping("/like")
+    @PostMapping("/dislike")
     public Response<String> dislikePost(@RequestParam Integer postId){
         return Response.buildSuccess(postService.dislikePost(postId));
 

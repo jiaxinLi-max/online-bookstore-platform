@@ -43,7 +43,7 @@ public class Post {
     private LocalDateTime time;
 
     @Basic
-    @Column(name = "like",nullable = false)
+    @Column(name = "likes",nullable = false)
     private Integer like;
 
     @Basic
