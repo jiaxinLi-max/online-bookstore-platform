@@ -9,6 +9,7 @@ import com.example.tomatomall.vo.PostVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,9 @@ public class PostServiceImpl implements PostService {
     @Override
     public String createPost(PostVO postVO){
         Post newPost=postVO.toPO();
+        newPost.setLike(0);
+        newPost.setDislike(0);
+        newPost.setTime(LocalDateTime.now());
         postRepository.save(newPost);
         return "创建成功";
 
