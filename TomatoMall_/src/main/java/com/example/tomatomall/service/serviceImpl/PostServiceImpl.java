@@ -78,7 +78,7 @@ public class PostServiceImpl implements PostService {
             throw TomatoMallException.postNotExist();
         }
         Integer dislike=post.getDislike();
-        post.setLike(dislike-1);
+        post.setDislike(dislike+1);
         postRepository.save(post);
         return "踩成功";
     }
