@@ -14,4 +14,4 @@ export const ADVERTISEMENT_MODULE = `${API_MODULE}/advertisements`
 
 export const ORDER_MODULE = `${API_MODULE}/orders`
 
-export const POSTING_MODULE = `${API_MODULE}/postings`
+export const POSTING_MODULE = `${API_MODULE}/posts`

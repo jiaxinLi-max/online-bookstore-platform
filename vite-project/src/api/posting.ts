@@ -2,7 +2,7 @@
 //import axios from 'axios';
 import {axios} from '../utils/request'
 //import {Specification} from './specification.ts'
-// 定义商品接口
+// 定义帖子接口
 export interface Posting {
     id: number;
     userId: number;
@@ -18,11 +18,12 @@ export interface Posting {
 import {POSTING_MODULE} from './_prefix';
 
 type postingInfo = {
-    id: number;
+
     userId: number;
     title: string;
     content: string;
     cover: string;
+
 };
 
 
