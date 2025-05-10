@@ -20,7 +20,7 @@ public class CommentController {
     /**
      * 获取指定书籍的所有评价
      */
-    @GetMapping("/{CommentId}")
+    @GetMapping("/{productId}")
     public Response<List<CommentVO>> getAllCommentInfo(@PathVariable Integer productId){
         return Response.buildSuccess(commentService.getAllCommentInfo(productId));
     }
@@ -29,7 +29,7 @@ public class CommentController {
     /**
      * 获取特定评价信息
      */
-    @GetMapping("/{id}")
+    @GetMapping("/detail/{id}")
     public Response<CommentVO> getCommentInfo(@PathVariable Integer id){
         return Response.buildSuccess(commentService.getCommentInfo(id));
     }
@@ -59,7 +59,7 @@ public class CommentController {
     }
 
 //      点赞评价
-    @PostMapping("/like")
+    @PostMapping("/like/{id}")
     public Response<String> likeComment(@PathVariable Integer id){
         return Response.buildSuccess((commentService.likeComment(id)));
     }
