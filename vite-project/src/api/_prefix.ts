@@ -15,3 +15,5 @@ export const ADVERTISEMENT_MODULE = `${API_MODULE}/advertisements`
 export const ORDER_MODULE = `${API_MODULE}/orders`
 
 export const POSTING_MODULE = `${API_MODULE}/posts`
+
+export const COMMENT_MODULE = `${API_MODULE}/comment`
