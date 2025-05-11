@@ -24,6 +24,14 @@ public class AccountController {
     }
 
     /**
+     * 获取用户详情，通过id
+     */
+    @GetMapping
+    public Response<AccountVO> getUserById(@RequestParam Integer id) {
+        return Response.buildSuccess(accountService.getUserById(id));
+    }
+
+    /**
      * 创建新的用户
      */
     @PostMapping()

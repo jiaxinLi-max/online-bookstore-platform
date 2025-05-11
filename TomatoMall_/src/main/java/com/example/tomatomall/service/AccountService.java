@@ -8,4 +8,6 @@ public interface AccountService {
     String login(String username,String password);
     AccountVO getInformation(String username);
     Boolean updateInformation(AccountVO accountVO);
+
+    AccountVO getUserById(Integer id);
 }

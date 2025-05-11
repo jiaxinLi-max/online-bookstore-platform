@@ -114,4 +114,13 @@ public class AccountServiceImpl implements AccountService {
         return  true;
     }
 
+    @Override
+    public AccountVO getUserById(Integer id){
+        Account account=accountRepository.findById(id).orElse(null);
+        if(account==null){
+            throw TomatoMallException.userNotExist();
+        }
+        return account.toVO();
+    }
+
 }
