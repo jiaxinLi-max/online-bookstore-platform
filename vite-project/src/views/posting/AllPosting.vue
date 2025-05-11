@@ -6,7 +6,7 @@
         class="create-posting-button"
         @click="goToCreatePosting"
         style="margin-bottom: 20px;"
-        v-if="role === 'customer'"
+        v-if="role === 'CUSTOMER'"
     >
       发帖子
     </el-button>

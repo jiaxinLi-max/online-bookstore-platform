@@ -91,7 +91,7 @@ export const deletePost = (id: number) => {
             'token': token
         },
         params: {
-            id: id
+            postId: id
         }
     }).then(res => {
             console.log('Res data:', res.data);
