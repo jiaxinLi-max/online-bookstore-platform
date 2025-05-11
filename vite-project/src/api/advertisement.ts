@@ -1,6 +1,5 @@
 import axios from 'axios';
-import {ADVERTISEMENT_MODULE, PRODUCT_MODULE} from "./_prefix.ts";
-import {Specification} from "./product.ts";
+import {ADVERTISEMENT_MODULE} from "./_prefix.ts";
 export interface Advertisement {
     id: number;
     title: string;

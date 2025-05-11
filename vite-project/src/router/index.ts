@@ -186,17 +186,36 @@ const router = createRouter({
                     meta: { title: '创建帖子' },
                 },
                 {
+                    path: 'product/:productId/create-comment',
+                    name: 'CreateComment',
+                    component: () => import('../views/comment/CreateComment.vue'),
+                    meta: { title: '撰写评价' },
+                },
+
+
+                {
                     path: 'product/:productId', // 动态路由，用于商品详情
                     name: 'ProductDetail',
                     component: () => import('../views/product/ProductDetail.vue'), // 确保路径正确
                     meta: { title: '商品详情' },
                     // children: [
                     //     {
-                    //         path: 'create_product', // 在商店详情下添加创建商品路由
-                    //         name: 'CreateProduct',
-                    //         component: () => import('../views/product/CreateProduct.vue'), // 确保路径正确
-                    //         meta: { title: '创建商品' },
+                    //         path: 'comments',
+                    //         name: 'ProductComments',
+                    //         component: () => import('../views/comment/TheAllComment.vue'),
+                    //         meta: { title: '商品评价' },
+                    //         children: [
+                    //             {
+                    //                 path: ':commentId',
+                    //                 name: 'CommentDetail',
+                    //                 component: () => import('../views/comment/CommentDetail.vue'),
+                    //                 meta: { title: '评价详情' },
+                    //             },
+                    //
+                    //
+                    //         ],
                     //     },
+                    //
                     // ],
                 },
                 // {
@@ -210,6 +229,19 @@ const router = createRouter({
                     component: () => import('../views/posting/PostingDetail.vue'),
                     meta: { title: '帖子详情' },
                 },
+                {
+                    path: 'product/:productId/comments',
+                    name: 'ProductComments',
+                    component: () => import('../views/comment/TheAllComment.vue'),
+                    meta: { title: '商品评价' }
+                },
+                {
+                    path: 'product/:productId/comments/:commentId',
+                    name: 'CommentDetail',
+                    component: () => import('../views/comment/CommentDetail.vue'),
+                    meta: { title: '评价详情' }
+                }
+
             ],
         },
         {

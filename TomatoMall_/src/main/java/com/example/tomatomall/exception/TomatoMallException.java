@@ -42,4 +42,8 @@ public class TomatoMallException extends RuntimeException {
   public static TomatoMallException invalidProductId(){return new TomatoMallException("无效的商品id","400");}
 
   public static TomatoMallException advertisementNotExist(){return new TomatoMallException("广告不存在","400");}
+
+  public static TomatoMallException commentNotExist(){return new TomatoMallException("评论不存在","400");}
+
+  public static TomatoMallException postNotExist(){return new TomatoMallException("帖子不存在","400");}
 }
