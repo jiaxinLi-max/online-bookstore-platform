@@ -2,7 +2,7 @@
 //import axios from 'axios';
 import {axios} from '../utils/request'
 //import {Specification} from './specification.ts'
-// 定义商品接口
+// 定义帖子接口
 export interface Posting {
     id: number;
     userId: number;
@@ -18,11 +18,12 @@ export interface Posting {
 import {POSTING_MODULE} from './_prefix';
 
 type postingInfo = {
-    id: number;
+
     userId: number;
     title: string;
     content: string;
     cover: string;
+
 };
 
 
@@ -90,7 +91,7 @@ export const deletePost = (id: number) => {
             'token': token
         },
         params: {
-            id: id
+            postId: id
         }
     }).then(res => {
             console.log('Res data:', res.data);
@@ -102,13 +103,16 @@ export const deletePost = (id: number) => {
     })
 }
 
-export const likePost = (id: number) => {
-    console.log("Liked post:", id);
+export const likePost = (postId: number) => {
+    console.log("Liked post:", postId);
     const token = sessionStorage.getItem('token');
     console.log("token:",token);
-    return axios.post(`${POSTING_MODULE}/like`, id, {
+    return axios.post(`${POSTING_MODULE}/like`, {
         headers: {
-            'token': token
+            'token': token,
+        },
+        params: {
+            postId: postId
         }
     }).then(res => {
             console.log("Res:", res.data);
@@ -120,13 +124,16 @@ export const likePost = (id: number) => {
     })
 }
 
-export const dislikePost = (id: number) => {
-    console.log("Disliked post:", id);
+export const dislikePost = (postId: number) => {
+    console.log("Disliked post:", postId);
     const token = sessionStorage.getItem('token');
     console.log("token:",token);
-    return axios.post(`${POSTING_MODULE}/dislike`, id, {
+    return axios.post(`${POSTING_MODULE}/dislike`, {
         headers: {
-            'token': token
+            'token': token,
+        },
+        params: {
+            postId: postId
         }
     }).then(res => {
         console.log("Res:", res.data);

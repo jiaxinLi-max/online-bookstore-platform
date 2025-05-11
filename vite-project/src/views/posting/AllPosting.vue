@@ -1,6 +1,15 @@
 
 <template>
   <el-main class="posting-list bgimage">
+    <!-- 创建帖子按钮 -->
+    <el-button
+        class="create-posting-button"
+        @click="goToCreatePosting"
+        style="margin-bottom: 20px;"
+        v-if="role === 'CUSTOMER'"
+    >
+      发帖子
+    </el-button>
     <el-card
         v-for="posting in postings"
         :key="posting.id"
@@ -27,7 +36,8 @@ const postings = ref<Posting[]>([]);
 
 const router = useRouter();
 
-// 获取所有商店数据
+const role = sessionStorage.getItem("role");
+
 async function get_getAllpostings() {
   try {
     const res = await getAllPosting();
@@ -39,13 +49,16 @@ async function get_getAllpostings() {
       console.error('获取数据失败：响应格式不符合预期');
     }
   } catch (error) {
-    console.error('获取商店列表失败:', error);
+    console.error('获取帖子列表失败:', error);
   }
 }
 
 // 导航到商店详情
 function goToPostingDetail(postingId: number) {
   router.push({ name: 'PostingDetail', params: { id: postingId } });
+}
+function goToCreatePosting() {
+  router.push({ path: '/home/create-posting' }); // 确保路由路径正确
 }
 
 // 在组件挂载时获取商店数据

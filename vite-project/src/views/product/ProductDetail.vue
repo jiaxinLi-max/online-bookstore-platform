@@ -347,6 +347,15 @@
     </div>
 <!--    <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>-->
 <!--    <el-button type="primary" @click="addToCart">加入购物车</el-button>-->
+    <!-- 评论按钮 -->
+    <el-button type="success" @click="goToCreateComment">发表评论</el-button>
+
+    <el-button type="info" @click="viewAllComments">查看全部评价</el-button>
+
+    <!-- 子页面显示区（例如：撰写评价） -->
+<!--    <div class="comment-child-view">-->
+<!--      <router-view />-->
+<!--    </div>-->
     <div class="action-area">
       <!-- 客户操作 -->
       <div>库存: {{ stockAmount }}</div>
@@ -452,7 +461,7 @@
 
 <script lang="ts">
 import {defineComponent, ref, onMounted} from 'vue';
-import { useRoute } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import {
   deleteTheProduct,
   getProduct,
@@ -472,6 +481,18 @@ export default defineComponent({
   methods: {updateProductInfo},
   setup() {
     const route = useRoute();
+    const router = useRouter();
+    function goToCreateComment() {
+      const productId = route.params.productId;
+      //router.push({ path: `/home/product/${productId}/create-comment` });
+      router.push({ name: 'CreateComment', params: { productId } });
+    }
+    function viewAllComments () {
+      router.push({
+        name: 'ProductComments',
+        params: { productId: route.params.productId }
+      })
+    }
     const productId = Number(route.params.productId).toString();
 
     const role = ref(sessionStorage.getItem('role') || '');
@@ -534,6 +555,7 @@ export default defineComponent({
         console.error('Error loading product details:', error);
       }
     };
+
 
     const openEditDialog = () => {
       showEditDialog.value = true;
@@ -725,6 +747,7 @@ export default defineComponent({
       }
     }
 
+
     return {
       product,
       specifications,
@@ -750,6 +773,8 @@ export default defineComponent({
       addSpecification,
       removeSpecification,
       newSpecifications,
+      goToCreateComment,
+      viewAllComments,
     };
   },
 });

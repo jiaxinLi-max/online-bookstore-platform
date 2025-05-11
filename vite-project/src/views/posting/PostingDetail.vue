@@ -41,8 +41,7 @@
         <el-button
             v-if="role === 'CUSTOMER'"
             type="primary"
-            @click.stop="handleLike"
-            :loading="likeLoading"
+            @click="handleLike"
             size="large"
         >
           <el-icon><Star /></el-icon>
@@ -52,8 +51,7 @@
         <el-button
             v-if="role === 'CUSTOMER'"
             type="info"
-            @click.stop="handleDislike"
-            :loading="dislikeLoading"
+            @click="handleDislike"
             size="large"
         >
           <el-icon><Flag /></el-icon>
@@ -93,8 +91,6 @@ const avatar = ref('')
 const time = ref('')
 const like = ref(0)
 const dislike = ref(0)
-const likeLoading = ref(false)
-const dislikeLoading = ref(false)
 
 // 获取帖子详情
 async function getPost() {
@@ -111,10 +107,11 @@ async function getPost() {
       userId.value = postData.userId
 
       // 获取用户信息
-      const userRes = await userInfo(postData.userId)
+      const userRes = await userInfo(userId.value)
       if (userRes.data.code === '200') {
         userName.value = userRes.data.username
         avatar.value = userRes.data.avatar
+        console.log(avatar)
       }
     }
   } catch (error) {
@@ -136,28 +133,26 @@ async function handleDelete() {
 // 点赞处理
 async function handleLike() {
   try {
-    likeLoading.value = true
     const res = await likePost(id)
     if (res.data.code === '200') {
       like.value++
       ElMessage.success(res.data.message)
     }
-  } finally {
-    likeLoading.value = false
+  } catch (error) {
+    ElMessage.error('点赞失败')
   }
 }
 
 // 点踩处理
 async function handleDislike() {
   try {
-    dislikeLoading.value = true
     const res = await dislikePost(id)
     if (res.data.code === '200') {
       dislike.value++
       ElMessage.success(res.data.message)
     }
-  } finally {
-    dislikeLoading.value = false
+  } catch (error) {
+    ElMessage.error('点踩失败')
   }
 }
 

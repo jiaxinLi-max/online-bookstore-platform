@@ -9,6 +9,10 @@
         <el-input v-model="title" placeholder="请输入帖子标题"></el-input>
       </el-form-item>
 
+      <el-form-item label="帖子内容" prop="postingContent">
+        <el-input v-model="content" placeholder="请输入内容"></el-input>
+      </el-form-item>
+
       <!-- 商品封面 -->
       <el-form-item label="帖子封面" prop="cover">
         <el-upload
@@ -27,17 +31,7 @@
           <img class="dialog-image" :src="dialogImageUrl" alt="Logo Preview" />
         </el-dialog>
       </el-form-item>
-      <!-- 商品选择下拉框 -->
-      <el-form-item label="选择商品" prop="productId">
-        <el-select v-model="selectedProductId" placeholder="请选择商品" style="width: 200px; margin-bottom: 20px;">
-          <el-option
-              v-for="product in products"
-              :key="product.id"
-              :label="product.title"
-              :value="product.id"
-          />
-        </el-select>
-      </el-form-item>
+
 
       <!-- 按钮 -->
       <el-form-item>
@@ -63,7 +57,7 @@ const content = ref('');
 const cover = ref('');
 
 const products = ref<Product[]>([]); // 存储商品列表
-const selectedProductId = ref<number | null>(null); // 修改为对应的类型
+
 const fileList = ref<UploadFile[]>([]);
 const dialogImageUrl = ref('');
 const dialogVisible = ref(false);
@@ -112,6 +106,7 @@ async function handleCreatePosting() {
   }
 
   const payload = {
+    userId: Number(sessionStorage.getItem('userId')),
     title: title.value,
     content: content.value,
     cover: cover.value,
@@ -134,22 +129,7 @@ async function handleCreatePosting() {
     ElMessage.error('创建帖子失败');
   }
 }
-// 获取所有商品数据
-async function getAllProductsData() {
-  try {
-    const res = await getAllProduct();
-    if (res.data && Array.isArray(res.data.data)) {
-      products.value = res.data.data;
-    } else {
-      console.error('获取商品数据失败：响应格式不符合预期');
-    }
-  } catch (error) {
-    console.error('获取商品列表失败:', error);
-  }
-}
-onMounted(() => {
-  getAllProductsData();
-});
+
 </script>
 
 <style scoped>
