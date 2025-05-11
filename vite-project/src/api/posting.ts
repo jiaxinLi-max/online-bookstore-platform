@@ -103,13 +103,16 @@ export const deletePost = (id: number) => {
     })
 }
 
-export const likePost = (id: number) => {
-    console.log("Liked post:", id);
+export const likePost = (postId: number) => {
+    console.log("Liked post:", postId);
     const token = sessionStorage.getItem('token');
     console.log("token:",token);
-    return axios.post(`${POSTING_MODULE}/like`, id, {
+    return axios.post(`${POSTING_MODULE}/like`, {
         headers: {
-            'token': token
+            'token': token,
+        },
+        params: {
+            postId: postId
         }
     }).then(res => {
             console.log("Res:", res.data);
@@ -121,13 +124,16 @@ export const likePost = (id: number) => {
     })
 }
 
-export const dislikePost = (id: number) => {
-    console.log("Disliked post:", id);
+export const dislikePost = (postId: number) => {
+    console.log("Disliked post:", postId);
     const token = sessionStorage.getItem('token');
     console.log("token:",token);
-    return axios.post(`${POSTING_MODULE}/dislike`, id, {
+    return axios.post(`${POSTING_MODULE}/dislike`, {
         headers: {
-            'token': token
+            'token': token,
+        },
+        params: {
+            postId: postId
         }
     }).then(res => {
         console.log("Res:", res.data);
