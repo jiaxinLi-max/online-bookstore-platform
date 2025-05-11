@@ -6,6 +6,7 @@
         class="create-posting-button"
         @click="goToCreatePosting"
         style="margin-bottom: 20px;"
+        v-if="role === 'customer'"
     >
       发帖子
     </el-button>
@@ -34,6 +35,8 @@ import {ElMessage} from "element-plus";
 const postings = ref<Posting[]>([]);
 
 const router = useRouter();
+
+const role = sessionStorage.getItem("role");
 
 async function get_getAllpostings() {
   try {
