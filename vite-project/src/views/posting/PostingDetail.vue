@@ -44,18 +44,18 @@
             @click="handleLike"
             size="large"
         >
-          <el-icon><Star /></el-icon>
-          {{ like || 0 }}
+          <span>赞</span>
+          <span>{{ like }}</span>
         </el-button>
 
         <el-button
             v-if="role === 'CUSTOMER'"
-            type="info"
+            type="primary"
             @click="handleDislike"
             size="large"
         >
-          <el-icon><Flag /></el-icon>
-          {{ dislike || 0 }}
+          <span>踩</span>
+          <span>{{ dislike }}</span>
         </el-button>
       </div>
     </el-card>
@@ -69,12 +69,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ArrowLeft, Delete, Star, Flag, Loading } from '@element-plus/icons-vue'
+import { ArrowLeft, Delete, Loading } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { getPostingDetail, deletePost, likePost, dislikePost } from '../../api/posting.ts'
-import { userInfo } from '../../api/user.ts'
+import { getPostingDetail, deletePost, likePost, dislikePost} from '../../api/posting.ts'
+import { getUserInfo } from '../../api/user.ts'
 
 const router = useRouter()
 const route = useRoute()
@@ -92,6 +92,18 @@ const time = ref('')
 const like = ref(0)
 const dislike = ref(0)
 
+function formatTime(timeStr: string): string {
+  const date = new Date(timeStr)
+
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0') // 月份从 0 开始
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+
+  return `${year}年${month}月${day}日 ${hours}时${minutes}分`
+}
+
 // 获取帖子详情
 async function getPost() {
   try {
@@ -101,17 +113,18 @@ async function getPost() {
       title.value = postData.title
       content.value = postData.content
       cover.value = postData.cover
-      time.value = postData.time  // 使用time字段
-      like.value = postData.likes
-      dislike.value = postData.dislikes
+      time.value = formatTime(postData.time)  // 使用time字段
+      like.value = Number(postData.like) || 0
+      dislike.value = Number(postData.dislike) || 0
       userId.value = postData.userId
 
       // 获取用户信息
-      const userRes = await userInfo(userId.value)
+      const userRes = await getUserInfo(Number(userId.value))
       if (userRes.data.code === '200') {
-        userName.value = userRes.data.username
-        avatar.value = userRes.data.avatar
-        console.log(avatar)
+        userName.value = userRes.data.data.username
+        avatar.value = userRes.data.data.avatar
+        console.log(userName.value)
+        console.log(avatar.value)
       }
     }
   } catch (error) {
@@ -124,7 +137,7 @@ async function handleDelete() {
   try {
     await deletePost(id)
     ElMessage.success('帖子删除成功')
-    router.push({ name: 'AllPostings' })
+    await router.push({ name: 'AllPostings' })
   } catch (error) {
     ElMessage.error('删除失败')
   }
@@ -136,7 +149,8 @@ async function handleLike() {
     const res = await likePost(id)
     if (res.data.code === '200') {
       like.value++
-      ElMessage.success(res.data.message)
+      console.log(like.value)
+      ElMessage.success(res.data.data)
     }
   } catch (error) {
     ElMessage.error('点赞失败')
@@ -149,7 +163,8 @@ async function handleDislike() {
     const res = await dislikePost(id)
     if (res.data.code === '200') {
       dislike.value++
-      ElMessage.success(res.data.message)
+      console.log(dislike.value)
+      ElMessage.success(res.data.data)
     }
   } catch (error) {
     ElMessage.error('点踩失败')

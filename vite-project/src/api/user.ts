@@ -61,6 +61,23 @@ export const userInfo = (username: string | null) => {
             return res
         })
 }
+export const getUserInfo = (userId: number) => {
+    const token = sessionStorage.getItem('token');
+    return axios.get(`${USER_MODULE}`, {
+        params: { id: userId },
+        headers: {
+            'token': token
+        }
+    })
+        .then (res => {
+            console.log("Res data:", res.data);
+            return res;
+        })
+        .catch (error => {
+            console.error("Error fetching user info:", error);
+            throw error;
+        })
+}
 // // 获取用户信息
 // export const userInfo_1 = () => {
 //     return axios.get(`${USER_MODULE}`)
