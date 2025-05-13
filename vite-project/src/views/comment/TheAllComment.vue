@@ -14,6 +14,7 @@
       <el-avatar :src="comment.avatar" class="comment-avatar" size="large" />
       <div class="comment-content">
         <h3 class="username">{{ comment.username }}</h3>
+        <p class="comment-time">🕒 {{ formatTime(comment.time) }}</p>
         <div class="score-like-row">
           <span>评分：{{ comment.score }} ⭐</span>
           <span class="like-count">👍 点赞数：{{ comment.likes }}</span>
@@ -39,6 +40,19 @@ const productId = String(Number(route.params.productId)); // 确保是字符串
 
 // 最终展示的评论列表
 const comments = ref<(Comment & { username: string; avatar: string })[]>([]);
+const time = ref('')
+
+function formatTime(timeStr: string): string {
+  const date = new Date(timeStr)
+
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+
+  return `${year}年${month}月${day}日 ${hours}时${minutes}分`
+}
 
 // 获取所有评论并补充用户信息
 async function get_getAllComments() {
