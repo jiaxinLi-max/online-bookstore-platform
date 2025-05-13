@@ -187,6 +187,9 @@ onMounted(() => {
   max-width: 1200px;
   margin: 20px auto;
   padding: 20px;
+  background-image: url("../../assets/kenan.png");
+  background-size: cover;
+  background-position: center top;
 }
 
 .back-button {

@@ -37,7 +37,7 @@ public class CommentController {
     /**
      * 更新评价信息
      */
-    @PutMapping
+    @PatchMapping
     public Response<String> updateCommentInfo(@RequestBody CommentVO CommentVO){
         return Response.buildSuccess(commentService.updateCommentInfo(CommentVO));
     }

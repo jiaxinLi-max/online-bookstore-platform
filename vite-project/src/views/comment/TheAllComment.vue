@@ -24,7 +24,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getTheAllComment, type Comment } from "../../api/comment.ts";
-import { userInfo } from "../../api/user.ts";
+import { getUserInfo } from "../../api/user.ts";
 
 // Vue Router
 const router = useRouter();
@@ -48,7 +48,7 @@ async function get_getAllComments() {
             let avatar = '';
 
             try {
-              const userRes = await userInfo(comment.userId);
+              const userRes = await getUserInfo(comment.userId);
               if (userRes.data.code === '200') {
                 username = userRes.data.data.username;
                 avatar = userRes.data.data.avatar;

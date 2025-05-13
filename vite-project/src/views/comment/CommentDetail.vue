@@ -27,11 +27,44 @@
             </div>
           </div>
         </div>
-        <div class="like-count">
-          <el-icon color="#F56C6C"><Star /></el-icon>
-          {{ like }} 人点赞
-        </div>
 
+      </div>
+
+      <!-- 新增操作按钮区域 -->
+      <div class="action-buttons">
+        <!-- 管理员删除按钮 -->
+        <el-button
+            v-if="currentUserRole === 'MANAGER'"
+            type="danger"
+            @click="handleDelete"
+            class="action-btn"
+        >
+          <el-icon><Delete /></el-icon>
+          删除评价
+        </el-button>
+
+        <!-- 用户编辑按钮 -->
+        <el-button
+            v-if="currentUserRole === 'CUSTOMER' && isCommentOwner"
+            type="primary"
+            @click="showEditDialog"
+            class="action-btn"
+        >
+          <el-icon><Edit /></el-icon>
+          编辑评价
+        </el-button>
+
+        <!-- 点赞按钮 -->
+        <el-button
+            v-if="currentUserRole === 'CUSTOMER'"
+            :loading="likeLoading"
+            type="warning"
+            @click="handleLike"
+            class="action-btn"
+        >
+          <el-icon><Star /></el-icon>
+          点赞 ({{ like }})
+        </el-button>
       </div>
 
       <!-- 帖子主要内容 -->
@@ -39,30 +72,60 @@
         <div class="content-text" v-html="content"></div>
       </div>
 
-
     </el-card>
+      <!-- 加载状态 -->
+      <div v-else class="loading-container">
+        <el-icon class="loading-icon"><Loading /></el-icon>
+        正在加载帖子详情...
+      </div>
 
-    <!-- 加载状态 -->
-    <div v-else class="loading-container">
-      <el-icon class="loading-icon"><Loading /></el-icon>
-      正在加载帖子详情...
-    </div>
+      <!-- 编辑对话框 -->
+      <el-dialog v-model="editDialogVisible" title="编辑评价" width="600px">
+        <el-form :model="editForm">
+          <el-form-item label="评分">
+            <el-rate v-model="editForm.score" :max="5" />
+          </el-form-item>
+          <el-form-item label="内容">
+            <el-input
+                v-model="editForm.content"
+                type="textarea"
+                :rows="4"
+                placeholder="请输入评价内容"
+            />
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <el-button @click="editDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="submitEdit">提交修改</el-button>
+        </template>
+      </el-dialog>
+
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ArrowLeft, Delete, Star, Flag, Loading } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { getComment, } from '../../api/comment.ts'
-import { userInfo } from '../../api/user.ts'
+import { getComment, deleteComment, updateComment, likeComment } from '../../api/comment.ts'
+import { getUserInfo } from '../../api/user.ts'
 import { formatTime } from '../..//utils/date'
 const router = useRouter()
 const route = useRoute()
 
 const id = Number(route.params.commentId)
+const currentUserRole = sessionStorage.getItem('role')
+const currentUserName = sessionStorage.getItem('username')
+const isCommentOwner = computed(() => currentUserName === userName.value)
+
+const editDialogVisible = ref(false)
+const editForm = reactive({
+  content: '',
+  score: 0,
+})
+
 const formattedTime = ref('')
 
 // 响应式数据
@@ -95,7 +158,7 @@ async function get_getComment() {
       userId.value = postData.userId
 
       // 获取用户信息
-      const userRes = await userInfo(postData.userId)
+      const userRes = await getUserInfo(postData.userId)
       if (userRes.data.code === '200') {
         userName.value = userRes.data.data.username
         avatar.value = userRes.data.data.avatar
@@ -111,6 +174,56 @@ async function get_getComment() {
 // 返回帖子列表
 function backToAllComment() {
   router.push({ name: 'ProductComments' })
+}
+
+// 删除处理
+async function handleDelete() {
+  try {
+    const res = await deleteComment(id)
+    if (res.data.code === '200') ElMessage.success(res.data.data)
+    else ElMessage.error(res.data.msg)
+    backToAllComment()
+  } catch (error) {
+    ElMessage.error('删除失败')
+  }
+}
+
+// 点赞处理
+async function handleLike() {
+  likeLoading.value = true
+  try {
+    const res = await likeComment(id)
+    like.value += 1
+    if (res.data.code === '200') ElMessage.success(res.data.data)
+    else ElMessage.error(res.data.msg)
+  } catch (error) {
+    ElMessage.error('点赞失败')
+  } finally {
+    likeLoading.value = false
+  }
+}
+
+// 编辑处理
+function showEditDialog() {
+  editForm.content = content.value
+  editForm.score = score.value
+  editDialogVisible.value = true
+}
+
+async function submitEdit() {
+  try {
+    const res = await updateComment({
+      id: id,
+      content: editForm.content,
+      score: editForm.score
+    })
+    if (res.data.code === '200') ElMessage.success(res.data.data)
+    else ElMessage.error(res.data.msg)
+    editDialogVisible.value = false
+    await get_getComment() // 刷新数据
+  } catch (error) {
+    ElMessage.error('修改失败')
+  }
 }
 
 onMounted(() => {
