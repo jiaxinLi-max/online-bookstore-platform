@@ -22,10 +22,12 @@ declare module 'vue' {
     ElInput: typeof import('element-plus/es')['ElInput']
     ElInputNumber: typeof import('element-plus/es')['ElInputNumber']
     ElMain: typeof import('element-plus/es')['ElMain']
+<<<<<<< HEAD
     ElOption: typeof import('element-plus/es')['ElOption']
+=======
+>>>>>>> 2fb1cec01cb4c01114a6d1e4f4daa82bbb1f4f94
     ElRate: typeof import('element-plus/es')['ElRate']
     ElRow: typeof import('element-plus/es')['ElRow']
-    ElSelect: typeof import('element-plus/es')['ElSelect']
     ElTag: typeof import('element-plus/es')['ElTag']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     Header: typeof import('./src/components/Header.vue')['default']
