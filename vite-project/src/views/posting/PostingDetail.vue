@@ -137,9 +137,13 @@ async function getPost() {
 // 删除处理
 async function handleDelete() {
   try {
-    await deletePost(id)
-    ElMessage.success('帖子删除成功')
-    await router.push({ name: 'AllPostings' })
+    const res = await deletePost(id)
+    if (res.data.code === '200') {
+      ElMessage.success('帖子删除成功')
+      await router.push({name: 'AllPostings'})
+    } else {
+      console.error("Error in deleting comment:", res.data.msg);
+    }
   } catch (error) {
     ElMessage.error('删除失败')
   }
