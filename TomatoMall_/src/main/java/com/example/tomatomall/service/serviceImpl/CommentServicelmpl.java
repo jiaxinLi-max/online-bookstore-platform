@@ -10,6 +10,7 @@ import com.example.tomatomall.vo.CommentVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class CommentServicelmpl implements CommentService {
         if(commentVO.getScore()!=null){
             comment.setScore(commentVO.getScore());
         }
-        comment.setTime(new Date());
+        comment.setTime(LocalDateTime.now());
 
 
 
@@ -65,7 +66,7 @@ public class CommentServicelmpl implements CommentService {
     public String addComment(CommentVO commentVO){
         Comment comment=commentVO.toPO();
         comment.setLikes(0);
-        comment.setTime(new Date());
+        comment.setTime(LocalDateTime.now());
         commentRepository.save(comment);
         return "创建成功";
     }
