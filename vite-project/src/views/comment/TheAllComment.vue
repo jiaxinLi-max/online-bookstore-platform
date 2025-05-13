@@ -1,5 +1,8 @@
 <template>
   <el-main class="comment-list bgimage">
+    <div class="back-button-wrapper">
+      <el-button type="primary" icon="ArrowLeft" @click="goToProductDetail">返回商品详情</el-button>
+    </div>
     <el-card
         v-for="comment in comments"
         :key="comment.id"
@@ -11,7 +14,10 @@
       <el-avatar :src="comment.avatar" class="comment-avatar" size="large" />
       <div class="comment-content">
         <h3 class="username">{{ comment.username }}</h3>
-        <p class="advertisement-content">评分：{{ comment.score }} ⭐</p>
+        <div class="score-like-row">
+          <span>评分：{{ comment.score }} ⭐</span>
+          <span class="like-count">👍 点赞数：{{ comment.likes }}</span>
+        </div>
         <p>{{ comment.content }}</p>
         <p class="link-text">点击查看详情</p>
       </div>
@@ -78,6 +84,9 @@ async function get_getAllComments() {
 function goToCommentDetail(commentId: number) {
   router.push({ path: `/home/product/${productId}/comments/${commentId}` });
 }
+function goToProductDetail() {
+  router.push({ path: `/home/product/${productId}` });
+}
 
 // 初始化
 onMounted(() => {
@@ -132,4 +141,24 @@ onMounted(() => {
   background-position: center;
   padding: 40px 0;
 }
+.score-like-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 250px;
+  font-weight: bold;
+  color: #333;
+}
+
+.like-count {
+  color: #f56c6c;
+}
+.back-button-wrapper {
+  width: 70%;
+  max-width: 600px;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+
+}
+
 </style>
