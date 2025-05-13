@@ -26,8 +26,6 @@ type postingInfo = {
 
 };
 
-
-
 export const createPosting = (postingInfo: postingInfo) => {
     // 使用反引号来构建 URL
     const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
@@ -107,9 +105,13 @@ export const likePost = (id: number) => {
     console.log("Liked post:", id);
     const token = sessionStorage.getItem('token');
     console.log("token:",token);
-    return axios.post(`${POSTING_MODULE}/like`, id, {
+
+    return axios.post(`${POSTING_MODULE}/like`, null, {
         headers: {
-            'token': token
+            'token': token,
+        },
+        params: {
+            postId: id
         }
     }).then(res => {
             console.log("Res:", res.data);
@@ -125,9 +127,12 @@ export const dislikePost = (id: number) => {
     console.log("Disliked post:", id);
     const token = sessionStorage.getItem('token');
     console.log("token:",token);
-    return axios.post(`${POSTING_MODULE}/dislike`, id, {
+    return axios.post(`${POSTING_MODULE}/dislike`, null, {
         headers: {
-            'token': token
+            'token': token,
+        },
+        params: {
+            postId: id
         }
     }).then(res => {
         console.log("Res:", res.data);
