@@ -1,69 +1,71 @@
 <template>
-  <div class="posting-detail-container">
-    <!-- 返回按钮 -->
-    <el-button type="primary" @click="backToAllPosting" class="back-button">
-      <el-icon><ArrowLeft /></el-icon>
-      返回帖子列表
-    </el-button>
+  <div class="post">
+    <div class="posting-detail-container">
+      <!-- 返回按钮 -->
+      <el-button type="primary" @click="backToAllPosting" class="back-button">
+        <el-icon><ArrowLeft /></el-icon>
+        返回帖子列表
+      </el-button>
 
-    <!-- 帖子内容卡片 -->
-    <el-card class="detail-card" v-if="title">
-      <!-- 用户信息头部 -->
-      <div class="post-header">
-        <div class="user-info">
-          <el-avatar :src="avatar" size="large" />
-          <div class="user-meta">
-            <h3 class="username">{{ userName }}</h3>
-            <span class="post-time">{{ time }}</span>
+      <!-- 帖子内容卡片 -->
+      <el-card class="detail-card" v-if="title">
+        <!-- 用户信息头部 -->
+        <div class="post-header">
+          <div class="user-info">
+            <el-avatar :src="avatar" size="large" />
+            <div class="user-meta">
+              <h3 class="username">{{ userName }}</h3>
+              <span class="post-time">{{ time }}</span>
+            </div>
           </div>
+          <el-button
+              v-if="role === 'MANAGER'"
+              type="danger"
+              @click="handleDelete"
+              size="small"
+              class="delete-btn"
+          >
+            <el-icon><Delete /></el-icon>
+            删除帖子
+          </el-button>
         </div>
-        <el-button
-            v-if="role === 'MANAGER'"
-            type="danger"
-            @click="handleDelete"
-            size="small"
-            class="delete-btn"
-        >
-          <el-icon><Delete /></el-icon>
-          删除帖子
-        </el-button>
+
+        <!-- 帖子主要内容 -->
+        <div class="post-content">
+          <h2 class="post-title">{{ title }}</h2>
+          <img v-if="cover" :src="cover" alt="封面图" class="cover-image" />
+          <div class="content-text" v-html="content"></div>
+        </div>
+
+        <!-- 互动按钮 -->
+        <div class="action-buttons">
+          <el-button
+              v-if="role === 'CUSTOMER'"
+              type="primary"
+              @click="handleLike"
+              size="large"
+          >
+            <span>赞</span>
+            <span>{{ like }}</span>
+          </el-button>
+
+          <el-button
+              v-if="role === 'CUSTOMER'"
+              type="primary"
+              @click="handleDislike"
+              size="large"
+          >
+            <span>踩</span>
+            <span>{{ dislike }}</span>
+          </el-button>
+        </div>
+      </el-card>
+
+      <!-- 加载状态 -->
+      <div v-else class="loading-container">
+        <el-icon class="loading-icon"><Loading /></el-icon>
+        正在加载帖子详情...
       </div>
-
-      <!-- 帖子主要内容 -->
-      <div class="post-content">
-        <h2 class="post-title">{{ title }}</h2>
-        <img v-if="cover" :src="cover" alt="封面图" class="cover-image" />
-        <div class="content-text" v-html="content"></div>
-      </div>
-
-      <!-- 互动按钮 -->
-      <div class="action-buttons">
-        <el-button
-            v-if="role === 'CUSTOMER'"
-            type="primary"
-            @click="handleLike"
-            size="large"
-        >
-          <span>赞</span>
-          <span>{{ like }}</span>
-        </el-button>
-
-        <el-button
-            v-if="role === 'CUSTOMER'"
-            type="primary"
-            @click="handleDislike"
-            size="large"
-        >
-          <span>踩</span>
-          <span>{{ dislike }}</span>
-        </el-button>
-      </div>
-    </el-card>
-
-    <!-- 加载状态 -->
-    <div v-else class="loading-container">
-      <el-icon class="loading-icon"><Loading /></el-icon>
-      正在加载帖子详情...
     </div>
   </div>
 </template>
@@ -182,14 +184,14 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* 保持原有样式不变 */
 .posting-detail-container {
   max-width: 1200px;
   margin: 20px auto;
   padding: 20px;
-  background-image: url("../../assets/kenan.png");
-  background-size: cover;
-  background-position: center top;
+}
+
+.post {
+  background-image: url("../../assets/login.png");
 }
 
 .back-button {

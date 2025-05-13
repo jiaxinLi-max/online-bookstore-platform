@@ -56,7 +56,7 @@
 
         <!-- 点赞按钮 -->
         <el-button
-            v-if="currentUserRole === 'CUSTOMER'"
+            v-if="currentUserRole === 'CUSTOMER' && !isCommentOwner"
             :loading="likeLoading"
             type="warning"
             @click="handleLike"
@@ -83,7 +83,7 @@
       <el-dialog v-model="editDialogVisible" title="编辑评价" width="600px">
         <el-form :model="editForm">
           <el-form-item label="评分">
-            <el-rate v-model="editForm.score" :max="5" />
+            <el-rate v-model="editForm.score" :max="5" :allow-half="true"/>
           </el-form-item>
           <el-form-item label="内容">
             <el-input
@@ -193,8 +193,10 @@ async function handleLike() {
   likeLoading.value = true
   try {
     const res = await likeComment(id)
-    like.value += 1
-    if (res.data.code === '200') ElMessage.success(res.data.data)
+    if (res.data.code === '200') {
+      ElMessage.success(res.data.data)
+      like.value += 1
+    }
     else ElMessage.error(res.data.msg)
   } catch (error) {
     ElMessage.error('点赞失败')
