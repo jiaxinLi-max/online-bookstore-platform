@@ -34,7 +34,7 @@
       <div class="action-buttons">
         <!-- 管理员删除按钮 -->
         <el-button
-            v-if="currentUserRole === 'MANAGER'"
+            v-if="currentUserRole === 'MANAGER' || isCommentOwner"
             type="danger"
             @click="handleDelete"
             class="action-btn"

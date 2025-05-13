@@ -85,7 +85,7 @@ export const updateComment = (updateInfo: updateInfo) => {
 
 export const deleteComment = (commentId: number) => {
     const token = sessionStorage.getItem('token');
-    return axios.delete(`${COMMENT_MODULE}`, {
+    return axios.delete(`${COMMENT_MODULE}/${commentId}`, {
         headers: {
             'token': token
         },
