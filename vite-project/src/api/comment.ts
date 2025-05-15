@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {COMMENT_MODULE, PRODUCT_MODULE} from "./_prefix.ts";
+import {isProtectedDayOfYearToken} from "date-fns/_lib/protectedTokens";
 export interface Comment {
     id: number;
     productId: number;
@@ -16,6 +17,12 @@ type commentInfo = {
     content: string;
     score:number;//float?
 };
+
+type updateInfo = {
+    id: number;
+    content: string;
+    score: number;
+}
 
 
 
@@ -56,3 +63,54 @@ export const getComment = (commentId: string) => {
     });
 
 };
+
+export const updateComment = (updateInfo: updateInfo) => {
+    console.log("UpdateInfo:", updateInfo);
+    const token = sessionStorage.getItem('token');
+    return axios.put(`${COMMENT_MODULE}/${updateInfo.id}`, updateInfo, {
+        headers: {
+            'Content-Type': 'application/json',
+            'token': token
+        }
+    })
+        .then(res => {
+            console.log("Update res:", res.data);
+            return res;
+        })
+        .catch(error => {
+            console.error("Update comment error:", error);
+            throw error;
+        })
+}
+
+export const deleteComment = (commentId: number) => {
+    const token = sessionStorage.getItem('token');
+    return axios.delete(`${COMMENT_MODULE}/${commentId}`, {
+        headers: {
+            'token': token
+        },
+        params: {
+            id: commentId
+        }
+    })
+        .then(res => {
+            console.log("delete res:", res.data);
+            return res;
+        })
+        .catch(error => {
+            console.error("Delete comment error:", error);
+            throw error;
+        })
+}
+
+export const likeComment = (commentId: number) => {
+    const token = sessionStorage.getItem('token');
+    return axios.post(`${COMMENT_MODULE}/like/${commentId}`, null, {
+        headers: {
+            'token': token
+        },
+        params: {
+            id: commentId
+        }
+    })
+}
