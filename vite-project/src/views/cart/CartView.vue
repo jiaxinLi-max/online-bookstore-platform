@@ -164,9 +164,10 @@
 
 <script lang="ts">
 import {computed, onMounted, ref} from 'vue';
+import { getUserInfo } from "../../api/user.ts";
 import {Cart, getCartItems, removeItemFromCart, updateCartItemQuantity, placeOrder} from '../../api/cart.ts';
 import {ElMessage} from "element-plus";
-import { useRoute, useRouter } from 'vue-router'; // 引入路由相关
+import { useRouter } from 'vue-router'; // 引入路由相关
 // 定义组件
 export default {
   setup() {
@@ -189,6 +190,8 @@ export default {
     const ableToOrder = computed(() => {
       return hasTelInput.value && telLegal.value && hasNameInput.value && hasLocationInput.value;
     });
+
+    let level = 0;
 
     // 获取购物车中的商品
     async function getAllInCart() {
@@ -224,6 +227,13 @@ export default {
         console.error('删除商品失败:', error);
       }
     };
+
+    async function getLevel() {
+      const res = await getUserInfo(Number(userId));
+      if (res.data.code === '200') {
+        level = res.data.data.grade;
+      }
+    }
 
     // 修改购物车中商品的数量
     // const updateQuantity = async (cartItemId: number, newQuantity: number) => {
@@ -276,6 +286,7 @@ export default {
     const generateOrder = async () => {
       let orderId: number;
       let totalAmount: number = 0;
+      let realAmount: number = 0;
       let createTime: string;
       const cartIds: number[] = [];
 
@@ -304,6 +315,7 @@ export default {
         if (res.data.code === '200') {
           orderId = res.data.data.id;
           totalAmount = res.data.data.totalAmount;
+          realAmount = res.data.data.realAmount;
           createTime = res.data.data.createTime;
           console.log("订单ID:", res.data.data.id);
 
@@ -312,6 +324,7 @@ export default {
             params: {
               orderId: orderId,
               totalAmount: totalAmount,
+              realAmount: realAmount,
               createTime: createTime,
             }
           });
@@ -330,6 +343,7 @@ export default {
     // 在组件挂载时获取购物车中的商品
     onMounted(() => {
       getAllInCart();
+      getLevel();
     });
 
     // 返回响应式变量和方法

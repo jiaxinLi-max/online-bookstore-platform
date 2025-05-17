@@ -1,6 +1,7 @@
 //import {axios} from '../utils/request'
 import {USER_MODULE} from './_prefix'
 import axios from 'axios';
+
 type LoginInfo = {
     username: string,
     password: string
@@ -26,6 +27,11 @@ type UpdateInfo = {
     telephone?: string,
     email?: string,
     location?: string,
+}
+
+type creditInfo = {
+    userId: number,
+    score: number,
 }
 
 // 如果有“Vue: This may be converted to an async function”警告，可以不管
@@ -104,6 +110,42 @@ export const userInfoUpdate = (updateInfo: UpdateInfo) => {
             return res
         })
         .catch(err => {
-            console.log(err)
+            console.error("UserInfo update error:", err)
+        })
+}
+
+
+// 增加积分
+export const addCredit = (updateInfo: creditInfo) => {
+    console.log("addCredit", updateInfo.userId, updateInfo.score)
+    const token = sessionStorage.getItem('token');
+    return axios.put(`${USER_MODULE}/add`, updateInfo, {
+        headers: {
+            'Content-Type': 'application/json',
+            'token': token
+        }
+    })
+        .then(res => {
+            return res
+        })
+        .catch(err => {
+            console.error("addCredit error:", err)
+        })
+}
+
+// 更新等级
+export const updateLevel = (userId: number) => {
+    console.log("updateLevel", userId)
+    const token = sessionStorage.getItem('token')
+    return axios.put(`${USER_MODULE}/update/${userId}`, userId, {
+        headers: {
+            'token': token
+        }
+    })
+        .then(res => {
+            return res
+        })
+        .catch(error => {
+            console.error("Error updating level:", error);
         })
 }
