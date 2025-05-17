@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { router } from '../router'
 import {parseRole, parseTime} from "../utils"
-import { User, SwitchButton, Plus,ShoppingCart,Promotion, ChatSquare } from "@element-plus/icons-vue"
+import { User, SwitchButton, Plus,ShoppingCart,Promotion, ChatSquare,Trophy } from "@element-plus/icons-vue"
 import {userInfo} from "../api/user.ts";
  // 导入 Plus 图标
 import {ref,  onMounted,computed} from 'vue';
@@ -96,6 +96,13 @@ function logout() {
           </el-icon>
         </router-link>
       </el-col>
+      <el-col :span="1" class="header-icon">
+        <router-link to="/home/rankings" class="no-link">
+          <el-icon :size="35" color="white">
+            <Trophy />
+          </el-icon>
+        </router-link>
+      </el-col>
 
       <el-col :span="1" class="header-icon">
         <router-link to="/home/all-postings" class="no-link">
@@ -106,7 +113,7 @@ function logout() {
       </el-col>
 
 
-      <el-col :span="14">
+      <el-col :span="13">
       </el-col>
 
 

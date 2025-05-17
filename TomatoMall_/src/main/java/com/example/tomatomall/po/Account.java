@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -49,6 +50,15 @@ public class Account {
     @Column(name = "location")  //数据库  下划线
     private String location;
 
+    //积分模块
+    @Basic
+    @Column(name="score")
+    private BigDecimal score;
+
+    @Basic
+    @Column(name = "grade")
+    private Integer grade;
+
     public AccountVO toVO(){
         AccountVO accountVO=new AccountVO();
 
@@ -61,6 +71,8 @@ public class Account {
         accountVO.setTelephone(this.telephone);
         accountVO.setEmail(this.email);
         accountVO.setLocation(this.location);
+        accountVO.setScore(this.score);
+        accountVO.setGrade(this.grade);
         return  accountVO;
     }
 }

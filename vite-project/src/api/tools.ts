@@ -18,3 +18,34 @@ export const getImage = async (file: File) => {
         throw error; // 重新抛出错误
     }
 };
+
+// 类型定义：post帖子 或 comment评价
+type SortType = 'post' | 'comment'
+
+// 按时间排序
+export const sortByTime = (type: SortType, productId?: number) => {
+    const token = sessionStorage.getItem('token');
+    return axios.get('/api/sortByTime', {
+        headers: {
+            token
+        },
+        params: {
+            type,
+            ...(productId !== undefined ? { productId } : {})
+        }
+    });
+}
+
+// 按点赞排序
+export const sortByLike = (type: SortType, productId?: number) => {
+    const token = sessionStorage.getItem('token');
+    return axios.get('/api/sortByLike', {
+        headers: {
+            token
+        },
+        params: {
+            type,
+            ...(productId !== undefined ? { productId } : {})
+        }
+    });
+}

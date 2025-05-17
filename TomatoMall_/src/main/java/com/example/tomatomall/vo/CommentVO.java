@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @NoArgsConstructor
@@ -17,7 +18,7 @@ public class CommentVO {
     private String content;
     private Float score;
     private Integer likes;
-    private Date time;
+    private LocalDateTime time;
     public Comment toPO(){
         Comment comment=new Comment();
         comment.setId(this.id);

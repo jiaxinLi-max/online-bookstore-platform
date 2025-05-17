@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,6 +42,9 @@ public class OrderServiceLmpl implements OrderService {
 
     @Autowired
     CartsOrdersRelationRepository cartsOrdersRelationRepository;
+
+    @Autowired
+    AccountRepository accountRepository;
 
 
     @Value("${alipay.serverUrl}")
@@ -68,6 +70,12 @@ public class OrderServiceLmpl implements OrderService {
         Order order=orderVO.toPO();
         order.setCreateTime(new Date());
         order.setTotalAmount(calculateTotalAmount(orderVO.getCartItemIds()));
+        Account account= accountRepository.findById(order.getUserId()).orElse(null);
+        if(account==null){
+            throw TomatoMallException.userNotExist();
+        }
+        double discount=1.0-account.getGrade()*0.05;
+        order.setRealAmount(order.getTotalAmount().multiply(BigDecimal.valueOf(discount)));
         order.setStatus("PENDING");
         orderRepository.save(order);
         order.setExpireTime(LocalDateTime.now().plusMinutes(30));
@@ -84,7 +92,7 @@ public class OrderServiceLmpl implements OrderService {
             Order order = orderRepository.findById(order_id).orElseThrow(TomatoMallException::orderNotExist);
             JSONObject bizContent = new JSONObject();
             bizContent.put("out_trade_no", String.valueOf(order_id));
-            bizContent.put("total_amount", String.valueOf(order.getTotalAmount()));
+            bizContent.put("total_amount", String.valueOf(order.getRealAmount()));
 
             bizContent.put("subject", "番茄书城订单 #" + order_id); // 商品标题（必填）
             bizContent.put("product_code", "FAST_INSTANT_TRADE_PAY");  // 固定配置

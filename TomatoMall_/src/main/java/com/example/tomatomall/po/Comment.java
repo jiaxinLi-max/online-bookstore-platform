@@ -2,11 +2,13 @@ package com.example.tomatomall.po;
 
 
 import com.example.tomatomall.vo.CommentVO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -39,9 +41,11 @@ public class Comment {
     @Column(name = "likes")  //数据库  下划线
     private Integer likes;
 
+
     @Basic
-    @Column(name = "time")
-    private Date time;
+    @Column(name = "time",nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime time;
 
     public CommentVO toVO(){
         CommentVO commentVO=new CommentVO();

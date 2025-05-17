@@ -4,12 +4,15 @@ import com.example.tomatomall.exception.TomatoMallException;
 import com.example.tomatomall.po.Comment;
 
 
+import com.example.tomatomall.po.Product;
 import com.example.tomatomall.repository.CommentRepository;
+import com.example.tomatomall.repository.ProductRepository;
 import com.example.tomatomall.service.CommentService;
 import com.example.tomatomall.vo.CommentVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +22,9 @@ import java.util.stream.Collectors;
 public class CommentServicelmpl implements CommentService {
     @Autowired
     CommentRepository commentRepository;
+
+    @Autowired
+    ProductRepository productRepository;
 
     @Override
     public List<CommentVO> getAllCommentInfo(Integer productId){
@@ -52,21 +58,35 @@ public class CommentServicelmpl implements CommentService {
         if(commentVO.getScore()!=null){
             comment.setScore(commentVO.getScore());
         }
-        comment.setTime(new Date());
-
-
-
-
+        comment.setTime(LocalDateTime.now());
         commentRepository.save(comment);
+        update_new_score(comment.getProductId());
         return "更新成功";
+    }
+
+    private void update_new_score(Integer productId){
+        List<Comment> comments = commentRepository.findByProductId(productId);
+        Product product=productRepository.findById(productId).orElse(null);
+        if(product==null){
+            throw TomatoMallException.productNotExist();
+        }
+        float sum_score=0;
+        int sum=comments.size();
+        for(Comment comment:comments){
+            sum_score+=comment.getScore();
+        }
+        float new_rate=sum_score/sum;
+        product.setRate(new_rate);
+        productRepository.save(product);
     }
 
     @Override
     public String addComment(CommentVO commentVO){
         Comment comment=commentVO.toPO();
         comment.setLikes(0);
-        comment.setTime(new Date());
+        comment.setTime(LocalDateTime.now());
         commentRepository.save(comment);
+        update_new_score(comment.getProductId());
         return "创建成功";
     }
     @Override

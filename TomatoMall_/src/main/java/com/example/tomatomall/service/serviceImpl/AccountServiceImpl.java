@@ -4,14 +4,13 @@ import com.example.tomatomall.exception.TomatoMallException;
 import com.example.tomatomall.po.Account;
 import com.example.tomatomall.repository.AccountRepository;
 import com.example.tomatomall.service.AccountService;
-import com.example.tomatomall.util.SecurityUtil;
 import com.example.tomatomall.util.TokenUtil;
 import com.example.tomatomall.vo.AccountVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
+import java.math.BigDecimal;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -39,6 +38,8 @@ public class AccountServiceImpl implements AccountService {
         // 将加密后的密码设置到用户对象
         accountVO.setPassword(encodedPassword);
         Account newaccount=accountVO.toPO();
+        newaccount.setScore(BigDecimal.ZERO);
+        newaccount.setGrade(0);
         accountRepository.save(newaccount);
         return "注册成功";
     }
@@ -121,6 +122,32 @@ public class AccountServiceImpl implements AccountService {
             throw TomatoMallException.userNotExist();
         }
         return account.toVO();
+    }
+
+    //积分模块
+    @Override
+    public String addScore(Integer userId, BigDecimal score){
+        Account account=accountRepository.findById(userId).orElse(null);
+        if(account==null){
+            throw TomatoMallException.userNotExist();
+        }
+        account.setScore(account.getScore().add(score));
+        accountRepository.save(account);
+        return "添加积分成功";
+    }
+
+    @Override
+    public String updateDegree(Integer userId){
+        Account account=accountRepository.findById(userId).orElse(null);
+        if(account==null){
+            throw TomatoMallException.userNotExist();
+        }
+        while(BigDecimal.valueOf(100.0).compareTo(account.getScore())<=0 && account.getGrade()<10){
+            account.setScore(account.getScore().subtract(BigDecimal.valueOf(100.0)));
+            account.setGrade(account.getGrade()+1);
+        }
+        accountRepository.save(account);
+        return "更新等级成功";
     }
 
 }

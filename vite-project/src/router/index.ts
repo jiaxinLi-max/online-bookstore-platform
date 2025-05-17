@@ -168,6 +168,11 @@ const router = createRouter({
                     meta: { title: '帖子列表' },
                 },
                 {
+                    path: 'rankings',
+                    name: 'Rankings',
+                    component: () => import('../views/ranking/AllRankings.vue')  // 示例
+                },
+                {
                     path: 'create-product',
                     name: 'CreateProduct',
                     component: () => import('../views/product/CreateProduct.vue'), // 确保路径正确
