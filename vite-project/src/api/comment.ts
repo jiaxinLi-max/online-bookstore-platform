@@ -1,6 +1,5 @@
 import axios from 'axios';
 import {COMMENT_MODULE, PRODUCT_MODULE} from "./_prefix.ts";
-import {isProtectedDayOfYearToken} from "date-fns/_lib/protectedTokens";
 export interface Comment {
     id: number;
     productId: number;

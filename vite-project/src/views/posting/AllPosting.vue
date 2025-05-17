@@ -13,6 +13,15 @@
     >
       发帖子
     </el-button>
+
+    <!-- 排序按钮 -->
+    <div style="margin-bottom: 20px;">
+      <el-radio-group v-model="sortOption" @change="fetchPostings">
+        <el-radio-button label="time">按时间排序</el-radio-button>
+        <el-radio-button label="likes">按点赞排序</el-radio-button>
+      </el-radio-group>
+    </div>
+
     <el-card
         v-for="posting in postings"
         :key="posting.id"
@@ -34,25 +43,45 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { getAllPosting, Posting} from '../../api/posting.ts';
 import {ElMessage} from "element-plus";
+import { sortByTime, sortByLike } from '../../api/tools.ts'
 
 const postings = ref<Posting[]>([]);
 
 const router = useRouter();
-
+const sortOption = ref<'time' | 'likes'>('time') // 排序方式：默认按时间
 const role = sessionStorage.getItem("role");
-
-async function get_getAllpostings() {
+//
+// async function get_getAllpostings() {
+//   try {
+//     const res = await getAllPosting();
+//     //console.log("get_getAllproducts",res);
+//     if (res.data && Array.isArray(res.data.data)) {
+//       postings.value = res.data.data;
+//       //console.log(res.data);
+//     } else {
+//       console.error('获取数据失败：响应格式不符合预期');
+//     }
+//   } catch (error) {
+//     console.error('获取帖子列表失败:', error);
+//   }
+// }
+async function fetchPostings() {
   try {
-    const res = await getAllPosting();
-    //console.log("get_getAllproducts",res);
-    if (res.data && Array.isArray(res.data.data)) {
-      postings.value = res.data.data;
-      //console.log(res.data);
+    let res
+    if (sortOption.value === 'time') {
+      res = await sortByTime('post')
     } else {
-      console.error('获取数据失败：响应格式不符合预期');
+      res = await sortByLike('post')
+    }
+
+    if (res.data && Array.isArray(res.data.data)) {
+      postings.value = res.data.data
+    } else {
+      console.error('获取数据失败：响应格式不符合预期')
     }
   } catch (error) {
-    console.error('获取帖子列表失败:', error);
+    console.error('获取帖子失败:', error)
+    ElMessage.error('获取帖子失败')
   }
 }
 
@@ -68,9 +97,12 @@ function goToAllProduct() {
 }
 
 // 在组件挂载时获取商店数据
+// onMounted(() => {
+//   get_getAllpostings();
+// });
 onMounted(() => {
-  get_getAllpostings();
-});
+  fetchPostings()
+})
 </script>
 
 <style scoped>

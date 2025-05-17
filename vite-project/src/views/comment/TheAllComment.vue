@@ -3,6 +3,12 @@
     <div class="back-button-wrapper">
       <el-button type="primary" icon="ArrowLeft" @click="goToProductDetail">返回商品详情</el-button>
     </div>
+    <div class="sort-select-wrapper">
+      <el-select v-model="sortOption" placeholder="选择排序方式" @change="fetchCommentsBySort" class="sort-select">
+        <el-option label="按时间排序" value="time" />
+        <el-option label="按点赞排序" value="like" />
+      </el-select>
+    </div>
     <el-card
         v-for="comment in comments"
         :key="comment.id"
@@ -32,7 +38,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getTheAllComment, type Comment } from "../../api/comment.ts";
 import { getUserInfo } from "../../api/user.ts";
-
+import { sortByTime, sortByLike } from '../../api/tools.ts';
 // Vue Router
 const router = useRouter();
 const route = useRoute();
@@ -41,7 +47,7 @@ const productId = String(Number(route.params.productId)); // 确保是字符串
 // 最终展示的评论列表
 const comments = ref<(Comment & { username: string; avatar: string })[]>([]);
 const time = ref('')
-
+const sortOption = ref<'time' | 'like'>('time');
 function formatTime(timeStr: string): string {
   const date = new Date(timeStr)
 
@@ -55,42 +61,77 @@ function formatTime(timeStr: string): string {
 }
 
 // 获取所有评论并补充用户信息
-async function get_getAllComments() {
+// async function get_getAllComments() {
+//   try {
+//     const res = await getTheAllComment(productId);
+//     if (res.data && Array.isArray(res.data.data)) {
+//       const rawComments: Comment[] = res.data.data;
+//
+//       // 并行获取用户名与头像
+//       const enrichedComments = await Promise.all(
+//           rawComments.map(async (comment) => {
+//             let username = '未知用户';
+//             let avatar = '';
+//
+//             try {
+//               const userRes = await getUserInfo(comment.userId);
+//               if (userRes.data.code === '200') {
+//                 username = userRes.data.data.username;
+//                 avatar = userRes.data.data.avatar;
+//               }
+//             } catch (err) {
+//               // 留空默认
+//             }
+//
+//             return {
+//               ...comment,
+//               username,
+//               avatar,
+//             };
+//           })
+//       );
+//
+//       comments.value = enrichedComments;
+//     } else {
+//       console.error('获取数据失败：响应格式不符合预期');
+//     }
+//   } catch (error) {
+//     console.error('获取评论列表失败:', error);
+//   }
+// }
+async function fetchCommentsBySort() {
   try {
-    const res = await getTheAllComment(productId);
+    let res;
+    if (sortOption.value === 'time') {
+      res = await sortByTime('comment', Number(productId));
+    } else {
+      res = await sortByLike('comment', Number(productId));
+    }
+
     if (res.data && Array.isArray(res.data.data)) {
       const rawComments: Comment[] = res.data.data;
 
-      // 并行获取用户名与头像
-      const enrichedComments = await Promise.all(
+      const enriched = await Promise.all(
           rawComments.map(async (comment) => {
             let username = '未知用户';
             let avatar = '';
-
             try {
               const userRes = await getUserInfo(comment.userId);
               if (userRes.data.code === '200') {
                 username = userRes.data.data.username;
                 avatar = userRes.data.data.avatar;
               }
-            } catch (err) {
-              // 留空默认
-            }
-
-            return {
-              ...comment,
-              username,
-              avatar,
-            };
+            } catch (e) {}
+            return { ...comment, username, avatar };
           })
       );
 
-      comments.value = enrichedComments;
+      comments.value = enriched;
     } else {
       console.error('获取数据失败：响应格式不符合预期');
     }
-  } catch (error) {
-    console.error('获取评论列表失败:', error);
+  } catch (err) {
+    console.error('获取评论失败:', err);
   }
 }
 
@@ -103,8 +144,11 @@ function goToProductDetail() {
 }
 
 // 初始化
+// onMounted(() => {
+//   get_getAllComments();
+// });
 onMounted(() => {
-  get_getAllComments();
+  fetchCommentsBySort();
 });
 </script>
 
@@ -173,6 +217,17 @@ onMounted(() => {
   justify-content: flex-start;
   margin-bottom: 10px;
 
+}
+.sort-select-wrapper {
+  width: 70%;
+  max-width: 600px;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.sort-select {
+  width: 160px;
 }
 
 </style>

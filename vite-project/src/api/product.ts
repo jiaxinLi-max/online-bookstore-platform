@@ -24,7 +24,7 @@ export interface Product {
 
 }
 
-import {PRODUCT_MODULE} from './_prefix';
+import {PRODUCT_MODULE,RANK_MODULE} from './_prefix';
 export interface Specification {
     id: string; // 规格的唯一标识符
     item: string; // 规格的名称（例如 "作者" 或 "副标题"）
@@ -98,6 +98,25 @@ export const getAllProduct = () => {
     const token = sessionStorage.getItem('token');
     console.log("token:",token);
     return axios.get(`${PRODUCT_MODULE}`,{
+        headers: {
+            'token': token // 使用 'token' 作为请求头
+        }
+    })
+        .then(res => {
+            console.log("Res data:", res.data);
+            return res;
+        })
+        .catch(error => {
+            console.error("Error fetching products:", error); // 增加错误捕获
+            throw error; // 将错误抛出以便其他处理
+        });
+};
+
+export const getRankProduct = () => {
+    console.log("Fetching rank products...");
+    const token = sessionStorage.getItem('token');
+    console.log("token:",token);
+    return axios.get(`${RANK_MODULE}`,{
         headers: {
             'token': token // 使用 'token' 作为请求头
         }
