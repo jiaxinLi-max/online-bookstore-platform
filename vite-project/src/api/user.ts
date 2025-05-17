@@ -29,11 +29,6 @@ type UpdateInfo = {
     location?: string,
 }
 
-type creditInfo = {
-    userId: number,
-    score: number,
-}
-
 // 如果有“Vue: This may be converted to an async function”警告，可以不管
 // 用户登录
 export const userLogin = (loginInfo: LoginInfo) => {
@@ -116,13 +111,17 @@ export const userInfoUpdate = (updateInfo: UpdateInfo) => {
 
 
 // 增加积分
-export const addCredit = (updateInfo: creditInfo) => {
-    console.log("addCredit", updateInfo.userId, updateInfo.score)
+export const addCredit = (updateId: number ,updateScore: number) => {
+    console.log("addCredit", updateId, updateScore)
     const token = sessionStorage.getItem('token');
-    return axios.put(`${USER_MODULE}/add`, updateInfo, {
+    return axios.put(`${USER_MODULE}/add`, null, {
         headers: {
             'Content-Type': 'application/json',
             'token': token
+        },
+        params: {
+            userId: updateId,
+            score: updateScore
         }
     })
         .then(res => {

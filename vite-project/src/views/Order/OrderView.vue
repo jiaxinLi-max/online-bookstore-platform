@@ -37,7 +37,7 @@
 <script lang="ts">
 import { onMounted, ref } from 'vue';
 import { addCredit, updateLevel } from '../../api/user.ts'
-import {postOrder, getStatus, Cart, getCartItems} from '../../api/cart.ts';
+import {postOrder, getStatus, Cart, getCartItems } from '../../api/cart.ts';
 import { ElMessage } from "element-plus";
 import { useRoute, useRouter } from 'vue-router';
 import {parseRole} from "../../utils"; // 引入路由相关
@@ -104,10 +104,10 @@ export default {
           if (res.data.data.status === 'TRADE_SUCCESS') {
             clearInterval(pollingTimer);
             ElMessage.success("支付成功！");
-            let toAdd = Math.floor(totalAmount / 10);
-            let numberId = Number(userId);
-            await addCredit({numberId, toAdd});
-            await updateLevel(numberId);
+            let updateScore = Math.floor(realAmount / 10);
+            console.log(userId, updateScore);
+            await addCredit(Number(userId), updateScore);
+            await updateLevel(Number(userId));
             console.log('success');
             orderClosed.value = true;
           }

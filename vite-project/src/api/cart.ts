@@ -26,6 +26,7 @@ export interface shippingAddress {
 }
 
 type form = {
+    userId: number;
     cartItemIds: number[];
     shipping_address: shippingAddress;
     payment_method: string;

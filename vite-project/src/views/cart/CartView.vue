@@ -301,6 +301,7 @@ export default {
       }
 
       const formData = {
+        userId: Number(userId),
         cartItemIds: cartIds,
         shipping_address: {
           name: name.value,
@@ -318,6 +319,7 @@ export default {
           realAmount = res.data.data.realAmount;
           createTime = res.data.data.createTime;
           console.log("订单ID:", res.data.data.id);
+          console.log("实际金额:", realAmount);
 
           await router.push({
             name: 'Order',
