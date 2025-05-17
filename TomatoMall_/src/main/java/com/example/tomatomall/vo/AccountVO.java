@@ -23,7 +23,7 @@ public class AccountVO {
 
     //积分模块
     private BigDecimal score;
-    private Integer degree;
+    private Integer grade;
 
     public Account toPO(){
         Account account=new Account();
@@ -36,7 +36,7 @@ public class AccountVO {
         account.setTelephone(this.telephone);
         account.setEmail(this.email);
         account.setLocation(this.location);
-        account.setDegree(this.degree);
+        account.setGrade(this.grade);
         account.setScore(this.score);
         return  account;
     }

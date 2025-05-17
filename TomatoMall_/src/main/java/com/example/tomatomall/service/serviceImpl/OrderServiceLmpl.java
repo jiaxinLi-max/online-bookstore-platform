@@ -12,7 +12,6 @@ import com.example.tomatomall.repository.*;
 import com.example.tomatomall.service.OrderService;
 import com.example.tomatomall.vo.OrderVO;
 
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -76,7 +74,7 @@ public class OrderServiceLmpl implements OrderService {
         if(account==null){
             throw TomatoMallException.userNotExist();
         }
-        double discount=1.0-account.getDegree()*0.05;
+        double discount=1.0-account.getGrade()*0.05;
         order.setRealAmount(order.getTotalAmount().multiply(BigDecimal.valueOf(discount)));
         order.setStatus("PENDING");
         orderRepository.save(order);

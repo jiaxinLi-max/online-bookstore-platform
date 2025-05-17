@@ -56,8 +56,8 @@ public class Account {
     private BigDecimal score;
 
     @Basic
-    @Column(name = "degree")
-    private Integer degree;
+    @Column(name = "grade")
+    private Integer grade;
 
     public AccountVO toVO(){
         AccountVO accountVO=new AccountVO();
@@ -72,7 +72,7 @@ public class Account {
         accountVO.setEmail(this.email);
         accountVO.setLocation(this.location);
         accountVO.setScore(this.score);
-        accountVO.setDegree(this.degree);
+        accountVO.setGrade(this.grade);
         return  accountVO;
     }
 }
