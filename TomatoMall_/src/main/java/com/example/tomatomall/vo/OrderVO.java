@@ -39,6 +39,9 @@ public class OrderVO {
 
     private String paymentForm;
 
+    //积分
+    private BigDecimal realAmount;
+
     public Order toPO(){
         Order order=new Order();
         order.setId(this.id);
@@ -52,6 +55,7 @@ public class OrderVO {
         order.setPaymentTime(this.paymentTime);
         order.setTradeNo(this.tradeNo);
         order.setPaymentForm(this.paymentForm);
+        order.setRealAmount(this.realAmount);
         return order;
     }
 }

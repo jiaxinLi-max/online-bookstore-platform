@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 @Service
@@ -121,6 +122,30 @@ public class AccountServiceImpl implements AccountService {
             throw TomatoMallException.userNotExist();
         }
         return account.toVO();
+    }
+
+    //积分模块
+    @Override
+    public String addScore(Integer userId, BigDecimal score){
+        Account account=accountRepository.findById(userId).orElse(null);
+        if(account==null){
+            throw TomatoMallException.userNotExist();
+        }
+        account.setScore(account.getScore().add(score));
+        return "添加积分成功";
+    }
+
+    @Override
+    public String updateDegree(Integer userId){
+        Account account=accountRepository.findById(userId).orElse(null);
+        if(account==null){
+            throw TomatoMallException.userNotExist();
+        }
+        while(BigDecimal.valueOf(100.0).compareTo(account.getScore())<=0 && account.getDegree()<10){
+            account.setScore(account.getScore().subtract(BigDecimal.valueOf(100.0)));
+            account.setDegree(account.getDegree()+1);
+        }
+        return "更新等级成功";
     }
 
 }

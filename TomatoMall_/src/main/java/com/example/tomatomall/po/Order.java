@@ -56,6 +56,11 @@ public class Order {
     @Column(name = "total_amount")
     private BigDecimal totalAmount;
 
+    //积分
+    @Basic
+    @Column(name = "real_amount")
+    private BigDecimal realAmount;
+
     @Basic
     @Column(name = "create_time")
     private Date createTime;
@@ -95,6 +100,7 @@ public class Order {
         orderVO.setPaymentTime(this.paymentTime);
         orderVO.setTradeNo(this.tradeNo);
         orderVO.setPaymentForm(this.paymentForm);
+        orderVO.setRealAmount(this.realAmount);
         return orderVO;
     }
 }

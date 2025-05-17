@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/accounts")
@@ -53,5 +54,16 @@ public class AccountController {
     @PostMapping("/login")
     public Response<String> login(@RequestBody AccountVO accountVO) {
         return Response.buildSuccess(accountService.login(accountVO.getUsername(), accountVO.getPassword()));
+    }
+
+
+    @PutMapping("/add")
+    public Response<String> addScore(@RequestParam Integer userId, @RequestParam BigDecimal score){
+       return Response.buildSuccess(accountService.addScore(userId,score));
+    }
+
+    @PutMapping("/update/{userId}")
+    public Response<String> updateDegree(@PathVariable(value="userId")Integer userId){
+        return Response.buildSuccess(accountService.updateDegree(userId));
     }
 }

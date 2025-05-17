@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @NoArgsConstructor
 @Getter
 @Setter
@@ -18,6 +20,11 @@ public class AccountVO {
     private String telephone;
     private String email;
     private String location;
+
+    //积分模块
+    private BigDecimal score;
+    private Integer degree;
+
     public Account toPO(){
         Account account=new Account();
         account.setId(this.id);
@@ -29,6 +36,8 @@ public class AccountVO {
         account.setTelephone(this.telephone);
         account.setEmail(this.email);
         account.setLocation(this.location);
+        account.setDegree(this.degree);
+        account.setScore(this.score);
         return  account;
     }
 }
