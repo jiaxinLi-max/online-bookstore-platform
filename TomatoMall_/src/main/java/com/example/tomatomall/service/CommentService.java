@@ -1,5 +1,6 @@
 package com.example.tomatomall.service;
 
+import com.example.tomatomall.po.Comment;
 import com.example.tomatomall.vo.CommentVO;
 
 import java.util.List;
@@ -11,5 +12,11 @@ public interface CommentService {
     String addComment(CommentVO commentVO);
     String deleteComment(Integer id);
     String likeComment(Integer id);
+    List<Comment>findAllByOrderByTimeDesc();
+    List<Comment>findAllByOrderByLikesDesc();
+    List<Comment>findAllByProductIdOrderByTimeDesc(Integer productId);
+    List<Comment>findAllByProductIdOrderByLikesDesc(Integer productId);
+
+
 
 }

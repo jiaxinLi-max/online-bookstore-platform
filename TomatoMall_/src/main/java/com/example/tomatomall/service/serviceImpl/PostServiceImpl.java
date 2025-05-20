@@ -82,4 +82,14 @@ public class PostServiceImpl implements PostService {
         postRepository.save(post);
         return "踩成功";
     }
+
+
+    @Override
+    public List<Post>findAllByOrderByTimeDesc(){
+        return postRepository.findAllByOrderByTimeDesc();
+    }
+    @Override
+    public List<Post>findAllByOrderByLikeDesc(){
+        return postRepository.findAllByOrderByLikeDesc();
+    }
 }

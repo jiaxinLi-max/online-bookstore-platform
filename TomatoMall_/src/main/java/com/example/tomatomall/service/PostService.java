@@ -1,5 +1,6 @@
 package com.example.tomatomall.service;
 
+import com.example.tomatomall.po.Post;
 import com.example.tomatomall.vo.PostVO;
 
 
@@ -19,4 +20,7 @@ public interface PostService {
     String likePost(Integer postId);
 
     String dislikePost(Integer postId);
+
+    List<Post>findAllByOrderByTimeDesc();
+    List<Post>findAllByOrderByLikeDesc();
 }

@@ -9,7 +9,10 @@ import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.example.tomatomall.exception.TomatoMallException;
 import com.example.tomatomall.po.*;
 import com.example.tomatomall.repository.*;
+import com.example.tomatomall.service.AccountService;
+import com.example.tomatomall.service.CartService;
 import com.example.tomatomall.service.OrderService;
+import com.example.tomatomall.service.ProductService;
 import com.example.tomatomall.vo.OrderVO;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +35,10 @@ public class OrderServiceLmpl implements OrderService {
     OrderRepository orderRepository;
 
     @Autowired
-    CartRepository cartRepository;
+    CartService cartService;
 
     @Autowired
-    ProductRepository productRepository;
+    ProductService productService;
 
     @Autowired
     StockpileRepository stockpileRepository;
@@ -44,7 +47,7 @@ public class OrderServiceLmpl implements OrderService {
     CartsOrdersRelationRepository cartsOrdersRelationRepository;
 
     @Autowired
-    AccountRepository accountRepository;
+    AccountService accountService;
 
 
     @Value("${alipay.serverUrl}")
@@ -70,7 +73,7 @@ public class OrderServiceLmpl implements OrderService {
         Order order=orderVO.toPO();
         order.setCreateTime(new Date());
         order.setTotalAmount(calculateTotalAmount(orderVO.getCartItemIds()));
-        Account account= accountRepository.findById(order.getUserId()).orElse(null);
+        Account account= accountService.findById(orderVO.getId());
         if(account==null){
             throw TomatoMallException.userNotExist();
         }
@@ -195,7 +198,7 @@ public class OrderServiceLmpl implements OrderService {
 
         for (Integer cartItemId : cartItemIds) {
             // 查询购物车商品信息
-            Cart cartItem = cartRepository.findById(cartItemId).orElse(null);
+            Cart cartItem = cartService.findById(cartItemId);
             if (cartItem != null) {
                 Integer productId=cartItem.getProductId();
                 // 单价 * 数量
@@ -210,7 +213,7 @@ public class OrderServiceLmpl implements OrderService {
                 stockpile.setAmount(stockpile.getAmount()-cartItem.getQuantity());
                 stockpile.setFrozen(stockpile.getFrozen()+cartItem.getQuantity());
                 stockpileRepository.save(stockpile);
-                Product product= productRepository.findById(productId).orElse(null);
+                Product product= productService.findById(productId);
                 if(product==null){
                     throw TomatoMallException.productNotExist();
                 }
@@ -225,7 +228,7 @@ public class OrderServiceLmpl implements OrderService {
 
     private void decreaseStockpile(List<Integer> cartItemIds,Integer orderId){
         for(Integer cartItemId:cartItemIds){
-            Cart cartItem = cartRepository.findById(cartItemId).orElse(null);
+            Cart cartItem = cartService.findById(cartItemId);
             if (cartItem != null) {
                 Integer productId=cartItem.getProductId();
                 Stockpile stockpile=stockpileRepository.findByProductId(productId);
@@ -249,7 +252,7 @@ public class OrderServiceLmpl implements OrderService {
     //如果支付失败的话
     private void releaseFrozenStock(List<Integer> cartItemIds) {
         for (Integer cartItemId : cartItemIds) {
-            Cart cartItem = cartRepository.findById(cartItemId).orElse(null);
+            Cart cartItem = cartService.findById(cartItemId);
             if (cartItem != null) {
                 Stockpile stockpile = stockpileRepository.findByProductId(cartItem.getProductId());
                 if (stockpile != null) {

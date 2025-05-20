@@ -1,5 +1,6 @@
 package com.example.tomatomall.service;
 
+import com.example.tomatomall.po.Cart;
 import com.example.tomatomall.vo.CartResponseVO;
 import com.example.tomatomall.vo.CartVO;
 
@@ -19,4 +20,6 @@ public interface CartService {
 
     //获取购物车商品列表
     CartResponseVO getPInCart(Integer userId);
+
+    Cart findById(Integer id);
 }
