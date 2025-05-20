@@ -19,7 +19,7 @@ public class RankServiceImpl implements RankService {
     private ProductRepository productRepository;
 
     @Autowired
-    private CommentRepository  commentRepository;
+    private CommentRepository commentRepository;
 
 
     @Override
