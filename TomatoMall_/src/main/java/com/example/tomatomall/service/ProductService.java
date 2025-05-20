@@ -1,6 +1,7 @@
 package com.example.tomatomall.service;
 
 
+import com.example.tomatomall.po.Product;
 import com.example.tomatomall.vo.ProductVO;
 import com.example.tomatomall.vo.Response;
 import com.example.tomatomall.vo.StockpileVO;
@@ -22,4 +23,11 @@ public interface ProductService {
     String updateStock(String productId,StockpileVO stockpileVO);
     //查询商品库存
     StockpileVO getStock(String productId);
+
+    Product findByTitle(String title);
+    List<Product>findAllByOrderByRateDesc();
+
+    Product findById(Integer id);
+
+    void saveProduct(Product product);
 }

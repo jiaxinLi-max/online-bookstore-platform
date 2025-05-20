@@ -5,24 +5,25 @@ import com.example.tomatomall.po.Cart;
 import com.example.tomatomall.po.Product;
 import com.example.tomatomall.po.Stockpile;
 import com.example.tomatomall.repository.CartRepository;
-import com.example.tomatomall.repository.ProductRepository;
+
 import com.example.tomatomall.repository.StockpileRepository;
 import com.example.tomatomall.service.CartService;
+import com.example.tomatomall.service.ProductService;
 import com.example.tomatomall.vo.CartResponseVO;
 import com.example.tomatomall.vo.CartVO;
-import com.example.tomatomall.vo.ProductVO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 public class CartServiceImpl implements CartService {
     @Autowired
-    ProductRepository productRepository;
+    ProductService productService;
 
     @Autowired
     StockpileRepository stockpileRepository;
@@ -32,7 +33,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartVO addPIntoCart(Integer userId,Integer productId,Integer quantity){
-        Product product=productRepository.findById(productId).orElse(null);
+        Product product=productService.findById(productId);
         if(product==null){
             throw TomatoMallException.productNotExist();
         }
@@ -116,8 +117,10 @@ public class CartServiceImpl implements CartService {
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (Cart cart : cartList) {
-            Product product = productRepository.findById(cart.getProductId())
-                    .orElseThrow(() -> new RuntimeException("商品不存在"));
+            Product product = productService.findById(cart.getProductId());
+            if(product==null){
+                throw TomatoMallException.productNotExist();
+            }
 
             CartVO cartVO = cart.toVO();
             cartVO.setTitle(product.getTitle());
@@ -139,5 +142,10 @@ public class CartServiceImpl implements CartService {
         response.setTotalAmount(totalAmount);
 
         return response;
+    }
+
+    @Override
+    public Cart findById(Integer id){
+        return cartRepository.findById(id).orElse(null);
     }
 }

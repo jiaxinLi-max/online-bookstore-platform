@@ -4,8 +4,9 @@ import com.example.tomatomall.exception.TomatoMallException;
 import com.example.tomatomall.po.Advertisement;
 import com.example.tomatomall.po.Product;
 import com.example.tomatomall.repository.AdvertisementRepository;
-import com.example.tomatomall.repository.ProductRepository;
+
 import com.example.tomatomall.service.AdvertisementService;
+import com.example.tomatomall.service.ProductService;
 import com.example.tomatomall.vo.AdvertisementVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
     AdvertisementRepository advertisementRepository;
 
     @Autowired
-    ProductRepository productRepository;
+    ProductService productService;
 
     @Override
     public List<AdvertisementVO> getAllAdvertisements(){
@@ -29,7 +30,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     @Override
     public String updateAdvertisement(AdvertisementVO advertisementVO){
-        Product product=productRepository.findById(advertisementVO.getProductId()).orElse(null);
+        Product product=productService.findById(advertisementVO.getProductId());
         Advertisement advertisement=advertisementRepository.findById(advertisementVO.getId()).orElse(null);
         if(advertisement==null){
             throw TomatoMallException.advertisementNotExist();
@@ -55,7 +56,7 @@ public class AdvertisementServiceImpl implements AdvertisementService {
 
     @Override
     public AdvertisementVO createAdvertisement(AdvertisementVO advertisementVO){
-        Product product=productRepository.findById(advertisementVO.getProductId()).orElse(null);
+        Product product=productService.findById(advertisementVO.getProductId());
         if(product==null){
             throw TomatoMallException.productNotExist();
         }
