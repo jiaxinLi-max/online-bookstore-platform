@@ -94,6 +94,7 @@ function logout() {
           <el-icon :size="35" color="white">
             <Promotion />
           </el-icon>
+          <div class="icon-label">广告</div> <!-- 新增的文本标签 -->
         </router-link>
       </el-col>
       <el-col :span="1" class="header-icon">
@@ -216,5 +217,11 @@ function logout() {
   object-fit: cover; /* 确保图片填充整个区域 */
   margin-top: 10px; /* 调整垂直位置 */
   margin-bottom: 10px; /* 调整垂直位置 */
+}
+.icon-label {
+  color: white;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 2px;
 }
 </style>

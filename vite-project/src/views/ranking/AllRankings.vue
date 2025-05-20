@@ -79,25 +79,30 @@
 <template>
   <el-main class="product-list bgimage">
     <el-card
-        v-for="product in products"
+        v-for="(product, index) in products"
         :key="product.id"
         class="product-card"
         @click="goToProductDetail(product.id)"
     >
+      <div class="rank-badge" v-if="index < 3">
+        第{{ index + 1 }}名
+      </div>
       <div class="product-image">
-        <img :src='product.cover' alt="Product Cover" />
+        <img :src="product.cover" alt="Product Cover" />
       </div>
       <h3>{{ product.title }}</h3>
+      <p>⭐ 评分：{{ product.rate?.toFixed(1) ?? '暂无评分' }}</p>
       <p>点击查看详情</p>
     </el-card>
-    <!--    <el-button type="primary" @click="createNewStore">创建商店</el-button>-->
   </el-main>
 </template>
+
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { getRankProduct, Product } from '../../api/product.ts';
+import { ElMessage } from 'element-plus'
 
 const products = ref<Product[]>([]);
 
@@ -128,28 +133,33 @@ function goToProductDetail(productId: number) {
 // 在组件挂载时获取商店数据
 onMounted(() => {
   get_getRankproducts();
+  ElMessage({
+    message: '当前页面为按评分排行展示商品',
+    type: 'info',
+    duration: 3000
+  });
 });
 </script>
 
 <style scoped>
 
 .product-list {
-  min-height: 800px;
   display: flex;
-  flex-wrap: wrap; /* 允许子元素换行 */
-  justify-content: center; /* 水平居中对齐 */
-  gap: 20px; /* 设置子元素之间的间距 */
+  flex-direction: column; /* 垂直方向布局，每一项一行 */
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
 }
 
 .product-card {
-  width: calc((100% / 4) - 20px); /* 每行三个卡片，减去间距 */
+  width: 40%; /* 一行一个卡片 */
   padding: 20px;
-  margin: 10px;
   cursor: pointer;
   transition: box-shadow 0.3s;
-  box-sizing: border-box; /* 确保 padding 和 border 不影响宽度 */
-  background-color: rgba(255, 255, 255, 0.6); /* 透明白色背景 */
-  border: 1px solid rgba(255, 255, 255, 0.5); /* 半透明边框 */
+  box-sizing: border-box;
+  background-color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  position: relative; /* 让角标定位相对于卡片 */
 }
 
 .product-card:hover {
@@ -157,18 +167,31 @@ onMounted(() => {
 }
 
 .product-image img {
-  width: 100%; /* 确保图片宽度充满容器 */
-  height: auto; /* 高度自适应 */
-  border-radius: 8px; /* 圆角效果 */
-  max-width: 200px; /* 最大宽度限制为 200px */
-  max-height: 150px; /* 最大高度限制为 150px */
-  object-fit: cover; /* 裁剪图片以适应容器 */
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  max-height: 150px;
+  object-fit: cover;
 }
+
+.rank-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: gold;
+  color: black;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
 .bgimage {
   background-image: url("../../assets/kenan.png");
   background-size: cover;
   background-position: center top;
   min-height: 100vh;
 }
+
 </style>
 

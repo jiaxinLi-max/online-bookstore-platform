@@ -16,4 +16,5 @@ public interface AccountService {
     //积分模块
     String addScore(Integer userId, BigDecimal score);
     String updateDegree(Integer userId);
+    Account findById(Integer id);
 }

@@ -1,6 +1,6 @@
 package com.example.tomatomall.service.serviceImpl;
 
-import com.example.tomatomall.TomatoMallApplication;
+
 import com.example.tomatomall.exception.TomatoMallException;
 import com.example.tomatomall.po.Product;
 import com.example.tomatomall.po.Specification;
@@ -11,7 +11,7 @@ import com.example.tomatomall.repository.StockpileRepository;
 import com.example.tomatomall.service.ProductService;
 import com.example.tomatomall.vo.ProductVO;
 import com.example.tomatomall.vo.StockpileVO;
-import org.apache.coyote.Response;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -163,5 +163,25 @@ public class ProductServiceImpl implements ProductService {
         } catch (NumberFormatException e) {
             throw TomatoMallException.invalidProductId();  // 处理无效的ID格式
         }
+    }
+
+    @Override
+    public Product findByTitle(String title){
+        return productRepository.findByTitle(title);
+    }
+
+    @Override
+    public List<Product>findAllByOrderByRateDesc(){
+        return productRepository.findAllByOrderByRateDesc();
+    }
+
+    @Override
+    public Product findById(Integer id){
+        return productRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public void saveProduct(Product product){
+        productRepository.save(product);
     }
 }

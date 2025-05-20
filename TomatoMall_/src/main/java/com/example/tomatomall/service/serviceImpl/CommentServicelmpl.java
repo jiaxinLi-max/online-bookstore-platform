@@ -6,14 +6,14 @@ import com.example.tomatomall.po.Comment;
 
 import com.example.tomatomall.po.Product;
 import com.example.tomatomall.repository.CommentRepository;
-import com.example.tomatomall.repository.ProductRepository;
 import com.example.tomatomall.service.CommentService;
+import com.example.tomatomall.service.ProductService;
 import com.example.tomatomall.vo.CommentVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+
 import java.util.List;
 
 import java.util.stream.Collectors;
@@ -24,7 +24,7 @@ public class CommentServicelmpl implements CommentService {
     CommentRepository commentRepository;
 
     @Autowired
-    ProductRepository productRepository;
+    ProductService productService;
 
     @Override
     public List<CommentVO> getAllCommentInfo(Integer productId){
@@ -66,7 +66,7 @@ public class CommentServicelmpl implements CommentService {
 
     private void update_new_score(Integer productId){
         List<Comment> comments = commentRepository.findByProductId(productId);
-        Product product=productRepository.findById(productId).orElse(null);
+        Product product=productService.findById(productId);
         if(product==null){
             throw TomatoMallException.productNotExist();
         }
@@ -77,7 +77,7 @@ public class CommentServicelmpl implements CommentService {
         }
         float new_rate=sum_score/sum;
         product.setRate(new_rate);
-        productRepository.save(product);
+        productService.saveProduct(product);
     }
 
     @Override
@@ -110,5 +110,23 @@ public class CommentServicelmpl implements CommentService {
         comment.setLikes(comment.getLikes()+1);
         commentRepository.save(comment);
         return "点赞成功";
+    }
+
+    @Override
+    public List<Comment>findAllByOrderByTimeDesc(){
+        return commentRepository.findAllByOrderByTimeDesc();
+    }
+    @Override
+    public List<Comment>findAllByOrderByLikesDesc(){
+        return commentRepository.findAllByOrderByLikesDesc();
+    }
+    @Override
+    public List<Comment>findAllByProductIdOrderByTimeDesc(Integer productId){
+        return commentRepository.findAllByProductIdOrderByTimeDesc(productId);
+    }
+
+    @Override
+    public  List<Comment>findAllByProductIdOrderByLikesDesc(Integer productId){
+        return commentRepository.findAllByProductIdOrderByLikesDesc(productId);
     }
 }
