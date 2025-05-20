@@ -6,6 +6,7 @@
     <div class="order-details">
       <p><strong>订单 ID：</strong>{{ orderId }}</p>
       <p><strong>总金额：</strong>{{ totalAmount }}元</p>
+      <p><strong>实际金额：</strong>{{ realAmount }}元</p>
       <p><strong>创建时间：</strong>{{ createTime }}</p>
     </div>
 
@@ -34,8 +35,9 @@
 </template>
 
 <script lang="ts">
-import { onMounted, ref ,nextTick} from 'vue';
-import {postOrder, getStatus, Cart, removeItemFromCart, getCartItems} from '../../api/cart.ts';
+import { onMounted, ref } from 'vue';
+import { addCredit, updateLevel } from '../../api/user.ts'
+import {postOrder, getStatus, Cart, getCartItems } from '../../api/cart.ts';
 import { ElMessage } from "element-plus";
 import { useRoute, useRouter } from 'vue-router';
 import {parseRole} from "../../utils"; // 引入路由相关
@@ -51,11 +53,11 @@ export default {
     // const payFormHtml = ref<string>(''); // 用来存储 Alipay 返回的 HTML 表单
 
     const orderId: string = route.params.orderId;
-    const totalAmount: number = route.params.totalAmount;
     const createTime: string = route.params.createTime;
-    let pollingTimer: ReturnType<typeof setInterval> | null = null;
-
+    let pollingTimer: ReturnType<typeof setInterval> | null = null
+    const totalAmount: number = Number(route.params.totalAmount);
     const orderClosed = ref<boolean>(false);
+    const realAmount: number = Number(route.params.realAmount);
 
     // const formContainer = ref<HTMLElement | null>(null);
 
@@ -93,7 +95,7 @@ export default {
       }
     };
 
-    const startPolling = () => {
+    const startPolling = async () => {
       pollingTimer = setInterval(async () => {
         const res = await getStatus(Number(orderId));
         if (res.data.code === '200') {
@@ -102,6 +104,10 @@ export default {
           if (res.data.data.status === 'TRADE_SUCCESS') {
             clearInterval(pollingTimer);
             ElMessage.success("支付成功！");
+            let updateScore = Math.floor(realAmount / 10);
+            console.log(userId, updateScore);
+            await addCredit(Number(userId), updateScore);
+            await updateLevel(Number(userId));
             console.log('success');
             orderClosed.value = true;
           }
@@ -153,10 +159,11 @@ export default {
       createTime,
       confirmOrder,
       // payFormHtml,
-      // formContainer, // ✅ 别忘了 return 出来
+      // formContainer,
       orderClosed,
       closeOrder,
       products,
+      realAmount,
     };
   }
 };

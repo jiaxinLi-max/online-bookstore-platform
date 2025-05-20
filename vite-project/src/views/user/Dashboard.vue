@@ -33,6 +33,11 @@ const fileList = ref<UploadFile[]>([]);
 const dialogImageUrl = ref('');
 const dialogVisible = ref(false);
 
+const credits = ref(0);
+const level = ref(0);
+
+const progressPercentage = computed(() => credits.value % 100);
+
 const hasConfirmPasswordInput = computed(() => confirmPassword.value != '')
 const isPasswordIdentical = computed(() => password.value == confirmPassword.value)
 const changeDisabled = computed(() => {
@@ -69,6 +74,8 @@ function getUserInfo() {
       location.value = res.data.data.location;
       avatar.value = res.data.data.avatar;
       email.value = res.data.data.email;
+      credits.value = res.data.data.score;
+      level.value = res.data.data.grade;
       // newName.value = name.value;
     } else {
       console.log("获取失败");
@@ -266,6 +273,18 @@ onMounted(async () => {
         </el-descriptions-item>
 
       </el-descriptions>
+
+      <div class="progress-container" v-if="role === 'CUSTOMER'">
+        <el-progress
+            :percentage="progressPercentage"
+            :text-inside="true"
+            :stroke-width="24"
+            style="flex: 1;"
+        />
+        <div class="level-display">
+          等级 {{ level }}
+        </div>
+      </div>
     </el-card>
 
     <el-card v-if="displayInfoCard" class="change-card">
@@ -401,6 +420,26 @@ onMounted(async () => {
 
 .aside-card {
   background: rgba(255, 215, 0, 0.8);
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.level-display {
+  font-size: 24px;
+  font-weight: bold;
+  color: #409eff;
+  min-width: 80px;
+  text-align: center;
+}
+
+.points-text {
+  margin-left: auto;
+  color: #606266;
 }
 
 </style>
