@@ -91,6 +91,7 @@
         <img :src="product.cover" alt="Product Cover" />
       </div>
       <h3>{{ product.title }}</h3>
+      <p>⭐ 评分：{{ product.rate?.toFixed(1) ?? '暂无评分' }}</p>
       <p>点击查看详情</p>
     </el-card>
   </el-main>
@@ -101,6 +102,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { getRankProduct, Product } from '../../api/product.ts';
+import { ElMessage } from 'element-plus'
 
 const products = ref<Product[]>([]);
 
@@ -131,6 +133,11 @@ function goToProductDetail(productId: number) {
 // 在组件挂载时获取商店数据
 onMounted(() => {
   get_getRankproducts();
+  ElMessage({
+    message: '当前页面为按评分排行展示商品',
+    type: 'info',
+    duration: 3000
+  });
 });
 </script>
 
