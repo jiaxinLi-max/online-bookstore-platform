@@ -8,4 +8,5 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product,Integer> {
     Product findByTitle(String title);
     List<Product>findAllByOrderByRateDesc();
+    List<Product> findByTitleContainingIgnoreCase(String title);
 }

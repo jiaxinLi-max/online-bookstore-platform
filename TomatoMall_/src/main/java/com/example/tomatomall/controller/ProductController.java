@@ -1,6 +1,7 @@
 package com.example.tomatomall.controller;
 
 
+import com.example.tomatomall.po.Product;
 import com.example.tomatomall.po.Stockpile;
 import com.example.tomatomall.service.ProductService;
 import com.example.tomatomall.vo.ProductVO;
@@ -80,6 +81,16 @@ public class ProductController {
     @GetMapping("/stockpile/{productId}")
     public Response<StockpileVO> getStock(@PathVariable String productId){
         return Response.buildSuccess(productService.getStock(productId));
+    }
+
+    /**
+     * 搜索书籍
+     * @param keyword
+     * @return
+     */
+    @GetMapping("/search")
+    public Response<List<ProductVO>> searchBooks(@RequestParam("keyword") String keyword) {
+        return Response.buildSuccess(productService.searchProducts(keyword));
     }
 
 

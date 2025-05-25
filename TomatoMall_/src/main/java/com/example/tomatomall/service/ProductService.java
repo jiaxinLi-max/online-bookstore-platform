@@ -30,4 +30,6 @@ public interface ProductService {
     Product findById(Integer id);
 
     void saveProduct(Product product);
+
+    List<ProductVO> searchProducts(String keyword);
 }
