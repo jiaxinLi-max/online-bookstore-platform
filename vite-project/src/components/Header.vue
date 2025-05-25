@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { router } from '../router'
+import { ElMessage } from 'element-plus';
+import { searchProduct } from '../api/product';
+import { useRouter } from 'vue-router';
 import {parseRole, parseTime} from "../utils"
 import { User, SwitchButton, Plus,ShoppingCart,Promotion, ChatSquare,Trophy } from "@element-plus/icons-vue"
 import {userInfo} from "../api/user.ts";
@@ -10,6 +13,10 @@ const username = sessionStorage.getItem("username");
 const role = ref<string>('');
 console.log('roleHeader:', role);
 const avatar = ref('')
+
+const router = useRouter(); // 获取 router 实例
+const searchKeyword = ref(''); // 绑定搜索框
+
 getUserInfo()
 function getUserInfo() {
   userInfo(username).then(res => {
@@ -28,6 +35,26 @@ function getUserInfo() {
 
 function gotoAllPosting() {
   router.push({ name: 'AllPostings'});
+}
+
+async function handleSearch() {
+  const keyword = searchKeyword.value.trim();
+  if (!keyword) return;
+
+  try {
+    const res = await searchProduct(keyword);
+    console.log("bookid",bookId);
+    if (res.data.code=='200') {
+      const bookId = books[0].id; // 默认跳转到第一个匹配的书
+      console.log("bookid",bookId);
+      router.push({ path: `/home/product/${bookId}` });
+    } else {
+      ElMessage.warning('书不存在');
+    }
+  } catch (error) {
+    console.error('搜索失败：', error);
+    ElMessage.error('搜索失败，请稍后再试');
+  }
 }
 // 在组件挂载时获取用户信息
 onMounted(() => {
@@ -114,7 +141,7 @@ function logout() {
       </el-col>
 
 
-      <el-col :span="13">
+      <el-col :span="7">
       </el-col>
 
 
@@ -130,6 +157,20 @@ function logout() {
 <!--      <el-col :span="1" class="header-icon">-->
 <!--        <button @click="goToCart">购物车 ({{ cartItemCount }})</button>-->
 <!--      </el-col>-->
+      <el-col :span="6">
+        <el-input
+            v-model="searchKeyword"
+            placeholder="搜索书籍名称"
+            size="large"
+            @keyup.enter="handleSearch"
+            clearable
+        >
+          <template #append>
+            <el-button @click="handleSearch" type="primary">搜索</el-button>
+          </template>
+        </el-input>
+      </el-col>
+
       <template v-if="role === 'CUSTOMER'">
         <el-col :span="1" class="header-icon">
           <router-link to="/home/cart" class="no-link">
