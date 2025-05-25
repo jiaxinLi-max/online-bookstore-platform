@@ -1,58 +1,62 @@
 
 <template>
   <el-main class="product-list bgimage">
-    <el-card
-        v-for="product in products"
-        :key="product.id"
-        class="product-card"
-        @click="goToProductDetail(product.id)"
-    >
-      <div class="product-image">
-        <img :src='product.cover' alt="Product Cover" />
+    <!-- 热门图书区域 -->
+    <div class="hot-section">
+      <h2 class="hot-title">🔥 热门书籍</h2>
+      <div class="hot-books">
+        <el-card
+            v-for="product in hotProducts"
+            :key="'hot-' + product.id"
+            class="hot-card"
+            @click="goToProductDetail(product.id)"
+        >
+          <img :src="product.cover" alt="Hot Book Cover" class="hot-image" />
+          <div class="hot-title-text">{{ product.title }}</div>
+        </el-card>
       </div>
-      <h3>{{ product.title }}</h3>
-      <p>点击查看详情</p>
-    </el-card>
-    <!--    <el-button type="primary" @click="createNewStore">创建商店</el-button>-->
+    </div>
+
+    <!-- 所有书籍区域 -->
+    <div class="all-books">
+      <el-card
+          v-for="product in products"
+          :key="product.id"
+          class="product-card"
+          @click="goToProductDetail(product.id)"
+          shadow="hover"
+      >
+        <div class="product-image">
+          <img :src="product.cover" alt="Product Cover" />
+        </div>
+        <h3 class="product-title">{{ product.title }}</h3>
+      </el-card>
+    </div>
   </el-main>
 </template>
+
+
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { getAllProduct, Product } from '../../api/product.ts';
+import { getAllProduct, Product ,getRankProduct} from '../../api/product.ts';
 
 const products = ref<Product[]>([]);
-// 定义静态假数据
-// const products = ref([
-//   {
-//     id: 1,
-//     title: '商品1',
-//     cover: 'https://bpic.588ku.com/back_origin_min_pic/19/10/22/7d5760a4e3926576c237d950d5964db1.jpg',
-//   },
-//   {
-//     id: 2,
-//     title: '商品2',
-//     cover: 'https://via.placeholder.com/300x200?text=Product+2',
-//   },
-//   {
-//     id: 3,
-//     title: '商品3',
-//     cover: 'https://via.placeholder.com/300x200?text=Product+3',
-//   },
-//   {
-//     id: 4,
-//     title: '商品4',
-//     cover: 'https://via.placeholder.com/300x200?text=Product+4',
-//   },
-//   {
-//     id: 5,
-//     title: '商品5',
-//     cover: 'https://via.placeholder.com/300x200?text=Product+5',
-//   },
-// ]);
+
 const router = useRouter();
 
+const hotProducts = ref<Product[]>([]);
+
+async function fetchHotProducts() {
+  try {
+    const res = await getRankProduct();
+    const list = res.data.data || [];
+    hotProducts.value = list.slice(0, 4); // 只取前四个
+  } catch (error) {
+    console.error("获取热门书籍失败:", error);
+  }
+}
 // 获取所有商店数据
 async function get_getAllproducts() {
   try {
@@ -79,48 +83,100 @@ function goToProductDetail(productId: number) {
 // 在组件挂载时获取商店数据
 onMounted(() => {
   get_getAllproducts();
+  fetchHotProducts();
 });
 </script>
 
 <style scoped>
-
 .product-list {
-  min-height: 800px;
   display: flex;
-  flex-wrap: wrap; /* 允许子元素换行 */
-  justify-content: center; /* 水平居中对齐 */
-  gap: 20px; /* 设置子元素之间的间距 */
-}
-
-.product-card {
-  width: calc((100% / 4) - 20px); /* 每行三个卡片，减去间距 */
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
   padding: 20px;
-  margin: 10px;
+  min-height: 800px;
+}
+
+/* 所有书籍卡片区域 */
+.all-books {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  max-width: 750px;
+}
+
+/* 单个卡片（热门 + 所有通用） */
+.product-card,
+.hot-card {
+  width: 140px;
+  height: 200px;
   cursor: pointer;
-  transition: box-shadow 0.3s;
-  box-sizing: border-box; /* 确保 padding 和 border 不影响宽度 */
-  background-color: rgba(255, 255, 255, 0.6); /* 透明白色背景 */
-  border: 1px solid rgba(255, 255, 255, 0.5); /* 半透明边框 */
+  padding: 8px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s ease;
 }
 
-.product-card:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+.product-card:hover,
+.hot-card:hover {
+  transform: scale(1.05);
 }
 
-.product-image img {
-  width: 100%; /* 确保图片宽度充满容器 */
-  height: auto; /* 高度自适应 */
-  border-radius: 8px; /* 圆角效果 */
-  max-width: 200px; /* 最大宽度限制为 200px */
-  max-height: 150px; /* 最大高度限制为 150px */
-  object-fit: cover; /* 裁剪图片以适应容器 */
+.product-image img,
+.hot-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 6px;
 }
+
+.product-title,
+.hot-title-text {
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 6px;
+  color: #333;
+  line-height: 1.2;
+}
+
+/* 热门区域整体背景与标题 */
+.hot-section {
+  width: 100%;
+  max-width: 960px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hot-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  color: white;
+}
+
+.hot-books {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 .bgimage {
-  //background-color: rgba(0, 0, 0, 0.3);
-  //background-image: url("../../assets/kenan.png");
   background-image: url("../../assets/kenan.png");
   background-size: cover;
   background-position: center top;
   min-height: 100vh;
 }
+
+
 </style>
