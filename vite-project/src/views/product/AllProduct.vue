@@ -1,6 +1,32 @@
 
 <template>
   <el-main class="product-list bgimage">
+    <!-- 广告轮播区域 -->
+    <el-carousel
+        height="200px"
+        :interval="2000"
+        trigger="click"
+        type="card"
+        arrow="never"
+        class="ad-carousel"
+    >
+      <el-carousel-item
+          v-for="ad in advertisements"
+          :key="ad.id"
+          @click="goToProductDetail(ad.productId)"
+          class="ad-carousel-item"
+      >
+        <div class="ad-item-container">
+          <img :src="ad.imgUrl" :alt="ad.title" class="ad-image-left" />
+          <div class="ad-content-right">
+            <div class="ad-title">{{ ad.title }}</div>
+            <div class="ad-desc">{{ ad.content || '' }}</div>
+          </div>
+        </div>
+      </el-carousel-item>
+
+    </el-carousel>
+
     <!-- 热门图书区域 -->
     <div class="hot-section">
       <h2 class="hot-title">🔥 热门书籍</h2>
@@ -41,10 +67,27 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { getAllProduct, Product ,getRankProduct} from '../../api/product.ts';
+import { getAllAdvertisement, Advertisement } from '../../api/advertisement.ts';
 
 const products = ref<Product[]>([]);
 
 const router = useRouter();
+
+const advertisements = ref<Advertisement[]>([]);
+
+async function fetchAdvertisements() {
+  try {
+    const res = await getAllAdvertisement();
+    if (res.data && Array.isArray(res.data.data)) {
+      advertisements.value = res.data.data;
+      console.log('广告数据:', advertisements.value);
+    } else {
+      console.error('广告数据格式不正确');
+    }
+  } catch (error) {
+    console.error('获取广告失败:', error);
+  }
+}
 
 const hotProducts = ref<Product[]>([]);
 
@@ -84,6 +127,7 @@ function goToProductDetail(productId: number) {
 onMounted(() => {
   get_getAllproducts();
   fetchHotProducts();
+  fetchAdvertisements();
 });
 </script>
 
@@ -147,7 +191,8 @@ onMounted(() => {
 /* 热门区域整体背景与标题 */
 .hot-section {
   width: 100%;
-  max-width: 960px;
+  max-width: 900px;
+  max-height: 500px;
   background-color: rgba(255, 255, 255, 0.5);
   border-radius: 12px;
   padding: 24px;
@@ -170,6 +215,64 @@ onMounted(() => {
   flex-wrap: wrap;
   justify-content: center;
 }
+.ad-carousel {
+  width: 100%;
+  max-width: 960px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.ad-carousel-item {
+  height: 200px;
+  cursor: pointer;
+  padding: 0;
+  display: flex; /* 建议加上防止内容坍塌 */
+  justify-content: center;
+  align-items: center;
+}
+
+.ad-item-container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.ad-image-left {
+  width: 300px;
+  height: 100%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.ad-content-right {
+  flex-grow: 1;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: black;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.ad-title {
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.ad-desc {
+  font-size: 14px;
+  line-height: 1.4;
+  opacity: 0.9;
+  white-space: pre-wrap;
+}
+
+
 
 .bgimage {
   background-image: url("../../assets/kenan.png");

@@ -39,11 +39,12 @@ function gotoAllPosting() {
 
 async function handleSearch() {
   const keyword = searchKeyword.value.trim();
+  console.log("keyword",keyword)
   if (!keyword) return;
 
   try {
     const res = await searchProduct(keyword);
-    console.log("bookid",bookId);
+    const books = res.data.data;
     if (res.data.code=='200') {
       const bookId = books[0].id; // 默认跳转到第一个匹配的书
       console.log("bookid",bookId);
@@ -141,7 +142,7 @@ function logout() {
       </el-col>
 
 
-      <el-col :span="7">
+      <el-col :span="1">
       </el-col>
 
 
@@ -157,7 +158,7 @@ function logout() {
 <!--      <el-col :span="1" class="header-icon">-->
 <!--        <button @click="goToCart">购物车 ({{ cartItemCount }})</button>-->
 <!--      </el-col>-->
-      <el-col :span="6">
+      <el-col :span="6" class="search-bar">
         <el-input
             v-model="searchKeyword"
             placeholder="搜索书籍名称"
@@ -169,6 +170,9 @@ function logout() {
             <el-button @click="handleSearch" type="primary">搜索</el-button>
           </template>
         </el-input>
+      </el-col>
+
+      <el-col :span="6">
       </el-col>
 
       <template v-if="role === 'CUSTOMER'">
@@ -264,5 +268,8 @@ function logout() {
   font-size: 12px;
   text-align: center;
   margin-top: 2px;
+}
+.search-bar {
+  margin-top: 12px; /* 向下移动 */
 }
 </style>
