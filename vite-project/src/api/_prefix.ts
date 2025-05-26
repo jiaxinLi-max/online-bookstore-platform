@@ -19,3 +19,5 @@ export const POSTING_MODULE = `${API_MODULE}/posts`
 export const COMMENT_MODULE = `${API_MODULE}/comment`
 
 export const RANK_MODULE = `${API_MODULE}/rank`
+
+export const CHECKIN_MODULE = `${API_MODULE}/checkin`

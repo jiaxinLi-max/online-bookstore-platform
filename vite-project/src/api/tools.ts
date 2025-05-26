@@ -1,5 +1,6 @@
 //import axios from 'axios';
 import {axios} from '../utils/request'
+import {PRODUCT_MODULE} from "./_prefix.ts";
 
 export const getImage = async (file: File) => {
     const formData = new FormData();
