@@ -285,6 +285,10 @@ onMounted(async () => {
           等级 {{ level }}
         </div>
       </div>
+      <div class="level-rules">
+        <p>• 最高可升至10级，每级享受额外0.5折优惠</p>
+        <p>• 每消费10元获取1积分，累计100积分可升1级</p>
+      </div>
     </el-card>
 
     <el-card v-if="displayInfoCard" class="change-card">
@@ -437,9 +441,15 @@ onMounted(async () => {
   text-align: center;
 }
 
-.points-text {
-  margin-left: auto;
-  color: #606266;
+.level-rules {
+  font-size: 13px;
+  color: #909399;
+  line-height: 1.6;
+  padding-left: 8px;
+}
+
+.level-rules p {
+  margin: 4px 0;
 }
 
 </style>

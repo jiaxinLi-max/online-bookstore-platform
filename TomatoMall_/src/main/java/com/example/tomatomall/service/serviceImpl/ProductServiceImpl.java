@@ -184,4 +184,11 @@ public class ProductServiceImpl implements ProductService {
     public void saveProduct(Product product){
         productRepository.save(product);
     }
+
+    //搜索书籍
+    @Override
+    public List<ProductVO>searchProducts(String keyword){
+        return productRepository.findByTitleContainingIgnoreCase(keyword).stream().map(Product::toVO).collect(Collectors.toList());
+    }
+
 }

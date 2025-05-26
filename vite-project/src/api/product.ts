@@ -205,3 +205,19 @@ export const getStockpile = (productId: string) => {
         return res;
     })
 }
+
+export const searchProduct = (keyword: string) => {
+    const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
+    return axios.get(`${PRODUCT_MODULE}/search`,  {
+        headers: {
+            'token': token // 使用 'token' 作为请求头
+        },
+        params: {
+            keyword // 通过 params 添加 keyword 参数
+        }
+    }).then(res => {
+        console.log("SearchProducts",res.data);
+        return res;
+    });
+
+};
