@@ -23,12 +23,12 @@ public class Order {
     private Integer id;
 
     @Basic
-    @Column(name = "user_id")
+    @Column(name = "user_id",nullable = false)
     private Integer userId;
 
     @ElementCollection
     @CollectionTable(name = "orders_cart_items", joinColumns = @JoinColumn(name = "orders_id"))
-    @Column(name = "cart_item_id")
+    @Column(name = "cart_item_id",nullable = false)
     private List<Integer> cartItemIds;
 
 
@@ -53,20 +53,20 @@ public class Order {
     private String paymentMethod;
 
     @Basic
-    @Column(name = "total_amount")
+    @Column(name = "total_amount",nullable = false)
     private BigDecimal totalAmount;
 
     //积分
     @Basic
-    @Column(name = "real_amount")
+    @Column(name = "real_amount",nullable = false)
     private BigDecimal realAmount;
 
     @Basic
-    @Column(name = "create_time")
+    @Column(name = "create_time",nullable = false)
     private Date createTime;
 
     @Basic
-    @Column(name = "status")
+    @Column(name = "status",nullable = false)
     private  String status;
 
     @Basic

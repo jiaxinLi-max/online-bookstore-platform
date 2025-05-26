@@ -6,7 +6,7 @@ import com.example.tomatomall.po.Product;
 import com.example.tomatomall.po.Stockpile;
 import com.example.tomatomall.repository.CartRepository;
 
-import com.example.tomatomall.repository.StockpileRepository;
+
 import com.example.tomatomall.service.CartService;
 import com.example.tomatomall.service.ProductService;
 import com.example.tomatomall.vo.CartResponseVO;
@@ -26,9 +26,6 @@ public class CartServiceImpl implements CartService {
     ProductService productService;
 
     @Autowired
-    StockpileRepository stockpileRepository;
-
-    @Autowired
     CartRepository cartRepository;
 
     @Override
@@ -37,7 +34,7 @@ public class CartServiceImpl implements CartService {
         if(product==null){
             throw TomatoMallException.productNotExist();
         }
-        Stockpile stockpile=stockpileRepository.findByProductId(productId);
+        Stockpile stockpile=productService.stockFindByProductId(productId);
         //超出可卖库存数
         if(stockpile==null){
             throw TomatoMallException.exceedAmount();
@@ -95,7 +92,7 @@ public class CartServiceImpl implements CartService {
         if(!cart.getUserId().equals(userId)){
             throw TomatoMallException.noPermissionToDelete();
         }
-        Stockpile stockpile=stockpileRepository.findByProductId(cart.getProductId());
+        Stockpile stockpile=productService.stockFindByProductId(cart.getProductId());
         if (stockpile==null){
             throw TomatoMallException.exceedAmount();
         }
