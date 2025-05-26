@@ -191,4 +191,20 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findByTitleContainingIgnoreCase(keyword).stream().map(Product::toVO).collect(Collectors.toList());
     }
 
+    @Override
+    public void stockDeleteByProductId(Integer id){
+        stockpileRepository.deleteByProductId(id);
+    }
+
+    @Override
+    public Stockpile stockFindByProductId(Integer productId){
+        return stockpileRepository.findByProductId(productId);
+    }
+
+    @Override
+    public void stockpileSave(Stockpile stockpile){
+        stockpileRepository.save(stockpile);
+    }
+
+
 }
