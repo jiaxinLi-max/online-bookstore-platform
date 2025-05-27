@@ -342,13 +342,13 @@ export default defineComponent({
         console.log("response.data.code",response.data.code);
         console.log(typeof response.data.code); // 打印类型
         if (response.data.code === "200") {
-          alert('商品已成功加入购物车');
+          ElMessage.success('商品已成功加入购物车');
         } else {
-          alert(response.data.msg || '添加失败?，请重试');
+          ElMessage.error(response.data.msg || '添加失败?，请重试');
         }
       } catch (error) {
         console.error('添加商品到购物车失败:', error);
-        alert('添加失败，请重试');
+        ElMessage.error('添加失败，请重试');
       }
     };
 
