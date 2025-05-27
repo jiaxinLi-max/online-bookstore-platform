@@ -2,6 +2,7 @@ package com.example.tomatomall.service;
 
 
 import com.example.tomatomall.po.Product;
+import com.example.tomatomall.po.Stockpile;
 import com.example.tomatomall.vo.ProductVO;
 import com.example.tomatomall.vo.Response;
 import com.example.tomatomall.vo.StockpileVO;
@@ -30,6 +31,13 @@ public interface ProductService {
     Product findById(Integer id);
 
     void saveProduct(Product product);
+
+    void stockDeleteByProductId(Integer id);
+
+    Stockpile stockFindByProductId(Integer productId);
+
+    void stockpileSave(Stockpile stockpile);
+
 
     List<ProductVO> searchProducts(String keyword);
 }

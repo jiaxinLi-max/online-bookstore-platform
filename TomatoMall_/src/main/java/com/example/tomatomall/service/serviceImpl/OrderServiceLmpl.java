@@ -40,8 +40,7 @@ public class OrderServiceLmpl implements OrderService {
     @Autowired
     ProductService productService;
 
-    @Autowired
-    StockpileRepository stockpileRepository;
+
 
     @Autowired
     CartsOrdersRelationRepository cartsOrdersRelationRepository;
@@ -202,7 +201,7 @@ public class OrderServiceLmpl implements OrderService {
             if (cartItem != null) {
                 Integer productId=cartItem.getProductId();
                 // 单价 * 数量
-                Stockpile stockpile=stockpileRepository.findByProductId(productId);
+                Stockpile stockpile=productService.stockFindByProductId(productId);
                 //超出可卖库存数
                 if(stockpile==null){
                     throw TomatoMallException.exceedAmount();
@@ -212,7 +211,7 @@ public class OrderServiceLmpl implements OrderService {
                 }
                 stockpile.setAmount(stockpile.getAmount()-cartItem.getQuantity());
                 stockpile.setFrozen(stockpile.getFrozen()+cartItem.getQuantity());
-                stockpileRepository.save(stockpile);
+                productService.stockpileSave(stockpile);
                 Product product= productService.findById(productId);
                 if(product==null){
                     throw TomatoMallException.productNotExist();
@@ -231,7 +230,7 @@ public class OrderServiceLmpl implements OrderService {
             Cart cartItem = cartService.findById(cartItemId);
             if (cartItem != null) {
                 Integer productId=cartItem.getProductId();
-                Stockpile stockpile=stockpileRepository.findByProductId(productId);
+                Stockpile stockpile=productService.stockFindByProductId(productId);
                 //超出可卖库存数
                 if(stockpile==null){
                     throw TomatoMallException.exceedAmount();
@@ -244,7 +243,7 @@ public class OrderServiceLmpl implements OrderService {
                 cartsOrdersRelation_new.setOrderId(orderId);
                 cartsOrdersRelation_new.setCartitemId(cartItemId);
                 cartsOrdersRelationRepository.save(cartsOrdersRelation_new);
-                stockpileRepository.save(stockpile);
+                productService.stockpileSave(stockpile);
             }
         }
     }
@@ -254,11 +253,11 @@ public class OrderServiceLmpl implements OrderService {
         for (Integer cartItemId : cartItemIds) {
             Cart cartItem = cartService.findById(cartItemId);
             if (cartItem != null) {
-                Stockpile stockpile = stockpileRepository.findByProductId(cartItem.getProductId());
+                Stockpile stockpile =productService.stockFindByProductId(cartItem.getProductId());
                 if (stockpile != null) {
                     stockpile.setAmount(stockpile.getAmount() + cartItem.getQuantity());
                     stockpile.setFrozen(stockpile.getFrozen() - cartItem.getQuantity());
-                    stockpileRepository.save(stockpile);
+                    productService.stockpileSave(stockpile);
                 }
             }
         }

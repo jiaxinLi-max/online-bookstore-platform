@@ -15,19 +15,19 @@ import java.math.BigDecimal;
 public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "id")
+    @Column(name = "id",nullable = false)
     private Integer id;
 
     @Basic
-    @Column(name = "username")  //数据库  下划线
+    @Column(name = "username",nullable = false)  //数据库  下划线
     private String username;
 
     @Basic
-    @Column(name = "password")  //数据库  下划线
+    @Column(name = "password",nullable = false)  //数据库  下划线
     private String password;
 
     @Basic
-    @Column(name = "name")  //数据库  下划线
+    @Column(name = "name",nullable = false)  //数据库  下划线
     private String name;
 
     @Basic
@@ -35,7 +35,7 @@ public class Account {
     private String avatar;
 
     @Basic
-    @Column(name = "role")  //数据库  下划线
+    @Column(name = "role",nullable = false)  //数据库  下划线
     private String role;
 
     @Basic
