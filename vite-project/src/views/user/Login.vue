@@ -178,6 +178,12 @@
 
 .bgimage {
   background-image: url("../../assets/login.png");
+  background-position: center top;
+  background-size: 1500px auto; /* 或根据需求调整为 cover 或百分比 */
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* 关键属性：背景固定 */
+  background-color: #7b6b4d; /* 深羊驼色兜底 */
+  min-height: 100vh;
 }
 
 .login-form {
