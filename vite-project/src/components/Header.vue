@@ -15,7 +15,14 @@ console.log('roleHeader:', role);
 const avatar = ref('')
 
 const router = useRouter(); // 获取 router 实例
-const searchKeyword = ref(''); // 绑定搜索框
+
+interface BookItem {
+  value: string; // 用于 el-autocomplete 展示
+  id: number;
+}
+
+const searchKeyword = ref('');
+const suggestions = ref<BookItem[]>([]);
 
 getUserInfo()
 function getUserInfo() {
@@ -37,26 +44,48 @@ function gotoAllPosting() {
   router.push({ name: 'AllPostings'});
 }
 
-async function handleSearch() {
-  const keyword = searchKeyword.value.trim();
-  console.log("keyword",keyword)
-  if (!keyword) return;
-
+// 异步获取匹配书籍
+const querySearch = async (queryString: string, cb: (results: BookItem[]) => void) => {
+  if (!queryString.trim()) {
+    cb([]);
+    return;
+  }
   try {
-    const res = await searchProduct(keyword);
+    const res = await searchProduct(queryString.trim());
+    const books = res.data.data || [];
+    const results = books.map((book: any) => ({
+      value: book.title,
+      id: book.id
+    }));
+    suggestions.value = results;
+    cb(results);
+  } catch (err) {
+    console.error('自动补全失败', err);
+    cb([]);
+  }
+};
+
+// 用户选中某一本书
+const handleSelect = (item: BookItem) => {
+  router.push({ path: `/home/product/${item.id}` });
+};
+
+// 用户点击按钮强制搜索（跳第一个）
+const manualSearch = async () => {
+  if (!searchKeyword.value.trim()) return;
+  try {
+    const res = await searchProduct(searchKeyword.value.trim());
     const books = res.data.data;
-    if (res.data.code=='200') {
-      const bookId = books[0].id; // 默认跳转到第一个匹配的书
-      console.log("bookid",bookId);
-      router.push({ path: `/home/product/${bookId}` });
+    if (books.length > 0) {
+      router.push({ path: `/home/product/${books[0].id}` });
     } else {
-      ElMessage.warning('书不存在');
+      ElMessage.warning('未找到相关书籍');
     }
-  } catch (error) {
-    console.error('搜索失败：', error);
+  } catch (e) {
+    console.error(e);
     ElMessage.error('搜索失败，请稍后再试');
   }
-}
+};
 // 在组件挂载时获取用户信息
 onMounted(() => {
   getUserInfo();
@@ -103,6 +132,7 @@ function logout() {
       <el-col :span="3" class="header-icon">
         <router-link to="/home/all-products" v-slot="{navigate}" class="no-link">
           <h1 @click="navigate" class="header-text"> 番茄侦探小说城</h1>
+          <div class="icon-label">返回主界面</div>
         </router-link>
       </el-col>
 
@@ -111,12 +141,6 @@ function logout() {
 
       </el-col>
 
-      <!-- 新增按钮，跳转到所有广告页面 -->
-<!--      <el-col :span="1" class="header-icon">-->
-<!--        <router-link to="/home/all-advertisements" class="no-link">-->
-<!--          <div style="color:white; font-size: small;">获取所有广告</div> &lt;!&ndash; 添加文本标签 &ndash;&gt;-->
-<!--        </router-link>-->
-<!--      </el-col>-->
       <el-col :span="1" class="header-icon">
         <router-link to="/home/all-advertisements" class="no-link">
           <el-icon :size="35" color="white">
@@ -130,6 +154,7 @@ function logout() {
           <el-icon :size="35" color="white">
             <Trophy />
           </el-icon>
+          <div class="icon-label">榜单</div>
         </router-link>
       </el-col>
 
@@ -138,38 +163,27 @@ function logout() {
           <el-icon :size="35" color="white">
             <ChatSquare />
           </el-icon>
+          <div class="icon-label">帖子</div>
         </router-link>
       </el-col>
-
 
       <el-col :span="1">
       </el-col>
 
-
-
-
-<!--      <el-col :span="1" class="header-icon">-->
-<!--        <router-link to="/home/dashboard" class="no-link">-->
-<!--          &lt;!&ndash; 动态绑定头像路径 &ndash;&gt;-->
-<!--          <img :src="avatar" alt="User Avatar" class="user-avatar" />-->
-<!--        </router-link>-->
-<!--      </el-col>-->
-      <!-- 购物车按钮 -->
-<!--      <el-col :span="1" class="header-icon">-->
-<!--        <button @click="goToCart">购物车 ({{ cartItemCount }})</button>-->
-<!--      </el-col>-->
       <el-col :span="6" class="search-bar">
-        <el-input
+        <el-autocomplete
             v-model="searchKeyword"
+            :fetch-suggestions="querySearch"
             placeholder="搜索书籍名称"
             size="large"
-            @keyup.enter="handleSearch"
+            @select="handleSelect"
+            :trigger-on-focus="false"
             clearable
         >
           <template #append>
-            <el-button @click="handleSearch" type="primary">搜索</el-button>
+            <el-button @click="manualSearch" type="primary">搜索</el-button>
           </template>
-        </el-input>
+        </el-autocomplete>
       </el-col>
 
       <el-col :span="6">

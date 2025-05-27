@@ -2,7 +2,23 @@
 
 <template>
   <div class="create_product bgimage">
-    <h1 class="create-product-title">创建广告</h1>
+    <div
+        class="header-wrapper"
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;"
+    >
+      <!-- 左侧按钮 -->
+      <el-button
+          class="custom-black-button"
+          type="primary"
+          plain
+          @click="goBack"
+      >
+        返回所有广告
+      </el-button>
+
+      <!-- 居中标题 -->
+      <h1 class="create-product-title" style="margin: 0 auto;">创建广告</h1>
+    </div>
     <el-form ref="form" label-width="120px" class="product-form">
       <!-- 基本信息 -->
       <el-form-item label="广告标题" prop="advertisementName" >
@@ -78,6 +94,7 @@ import { createAdvertisement} from "../../api/advertisement.ts";
 import {getAllProduct,Product} from "../../api/product.ts";
 import { Plus } from '@element-plus/icons-vue';
 import { getImage } from '../../api/tools';
+import { useRouter } from 'vue-router';
 
 const title = ref('');
 const imgUrl = ref('');
@@ -89,6 +106,7 @@ const productId = ref('');
 const products = ref<Product[]>([]); // 存储商品列表
 const selectedProductId = ref<number | null>(null); // 修改为对应的类型
 
+const router = useRouter();
 // 计算属性，检查输入状态
 const createDisabled = computed(() => {
   return !title.value || !content.value  || !imgUrl.value;
@@ -170,6 +188,9 @@ async function getAllProductsData() {
   } catch (error) {
     console.error('获取商品列表失败:', error);
   }
+}
+function goBack() {
+  router.push('/home/all-advertisements');
 }
 onMounted(() => {
   getAllProductsData();
