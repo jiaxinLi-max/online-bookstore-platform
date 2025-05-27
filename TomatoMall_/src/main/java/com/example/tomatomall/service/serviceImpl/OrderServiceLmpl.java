@@ -72,7 +72,7 @@ public class OrderServiceLmpl implements OrderService {
         Order order=orderVO.toPO();
         order.setCreateTime(new Date());
         order.setTotalAmount(calculateTotalAmount(orderVO.getCartItemIds()));
-        Account account= accountService.findById(orderVO.getId());
+        Account account= accountService.findById(orderVO.getUserId());
         if(account==null){
             throw TomatoMallException.userNotExist();
         }

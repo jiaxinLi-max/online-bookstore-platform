@@ -75,6 +75,7 @@ public class CommentServicelmpl implements CommentService {
         for(Comment comment:comments){
             sum_score+=comment.getScore();
         }
+        sum_score=sum_score*2;
         float new_rate=sum_score/sum;
         product.setRate(new_rate);
         productService.saveProduct(product);
