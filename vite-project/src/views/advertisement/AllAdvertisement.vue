@@ -1,52 +1,160 @@
 
+<!--<template>-->
+<!--  <el-main class="advertisement-list bgimage">-->
+<!--    &lt;!&ndash; 创建广告按钮 &ndash;&gt;-->
+<!--    <div class="create-button-container" v-if="role === 'MANAGER'">-->
+<!--      <el-button-->
+<!--          class="create-advertisement-button"-->
+<!--          @click="goToCreateAdvertisement"-->
+<!--      >-->
+<!--        创建广告-->
+<!--      </el-button>-->
+<!--    </div>-->
+
+<!--    <el-card-->
+<!--        v-for="advertisement in advertisements"-->
+<!--        :key="advertisement.id"-->
+<!--        class="advertisement-card"-->
+<!--    >-->
+<!--      <div class="advertisement-image">-->
+<!--        <img :src="advertisement.imgUrl" alt="Advertisement Cover" @click="goToProductDetail(advertisement.productId)"/>-->
+<!--      </div>-->
+<!--      <h3>{{ advertisement.title }}</h3>-->
+<!--      <p class="advertisement-content">{{ advertisement.content }}</p>-->
+<!--      <p>点击查看详情</p>-->
+<!--      <div v-if="role === 'MANAGER'" class="manager-actions">-->
+<!--        <div class="management-buttons">-->
+<!--          <el-button type="primary" @click="openEditDialog(advertisement.id)">编辑广告</el-button>-->
+<!--          <el-button type="danger" @click="deleteAd(advertisement.id)">删除广告</el-button>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--      <el-dialog-->
+<!--          v-model="showEditDialog"-->
+<!--          title="修改广告"-->
+<!--          width="40%"-->
+<!--          class="edit-dialog"-->
+<!--          :before-close="handleCancel"-->
+
+<!--      >-->
+<!--        <el-form ref="form" label-width="120px" class="advertisement-form">-->
+<!--          <el-form-item label="广告标题" prop="advertisementName">-->
+<!--            <el-input v-model="updateTitle" placeholder="请输入广告标题"></el-input>-->
+<!--          </el-form-item>-->
+
+<!--          <el-form-item label="广告内容" prop="advertisementDescription">-->
+<!--            <el-input v-model="updateContent" placeholder="请输入广告内容"></el-input>-->
+<!--          </el-form-item>-->
+
+<!--          <el-form-item label="选择商品" prop="productId">-->
+<!--            <el-select v-model="updateProductId" placeholder="请选择商品" style="width: 200px; margin-bottom: 20px;">-->
+<!--              <el-option-->
+<!--                  v-for="product in products"-->
+<!--                  :key="product.id"-->
+<!--                  :label="product.title"-->
+<!--                  :value="product.id"-->
+<!--              />-->
+<!--            </el-select>-->
+<!--          </el-form-item>-->
+
+<!--          <el-form-item label="广告图片" prop="cover">-->
+<!--            <el-upload-->
+<!--                action="http://localhost:8080/api/images"-->
+<!--                list-type="picture-card"-->
+<!--                :auto-upload="true"-->
+<!--                :file-list="fileList"-->
+<!--                :on-change="handleChange"-->
+<!--                :on-remove="handleRemove"-->
+<!--                :on-preview="handlePictureCardPreview"-->
+<!--            >-->
+<!--              <el-icon><Plus /></el-icon>-->
+<!--              <div>点击上传广告图片</div>-->
+<!--            </el-upload>-->
+<!--            <el-dialog v-model="dialogVisible">-->
+<!--              <img class="dialog-image" :src="dialogImageUrl" alt="Logo Preview" />-->
+<!--            </el-dialog>-->
+<!--          </el-form-item>-->
+
+<!--          &lt;!&ndash; 按钮 &ndash;&gt;-->
+<!--          <el-form-item>-->
+<!--            <el-button @click.prevent="updateAd" type="primary" plain>-->
+<!--              更新广告-->
+<!--            </el-button>-->
+<!--          </el-form-item>-->
+<!--        </el-form>-->
+<!--      </el-dialog>-->
+<!--    </el-card>-->
+<!--  </el-main>-->
+<!--</template>-->
 <template>
   <el-main class="advertisement-list bgimage">
-    <!-- 创建广告按钮 -->
-    <el-button
-        v-if="role === 'MANAGER'"
-        class="create-advertisement-button"
-        @click="goToCreateAdvertisement"
-        style="margin-bottom: 20px;"
-    >
-      创建广告
-    </el-button>
+    <!-- 创建广告按钮单独一行，居中 -->
+    <div class="create-button-container" v-if="role === 'MANAGER'">
+      <el-button
+          class="create-advertisement-button"
+          @click="goToCreateAdvertisement"
+      >
+        创建广告
+      </el-button>
+    </div>
 
-    <el-card
-        v-for="advertisement in advertisements"
-        :key="advertisement.id"
-        class="advertisement-card"
-    >
-      <div class="advertisement-image">
-        <img :src="advertisement.imgUrl" alt="Advertisement Cover" @click="goToProductDetail(advertisement.productId)"/>
-      </div>
-      <h3>{{ advertisement.title }}</h3>
-      <p class="advertisement-content">{{ advertisement.content }}</p>
-      <p>点击查看详情</p>
-      <div v-if="role === 'MANAGER'" class="manager-actions">
-        <div class="management-buttons">
-          <el-button type="primary" @click="openEditDialog(advertisement.id)">编辑广告</el-button>
-          <el-button type="danger" @click="deleteAd(advertisement.id)">删除广告</el-button>
+    <!-- 广告卡片单独容器 -->
+    <div class="cards-container">
+      <el-card
+          v-for="advertisement in advertisements"
+          :key="advertisement.id"
+          class="advertisement-card"
+      >
+        <div class="advertisement-image">
+          <img
+              :src="advertisement.imgUrl"
+              alt="Advertisement Cover"
+              @click="goToProductDetail(advertisement.productId)"
+          />
         </div>
-      </div>
+        <h3>{{ advertisement.title }}</h3>
+        <p class="advertisement-content">{{ advertisement.content }}</p>
+        <p>点击查看详情</p>
+        <div v-if="role === 'MANAGER'" class="manager-actions">
+          <div class="management-buttons">
+            <el-button type="primary" @click="openEditDialog(advertisement.id)">
+              编辑广告
+            </el-button>
+            <el-button type="danger" @click="deleteAd(advertisement.id)">
+              删除广告
+            </el-button>
+          </div>
+        </div>
+      </el-card>
+
+      <!-- 编辑广告弹窗 -->
       <el-dialog
           v-model="showEditDialog"
           title="修改广告"
           width="40%"
           class="edit-dialog"
           :before-close="handleCancel"
-
       >
         <el-form ref="form" label-width="120px" class="advertisement-form">
           <el-form-item label="广告标题" prop="advertisementName">
-            <el-input v-model="updateTitle" placeholder="请输入广告标题"></el-input>
+            <el-input
+                v-model="updateTitle"
+                placeholder="请输入广告标题"
+            ></el-input>
           </el-form-item>
 
           <el-form-item label="广告内容" prop="advertisementDescription">
-            <el-input v-model="updateContent" placeholder="请输入广告内容"></el-input>
+            <el-input
+                v-model="updateContent"
+                placeholder="请输入广告内容"
+            ></el-input>
           </el-form-item>
 
           <el-form-item label="选择商品" prop="productId">
-            <el-select v-model="updateProductId" placeholder="请选择商品" style="width: 200px; margin-bottom: 20px;">
+            <el-select
+                v-model="updateProductId"
+                placeholder="请选择商品"
+                style="width: 200px; margin-bottom: 20px;"
+            >
               <el-option
                   v-for="product in products"
                   :key="product.id"
@@ -70,11 +178,14 @@
               <div>点击上传广告图片</div>
             </el-upload>
             <el-dialog v-model="dialogVisible">
-              <img class="dialog-image" :src="dialogImageUrl" alt="Logo Preview" />
+              <img
+                  class="dialog-image"
+                  :src="dialogImageUrl"
+                  alt="Logo Preview"
+              />
             </el-dialog>
           </el-form-item>
 
-          <!-- 按钮 -->
           <el-form-item>
             <el-button @click.prevent="updateAd" type="primary" plain>
               更新广告
@@ -82,7 +193,7 @@
           </el-form-item>
         </el-form>
       </el-dialog>
-    </el-card>
+    </div>
   </el-main>
 </template>
 <script setup lang="ts">
@@ -251,34 +362,95 @@ onMounted(() => {
 
 .advertisement-list {
   min-height: 800px;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.3);
+  background-image: url("../../assets/kenan.png");
+  background-size: cover;
+  background-position: center;
+
   display: flex;
-  flex-wrap: wrap; /* 允许子元素换行 */
-  justify-content: center; /* 水平居中对齐 */
-  gap: 20px; /* 设置子元素之间的间距 */
+  flex-direction: column;
+}
+
+.create-button-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  justify-content: center;
+  flex-grow: 1;
 }
 
 .advertisement-card {
-  background-color: rgba(255, 255, 255, 0.6); /* 透明白色背景 */
-  border: 1px solid rgba(255, 255, 255, 0.5); /* 半透明边框 */
-  width: calc((100% / 4) - 20px); /* 每行三个卡片，减去间距 */
-  padding: 20px;
-  margin: 10px;
-  cursor: pointer;
-  transition: box-shadow 0.3s;
-  box-sizing: border-box; /* 确保 padding 和 border 不影响宽度 */
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .advertisement-card:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 .advertisement-image img {
-  width: 100%; /* 确保图片宽度充满容器 */
-  height: auto; /* 高度自适应 */
-  border-radius: 8px; /* 圆角效果 */
-  max-width: 200px; /* 最大宽度限制为 200px */
-  max-height: 150px; /* 最大高度限制为 150px */
-  object-fit: cover; /* 裁剪图片以适应容器 */
+  width: 100%;
+  max-width: 260px;
+  height: 150px;
+  border-radius: 10px;
+  object-fit: cover;
+  cursor: pointer;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.advertisement-card h3 {
+  font-size: 1.25rem;
+  margin: 10px 0 6px 0;
+  color: #333;
+  text-align: center;
+  font-weight: 600;
+}
+
+.advertisement-content {
+  font-size: 0.9rem;
+  color: #555;
+  text-align: center;
+  margin-bottom: 10px;
+  min-height: 40px; /* 保持统一高度 */
+}
+
+.advertisement-card p:last-child {
+  font-size: 0.85rem;
+  color: #777;
+  margin-bottom: 15px;
+}
+
+.manager-actions {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.management-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.management-buttons .el-button {
+  flex: 1;
+  font-size: 0.9rem;
+  padding: 6px 12px;
 }
 .bgimage {
   background-color: rgba(0, 0, 0, 0.3);

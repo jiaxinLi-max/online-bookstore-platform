@@ -187,9 +187,21 @@ public class ProductServiceImpl implements ProductService {
 
     //搜索书籍
     @Override
-    public List<ProductVO>searchProducts(String keyword){
-        return productRepository.findByTitleContainingIgnoreCase(keyword).stream().map(Product::toVO).collect(Collectors.toList());
+    public List<ProductVO> searchProducts(String keyword) {
+        Set<Character> chars = keyword.toLowerCase().chars()
+                .mapToObj(c -> (char) c)
+                .collect(Collectors.toSet());
+
+        return productRepository.findAll().stream()
+                .filter(product -> {
+                    String title = product.getTitle().toLowerCase();
+                    return chars.stream().anyMatch(ch -> title.contains(String.valueOf(ch)));
+                })
+                .map(Product::toVO)
+                .collect(Collectors.toList());
     }
+
+
 
     @Override
     public void stockDeleteByProductId(Integer id){

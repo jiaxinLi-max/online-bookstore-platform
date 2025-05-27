@@ -91,7 +91,7 @@
         <img :src="product.cover" alt="Product Cover" />
       </div>
       <h3>{{ product.title }}</h3>
-      <p>⭐ 评分：{{ product.rate?.toFixed(1) ?? '暂无评分' }}</p>
+      <p>⭐ 评分：{{ product.rate ?.toFixed(1) ?? '暂无评分' }}</p>
       <p>点击查看详情</p>
     </el-card>
   </el-main>
