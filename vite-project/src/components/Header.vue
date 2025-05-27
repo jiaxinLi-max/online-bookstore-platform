@@ -233,16 +233,15 @@ function logout() {
 
 <style scoped>
 .custom-header {
-  background-color: #000000;
-
-
+  background-color: #3b3225; /* 深羊驼色 */
   display: flex;
   flex-direction: column;
 }
+
 .custom-tag {
-  background-color: #000000; /* 背景颜色改为黑色 */
-  color: white; /* 文字颜色改为白色 */
-  border-color: #000000; /* 边框颜色改为黑色 */
+  background-color: #3b3225;
+  color: white;
+  border-color: #3b3225;
 }
 
 .no-link {
