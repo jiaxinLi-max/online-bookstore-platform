@@ -195,6 +195,7 @@ function logout() {
             <el-icon @click="goToCart" :size="35" color="white">
               <ShoppingCart /> <!-- 使用 Element Plus 的购物车图标 -->
             </el-icon>
+            <div class="icon-label">购物车</div>
           </router-link>
         </el-col>
       </template>
@@ -210,6 +211,7 @@ function logout() {
               <el-icon @click="navigate" :size="35" color="white">
                 <Plus />
               </el-icon>
+              <div class="icon-label">创建商品</div>
             </router-link>
         </el-col>
       </template>

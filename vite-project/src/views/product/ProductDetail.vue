@@ -35,21 +35,16 @@
 <!--    <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>-->
 <!--    <el-button type="primary" @click="addToCart">加入购物车</el-button>-->
     <!-- 评论按钮 -->
-    <el-button type="success" @click="goToCreateComment">发表评论</el-button>
+    <div class="comment-buttons">
+      <el-button type="primary" @click="goToCreateComment">发表评论</el-button>
+      <el-button type="warning" @click="viewAllComments">查看全部评价</el-button>
+    </div>
+<!--    <el-button type="success" @click="goToCreateComment">发表评论</el-button>-->
+<!--    <el-button type="info" @click="viewAllComments">查看全部评价</el-button>-->
 
-    <el-button type="info" @click="viewAllComments">查看全部评价</el-button>
 
-    <!-- 子页面显示区（例如：撰写评价） -->
-<!--    <div class="comment-child-view">-->
-<!--      <router-view />-->
-<!--    </div>-->
     <div class="action-area">
-<!--      &lt;!&ndash; 客户操作 &ndash;&gt;-->
-<!--      <div>库存: {{ stockAmount }}</div>-->
-<!--      <div v-if="role === 'CUSTOMER'" class="customer-actions">-->
-<!--        <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>-->
-<!--        <el-button type="primary" @click="addToCart">加入购物车</el-button>-->
-<!--      </div>-->
+
 
       <!-- 管理员操作 -->
       <div v-if="role === 'MANAGER'" class="manager-actions">
@@ -557,5 +552,15 @@ html, body {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+}
+.comment-buttons {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px; /* 控制两个按钮之间的间距 */
+}
+
+.comment-buttons .el-button {
+  padding: 8px 16px;
+  font-weight: 500;
 }
 </style>

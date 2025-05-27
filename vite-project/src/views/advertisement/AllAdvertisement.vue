@@ -113,7 +113,7 @@
         </div>
         <h3>{{ advertisement.title }}</h3>
         <p class="advertisement-content">{{ advertisement.content }}</p>
-        <p>点击查看详情</p>
+
         <div v-if="role === 'MANAGER'" class="manager-actions">
           <div class="management-buttons">
             <el-button type="primary" @click="openEditDialog(advertisement.id)">
