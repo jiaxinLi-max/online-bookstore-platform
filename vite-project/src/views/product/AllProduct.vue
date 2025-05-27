@@ -157,7 +157,7 @@ onMounted(() => {
   height: 200px;
   cursor: pointer;
   padding: 8px;
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 248, 220, 0.8);
   border-radius: 10px;
   text-align: center;
   display: flex;
@@ -193,7 +193,7 @@ onMounted(() => {
   width: 100%;
   max-width: 900px;
   max-height: 500px;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(200, 200, 200, 0.7);
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 40px;
@@ -206,7 +206,7 @@ onMounted(() => {
   font-size: 20px;
   font-weight: bold;
   margin-bottom: 16px;
-  color: white;
+  color: black;
 }
 
 .hot-books {
@@ -249,7 +249,7 @@ onMounted(() => {
 
 .ad-content-right {
   flex-grow: 1;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 248, 220, 0.8);
   color: black;
   padding: 20px;
   display: flex;

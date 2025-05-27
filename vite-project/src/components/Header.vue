@@ -103,6 +103,7 @@ function logout() {
       <el-col :span="3" class="header-icon">
         <router-link to="/home/all-products" v-slot="{navigate}" class="no-link">
           <h1 @click="navigate" class="header-text"> 番茄侦探小说城</h1>
+          <div class="icon-label">返回主界面</div>
         </router-link>
       </el-col>
 
@@ -111,12 +112,6 @@ function logout() {
 
       </el-col>
 
-      <!-- 新增按钮，跳转到所有广告页面 -->
-<!--      <el-col :span="1" class="header-icon">-->
-<!--        <router-link to="/home/all-advertisements" class="no-link">-->
-<!--          <div style="color:white; font-size: small;">获取所有广告</div> &lt;!&ndash; 添加文本标签 &ndash;&gt;-->
-<!--        </router-link>-->
-<!--      </el-col>-->
       <el-col :span="1" class="header-icon">
         <router-link to="/home/all-advertisements" class="no-link">
           <el-icon :size="35" color="white">
@@ -130,6 +125,7 @@ function logout() {
           <el-icon :size="35" color="white">
             <Trophy />
           </el-icon>
+          <div class="icon-label">榜单</div>
         </router-link>
       </el-col>
 
@@ -138,26 +134,13 @@ function logout() {
           <el-icon :size="35" color="white">
             <ChatSquare />
           </el-icon>
+          <div class="icon-label">帖子</div>
         </router-link>
       </el-col>
-
 
       <el-col :span="1">
       </el-col>
 
-
-
-
-<!--      <el-col :span="1" class="header-icon">-->
-<!--        <router-link to="/home/dashboard" class="no-link">-->
-<!--          &lt;!&ndash; 动态绑定头像路径 &ndash;&gt;-->
-<!--          <img :src="avatar" alt="User Avatar" class="user-avatar" />-->
-<!--        </router-link>-->
-<!--      </el-col>-->
-      <!-- 购物车按钮 -->
-<!--      <el-col :span="1" class="header-icon">-->
-<!--        <button @click="goToCart">购物车 ({{ cartItemCount }})</button>-->
-<!--      </el-col>-->
       <el-col :span="6" class="search-bar">
         <el-input
             v-model="searchKeyword"
