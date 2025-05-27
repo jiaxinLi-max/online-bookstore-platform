@@ -15,7 +15,14 @@ console.log('roleHeader:', role);
 const avatar = ref('')
 
 const router = useRouter(); // 获取 router 实例
-const searchKeyword = ref(''); // 绑定搜索框
+
+interface BookItem {
+  value: string; // 用于 el-autocomplete 展示
+  id: number;
+}
+
+const searchKeyword = ref('');
+const suggestions = ref<BookItem[]>([]);
 
 getUserInfo()
 function getUserInfo() {
@@ -37,26 +44,48 @@ function gotoAllPosting() {
   router.push({ name: 'AllPostings'});
 }
 
-async function handleSearch() {
-  const keyword = searchKeyword.value.trim();
-  console.log("keyword",keyword)
-  if (!keyword) return;
-
+// 异步获取匹配书籍
+const querySearch = async (queryString: string, cb: (results: BookItem[]) => void) => {
+  if (!queryString.trim()) {
+    cb([]);
+    return;
+  }
   try {
-    const res = await searchProduct(keyword);
+    const res = await searchProduct(queryString.trim());
+    const books = res.data.data || [];
+    const results = books.map((book: any) => ({
+      value: book.title,
+      id: book.id
+    }));
+    suggestions.value = results;
+    cb(results);
+  } catch (err) {
+    console.error('自动补全失败', err);
+    cb([]);
+  }
+};
+
+// 用户选中某一本书
+const handleSelect = (item: BookItem) => {
+  router.push({ path: `/home/product/${item.id}` });
+};
+
+// 用户点击按钮强制搜索（跳第一个）
+const manualSearch = async () => {
+  if (!searchKeyword.value.trim()) return;
+  try {
+    const res = await searchProduct(searchKeyword.value.trim());
     const books = res.data.data;
-    if (res.data.code=='200') {
-      const bookId = books[0].id; // 默认跳转到第一个匹配的书
-      console.log("bookid",bookId);
-      router.push({ path: `/home/product/${bookId}` });
+    if (books.length > 0) {
+      router.push({ path: `/home/product/${books[0].id}` });
     } else {
-      ElMessage.warning('书不存在');
+      ElMessage.warning('未找到相关书籍');
     }
-  } catch (error) {
-    console.error('搜索失败：', error);
+  } catch (e) {
+    console.error(e);
     ElMessage.error('搜索失败，请稍后再试');
   }
-}
+};
 // 在组件挂载时获取用户信息
 onMounted(() => {
   getUserInfo();
@@ -142,17 +171,19 @@ function logout() {
       </el-col>
 
       <el-col :span="6" class="search-bar">
-        <el-input
+        <el-autocomplete
             v-model="searchKeyword"
+            :fetch-suggestions="querySearch"
             placeholder="搜索书籍名称"
             size="large"
-            @keyup.enter="handleSearch"
+            @select="handleSelect"
+            :trigger-on-focus="false"
             clearable
         >
           <template #append>
-            <el-button @click="handleSearch" type="primary">搜索</el-button>
+            <el-button @click="manualSearch" type="primary">搜索</el-button>
           </template>
-        </el-input>
+        </el-autocomplete>
       </el-col>
 
       <el-col :span="6">
