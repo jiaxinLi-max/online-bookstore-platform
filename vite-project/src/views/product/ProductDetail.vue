@@ -1,21 +1,9 @@
-
 <template>
   <div class="product-detail">
     <div class="product-info">
-      <div class="product-image" style="position: relative;">
+      <div class="product-image">
         <img :src="product.cover" alt="Cover Image" class="cover-image" />
-        <div v-if="role === 'CUSTOMER'" class="add-to-cart-container">
-          <el-button
-              type="default"
-              @click="addToCart"
-              class="add-to-cart-button"
-              plain
-          >
-            加入购物车
-          </el-button>
-        </div>
       </div>
-
       <div class="product-details">
         <h1>{{ product.title }}</h1>
         <div class="price">价格: ¥{{ product.price }}</div>
@@ -32,19 +20,24 @@
         <p v-if="specifications.length === 0">没有书籍信息可显示。</p>
       </div>
     </div>
-<!--    <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>-->
-<!--    <el-button type="primary" @click="addToCart">加入购物车</el-button>-->
+    <!--    <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>-->
+    <!--    <el-button type="primary" @click="addToCart">加入购物车</el-button>-->
     <!-- 评论按钮 -->
-    <div class="comment-buttons">
-      <el-button type="primary" @click="goToCreateComment">发表评论</el-button>
-      <el-button type="warning" @click="viewAllComments">查看全部评价</el-button>
-    </div>
-<!--    <el-button type="success" @click="goToCreateComment">发表评论</el-button>-->
-<!--    <el-button type="info" @click="viewAllComments">查看全部评价</el-button>-->
+    <el-button type="success" @click="goToCreateComment">发表评论</el-button>
 
+    <el-button type="info" @click="viewAllComments">查看全部评价</el-button>
 
+    <!-- 子页面显示区（例如：撰写评价） -->
+    <!--    <div class="comment-child-view">-->
+    <!--      <router-view />-->
+    <!--    </div>-->
     <div class="action-area">
-
+      <!-- 客户操作 -->
+      <div>库存: {{ stockAmount }}</div>
+      <div v-if="role === 'CUSTOMER'" class="customer-actions">
+        <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>
+        <el-button type="primary" @click="addToCart">加入购物车</el-button>
+      </div>
 
       <!-- 管理员操作 -->
       <div v-if="role === 'MANAGER'" class="manager-actions">
