@@ -38,6 +38,8 @@ const dialogVisible = ref(false);
 const credits = ref(0);
 const level = ref(0);
 
+const latestCheck = ref('');
+
 const progressPercentage = computed(() => credits.value % 100);
 
 const hasConfirmPasswordInput = computed(() => confirmPassword.value != '')
@@ -215,17 +217,32 @@ const handleCheckIn = async () => {
   if (res.data.code === '200') {
     ElMessage.success('签到成功，获得1积分！');
     await addCredit(Number(userId), 1);
-    await updateLevel(userId);
+    await updateLevel(Number(userId));
     getUserInfo();
+    await getLatestCheckIn();
   }
   else {
     ElMessage.error('今日已签到！');
   }
 }
 
+const getLatestCheckIn = async () => {
+  const res = await getCheckinHistory(Number(userId));
+  console.log("Got checkin history:", res.data.data);
+  if (res.data.code === '200') {
+    const length = res.data.data.length;
+    latestCheck.value = res.data.data[length-1].checkinTime;
+    console.log("Latest check in date:", latestCheck.value);
+  }
+  else {
+    ElMessage.error('无法获取签到信息');
+  }
+}
+
 onMounted(async () => {
   // await fetchStores(); // 首先获取商店列表
   await getUserInfo(); // 然后获取用户信息
+  await getLatestCheckIn();
 });
 </script>
 
@@ -304,6 +321,10 @@ onMounted(async () => {
         <p>• 最高可升至10级，每级享受额外0.5折优惠</p>
         <p>• 每消费10元获取1积分，累计100积分可升1级</p>
         <p>• 每日可签到一次，获取1积分</p>
+      </div>
+
+      <div class="latestCheck-container" v-if="role === 'CUSTOMER'">
+        <p>最近签到日期：{{ latestCheck }}</p>
       </div>
 
       <div class="checkInButton" v-if="role === 'CUSTOMER'" >
