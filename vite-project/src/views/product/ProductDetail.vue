@@ -20,34 +20,29 @@
         <p v-if="specifications.length === 0">没有书籍信息可显示。</p>
       </div>
     </div>
-    <!--    <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>-->
-    <!--    <el-button type="primary" @click="addToCart">加入购物车</el-button>-->
-    <!-- 评论按钮 -->
-    <el-button type="success" @click="goToCreateComment">发表评论</el-button>
 
-    <el-button type="info" @click="viewAllComments">查看全部评价</el-button>
+    <div class="comment-area">
+      <el-button type="success" @click="goToCreateComment">发表评论</el-button>
+      <el-button type="info" @click="viewAllComments">查看全部评价</el-button>
+    </div>
 
-    <!-- 子页面显示区（例如：撰写评价） -->
-    <!--    <div class="comment-child-view">-->
-    <!--      <router-view />-->
-    <!--    </div>-->
     <div class="action-area">
-      <!-- 客户操作 -->
-      <div>库存: {{ stockAmount }}</div>
-      <div v-if="role === 'CUSTOMER'" class="customer-actions">
-        <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>
-        <el-button type="primary" @click="addToCart">加入购物车</el-button>
+      <div v-if="role === 'CUSTOMER'" class="customer-actions-group">
+        <div class="stock-display" v-if="stockAmount <= 10">库存紧张</div>
+        <div class="action-row">
+          <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>
+          <el-button type="primary" @click="addToCart">加入购物车</el-button>
+        </div>
       </div>
 
-      <!-- 管理员操作 -->
-      <div v-if="role === 'MANAGER'" class="manager-actions">
-        <div>库存: {{ stockAmount }}</div>
-        <div class="stock-control">
+      <div v-if="role === 'MANAGER'" class="manager-actions-group">
+        <div class="stock-display">库存: {{ stockAmount }}</div>
+        <div class="action-row stock-control">
           <el-input-number v-model="newStock" :min="0" label="新库存"></el-input-number>
           <el-button type="warning" @click="updateStock">更新库存</el-button>
         </div>
 
-        <div class="management-buttons">
+        <div class="action-row management-buttons">
           <el-button type="primary" @click="openEditDialog">更新信息</el-button>
           <el-button type="danger" @click="deleteProduct">删除商品</el-button>
         </div>
@@ -61,7 +56,6 @@
       class="edit-dialog"
   >
     <el-form ref="form" label-width="120px" class="product-form">
-      <!-- 基本信息 -->
       <el-form-item label="商品名称" prop="productName">
         <el-input v-model="editForm.title" placeholder="请输入商品名称"></el-input>
       </el-form-item>
@@ -82,7 +76,6 @@
         <el-input v-model="editForm.detail" placeholder="请输入商品详细说明"></el-input>
       </el-form-item>
 
-      <!-- 规格说明类 -->
       <el-form-item label="规格说明" prop="specifications">
         <div v-for="(spec, index) in newSpecifications" :key="index" class="specification-item">
           <el-input
@@ -97,15 +90,12 @@
           ></el-input>
           <el-button type="danger" @click="removeSpecification(index)">删除</el-button>
         </div>
-        <!--        <el-button type="primary" @click="addSpecification">添加规格</el-button>-->
       </el-form-item>
 
-      <!-- 添加规格按钮另起一行 -->
       <el-form-item>
         <el-button type="primary" @click="addSpecification">添加规格</el-button>
       </el-form-item>
 
-      <!-- 商品封面 -->
       <el-form-item label="商品封面" prop="cover">
         <el-upload
             action="http://localhost:8080/api/images"
@@ -124,7 +114,6 @@
         </el-dialog>
       </el-form-item>
 
-      <!-- 按钮 -->
       <el-form-item>
         <el-button @click.prevent="handleUpdateProduct" type="primary" plain>
           更新商品
@@ -148,7 +137,7 @@ import { addCart } from '../../api/cart.ts';
 import { Specification } from "../../api/specification.ts";
 import {ElMessage, type UploadFile} from "element-plus";
 import {Plus} from "@element-plus/icons-vue";
-import {getImage} from "../../api/tools.ts"; // 导入 Specification 接口
+import {getImage} from "../../api/tools.ts";
 
 export default defineComponent({
   name: 'ProductDetail',
@@ -159,7 +148,6 @@ export default defineComponent({
     const router = useRouter();
     function goToCreateComment() {
       const productId = route.params.productId;
-      //router.push({ path: `/home/product/${productId}/create-comment` });
       router.push({ name: 'CreateComment', params: { productId } });
     }
     function viewAllComments () {
@@ -182,7 +170,6 @@ export default defineComponent({
     const dialogImageUrl = ref('');
     const dialogVisible = ref(false);
 
-    // 商品数据
     const product = ref({
       title: '',
       price: 0,
@@ -192,11 +179,10 @@ export default defineComponent({
       detail: '',
     });
 
-    // 规格信息
     const specifications = ref<Specification[]>([]);
     const newSpecifications = ref<Specification[]>([]);
     const quantity = ref(1);
-    const maxQuantity = ref(10); // 这里可以根据实际库存动态设置
+    const maxQuantity = ref(10);
 
     const editForm = ref({
       title: product.value.title,
@@ -207,13 +193,11 @@ export default defineComponent({
       detail: product.value.detail,
     });
 
-    // 加载产品详情
     const loadProductDetails = async (productId: string) => {
       try {
         const response = await getProduct(productId);
-        const productData = response.data.data; // 假设响应的结构是 { code: 200, data: {...} }
+        const productData = response.data.data;
 
-        // 更新产品数据
         product.value = {
           title: productData.title,
           price: productData.price,
@@ -223,8 +207,7 @@ export default defineComponent({
           detail: productData.detail,
         };
 
-        // 更新规格数据，直接使用返回的规格数组
-        specifications.value = productData.specifications || []; // 赋值为数组
+        specifications.value = productData.specifications || [];
 
       } catch (error) {
         console.error('Error loading product details:', error);
@@ -243,7 +226,7 @@ export default defineComponent({
         detail: product.value.detail,
       };
       fileList.value = [];
-      newSpecifications.value = specifications.value;
+      newSpecifications.value = JSON.parse(JSON.stringify(specifications.value)); // 深拷贝防止直接修改
     };
 
     async function handleChange(file: UploadFile, fileListNew: UploadFile[]) {
@@ -276,7 +259,6 @@ export default defineComponent({
     };
 
     async function handleUpdateProduct() {
-      console.log("Update product!");
       const token = sessionStorage.getItem('token');
       if (!token) {
         ElMessage.error('请先登录!');
@@ -297,36 +279,20 @@ export default defineComponent({
         if (res.data.code === '200') {
           ElMessage.success('更新商品成功');
           await loadProductDetails(productId);
-          editForm.value.title = product.value.title;
-          editForm.value.description = product.value.description;
-          editForm.value.detail = product.value.detail;
-          editForm.value.price = product.value.price;
-          editForm.value.rate = product.value.rate;
-          editForm.value.cover = product.value.cover;
-          fileList.value = [];
-          newSpecifications.value = specifications.value;
+          showEditDialog.value = false;
         } else {
           ElMessage.error(res.data.message);
-          editForm.value.title = product.value.title;
-          editForm.value.description = product.value.description;
-          editForm.value.detail = product.value.detail;
-          editForm.value.price = product.value.price;
-          editForm.value.rate = product.value.rate;
-          editForm.value.cover = product.value.cover;
-          fileList.value = [];
-          newSpecifications.value = specifications.value;
         }
-        showEditDialog.value = false;
       } catch (error) {
-        console.log("error",error);
+        console.error("error",error);
         ElMessage.error('更新商品失败');
       }
     }
 
     function addSpecification() {
       newSpecifications.value.push({
-        item: '',     // 新规格的名称
-        value: '',    // 新规格的值
+        item: '',
+        value: '',
       });
     }
 
@@ -334,17 +300,14 @@ export default defineComponent({
       newSpecifications.value.splice(index, 1);
     }
 
-    // 添加到购物车
     const addToCart = async () => {
       try {
         const userId = sessionStorage.getItem('userId');
         const response = await addCart(userId, productId, quantity.value);
-        console.log("response.data.code",response.data.code);
-        console.log(typeof response.data.code); // 打印类型
         if (response.data.code === "200") {
           ElMessage.success('商品已成功加入购物车');
         } else {
-          ElMessage.error(response.data.msg || '添加失败?，请重试');
+          ElMessage.error(response.data.msg || '添加失败，请重试');
         }
       } catch (error) {
         console.error('添加商品到购物车失败:', error);
@@ -352,40 +315,18 @@ export default defineComponent({
       }
     };
 
-    // 在组件挂载后加载产品详情
     onMounted(() => {
       loadProductDetails(productId);
-
       getStock();
     });
-
-    // const updateInfo = async () => {
-    //   try {
-    //     const response = await updateProductInfo({
-    //       id: productId.toString(),
-    //       title: product.value.title,
-    //       price: product.value.price,
-    //       rate: product.value.rate,
-    //       description: product.value.description,
-    //       cover: product.value.cover,
-    //       detail: product.value.detail,
-    //       specifications: specifications.value,
-    //     });
-    //     if (response.data.code === '200') {
-    //       ElMessage.success('商品信息更新成功');
-    //       console.log(response.data);
-    //     }
-    //   } catch (error) {
-    //     console.error('更新商品信息失败:', error);
-    //   }
-    // };
 
     const deleteProduct = async () => {
       try {
         const response = await deleteTheProduct(productId.toString());
         if (response.data.code === '200') {
           ElMessage.success('商品删除成功');
-          console.log(response.data);
+        } else {
+          ElMessage.error(response.data.msg || '删除失败，请重试');
         }
       } catch (error) {
         console.error('删除商品失败:', error);
@@ -401,7 +342,8 @@ export default defineComponent({
         if (response.data.code === '200') {
           stockAmount.value = newStock.value;
           ElMessage.success('库存更新成功');
-          console.log(response.data);
+        } else {
+          ElMessage.error(response.data.msg || '更新库存失败，请重试');
         }
       } catch (error) {
         console.error('更新库存失败:', error);
@@ -414,14 +356,13 @@ export default defineComponent({
         if (response.data.code === '200') {
           stockAmount.value = response.data.data.amount;
           stockFrozen.value = response.data.data.frozen;
-          console.log("StockAmount:" + response.data.data.amount);
-          console.log("StockFrozen:" + response.data.data.frozen);
+        } else {
+          ElMessage.error(response.data.msg || '获取库存信息失败');
         }
       } catch (error) {
         console.error('获取库存信息失败:', error);
       }
     }
-
 
     return {
       product,
@@ -462,24 +403,27 @@ html, body {
 .product-detail {
   padding: 20px;
   display: flex;
-  justify-content: center; /* 水平居中 */
-  align-items: center; /* 垂直居中 */
-  flex-direction: column; /* 使内容垂直排列 */
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
   background-image: url("../../assets/kenan.png");
   background-size: cover;
   background-position: center top;
   min-height: 100vh;
-  color: black; /* 设置文字颜色为白色，确保可读性 */
+  color: black;
 }
 
 .product-info {
   display: flex;
-  justify-content: center; /* 水平居中 */
-  align-items: flex-start; /* 垂直起始对齐 */
+  justify-content: center;
+  align-items: flex-start;
   width: 100%;
-  max-width: 1200px; /* 限制最大宽度 */
-  margin: 0 auto;
-  background-color: rgba(255,255, 255, 0.6); /* 可以给商品信息部分添加白色背景，以提升可读性 */
+  max-width: 1200px;
+  margin: 0 auto 20px auto; /* 增加下方外边距 */
+  background-color: rgba(255, 255, 255, 0.6);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .product-image {
@@ -491,6 +435,7 @@ html, body {
   max-width: 100%;
   height: auto;
   display: block;
+  border-radius: 8px;
 }
 .cover-image {
   width: 100%;
@@ -499,38 +444,58 @@ html, body {
   border-radius: 8px;
 }
 
-/* 加入购物车按钮容器：在图片正下方，左对齐，留出距离 */
-.add-to-cart-container {
-  margin-top: 18px; /* 图片和按钮之间的间距 */
-  text-align: left;
-  margin-left: 120px;
-}
-
-/* 加入购物车按钮样式：白底黑字 */
-.add-to-cart-button {
-  background-color: white;
-  color: black;
-  border: 1px solid #ccc;
-  padding: 4px 12px;
-  font-size: 14px;
-}
-
 .product-details {
   flex: 2;
   margin-left: 20px;
 }
 
+.product-details h1 {
+  font-size: 2.5em;
+  margin-bottom: 10px;
+  color: #333;
+}
+
 .price {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: bold;
+  color: #e60023; /* 醒目的价格颜色 */
+  margin-bottom: 10px;
 }
 
 .rating {
   color: goldenrod;
+  font-size: 1.1em;
+  margin-bottom: 10px;
 }
 
 .description, .detail {
   margin: 10px 0;
+  line-height: 1.6;
+  color: #555;
+}
+
+.product-details h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.product-details ul {
+  list-style: none;
+  padding: 0;
+}
+
+.product-details li {
+  margin-bottom: 5px;
+  color: #666;
+}
+
+/* 新增的评论区和操作区样式 */
+.comment-area {
+  display: flex;
+  gap: 20px; /* 增加按钮间距 */
+  margin-top: 20px;
+  margin-bottom: 20px; /* 与下方操作区域的间距 */
 }
 
 .action-area {
@@ -538,22 +503,66 @@ html, body {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  background-color: rgba(255, 255, 255, 0.6);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 1200px;
 }
 
-.manager-actions {
+.customer-actions-group,
+.manager-actions-group {
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
-}
-.comment-buttons {
-  margin-top: 20px;
-  display: flex;
-  gap: 12px; /* 控制两个按钮之间的间距 */
+  align-items: center;
+  width: 100%; /* 使其占据父容器的宽度 */
+  margin-bottom: 15px; /* 增加组之间的垂直间距 */
 }
 
-.comment-buttons .el-button {
-  padding: 8px 16px;
-  font-weight: 500;
+.stock-display {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: white; /* 库存字体改为白色 */
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.7); /* 增加文字阴影，提高在复杂背景下的可读性 */
+  margin-bottom: 15px; /* 与下方按钮组的间距 */
+}
+
+.action-row {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* 增加行内元素间距 */
+  margin-bottom: 15px; /* 每行之间的垂直间距 */
+}
+
+.action-row .el-input-number {
+  width: 150px; /* 调整输入框宽度 */
+}
+
+.action-row .el-button {
+  padding: 10px 20px;
+  font-size: 1em;
+}
+
+.management-buttons {
+  margin-top: 10px; /* 管理按钮组与上方库存控制组的间距 */
+}
+
+/* El-dialog 中的表单项间距 */
+.product-form .el-form-item {
+  margin-bottom: 20px;
+}
+
+.specification-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px; /* 规格项内部元素间距 */
+}
+
+.dialog-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
 </style>
