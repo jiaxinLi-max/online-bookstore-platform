@@ -101,7 +101,7 @@ export const deletePost = (id: number) => {
     })
 }
 
-export const likePost = (id: number) => {
+export const likePost = (id: number, userId: number) => {
     console.log("Liked post:", id);
     const token = sessionStorage.getItem('token');
     console.log("token:",token);
@@ -111,7 +111,8 @@ export const likePost = (id: number) => {
             'token': token,
         },
         params: {
-            postId: id
+            postId: id,
+            userId: userId
         }
     }).then(res => {
             console.log("Res:", res.data);
@@ -123,7 +124,7 @@ export const likePost = (id: number) => {
     })
 }
 
-export const dislikePost = (id: number) => {
+export const dislikePost = (id: number, userId: number) => {
     console.log("Disliked post:", id);
     const token = sessionStorage.getItem('token');
     console.log("token:",token);
@@ -132,7 +133,8 @@ export const dislikePost = (id: number) => {
             'token': token,
         },
         params: {
-            postId: id
+            postId: id,
+            userId: userId
         }
     }).then(res => {
         console.log("Res:", res.data);

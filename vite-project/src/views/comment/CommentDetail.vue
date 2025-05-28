@@ -141,6 +141,8 @@ const like = ref(0)
 
 const likeLoading = ref(false)
 
+const curUserId = sessionStorage.getItem('userId')
+
 
 // 获取帖子详情
 async function get_getComment() {
@@ -192,10 +194,10 @@ async function handleDelete() {
 async function handleLike() {
   likeLoading.value = true
   try {
-    const res = await likeComment(id)
+    const res = await likeComment(id, Number(curUserId))
     if (res.data.code === '200') {
       ElMessage.success(res.data.data)
-      like.value += 1
+      await get_getComment();
     }
     else ElMessage.error(res.data.msg)
   } catch (error) {
