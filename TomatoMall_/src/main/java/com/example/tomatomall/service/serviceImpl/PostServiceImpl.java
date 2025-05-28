@@ -58,29 +58,47 @@ public class PostServiceImpl implements PostService {
 
     }
 
-    @Override
-    public String likePost(Integer postId){
-        Post post=postRepository.findById(postId).orElse(null);
-        if(post==null){
-            throw TomatoMallException.postNotExist();
 
+    @Override
+    public String likePost(Integer postId,Integer userId) {
+        Post post = postRepository.findById(postId).orElse(null);
+        if (post == null) {
+            throw TomatoMallException.postNotExist();
         }
-        Integer like=post.getLike();
-        post.setLike(like+1);
-        postRepository.save(post);
-        return "点赞成功";
+
+        if (post.getLikedUserIds().contains(userId)) {
+            post.setLike(post.getLike()-1);
+            post.getLikedUserIds().remove(userId);
+            postRepository.save(post);
+            return "取消点赞";
+        }else {
+            post.setLike(post.getLike() + 1);
+            post.getLikedUserIds().add(userId);
+            postRepository.save(post);
+            return "点赞成功";
+        }
+
     }
 
+
+
     @Override
-    public String dislikePost(Integer postId){
-        Post post=postRepository.findById(postId).orElse(null);
-        if(post==null){
+    public String dislikePost(Integer postId,Integer userId){
+        Post post = postRepository.findById(postId).orElse(null);
+        if (post == null) {
             throw TomatoMallException.postNotExist();
         }
-        Integer dislike=post.getDislike();
-        post.setDislike(dislike+1);
-        postRepository.save(post);
-        return "踩成功";
+        if (post.getDislikedUserIds().contains(userId)) {
+            post.setDislike(post.getDislike() - 1);
+            post.getDislikedUserIds().remove(userId);
+            postRepository.save(post);
+            return "取消踩";
+        }else {
+            post.setDislike(post.getDislike() + 1);
+            post.getDislikedUserIds().add(userId);
+            postRepository.save(post);
+            return "踩成功";
+        }
     }
 
 

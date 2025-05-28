@@ -10,6 +10,8 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -40,6 +42,9 @@ public class Comment {
     @Basic
     @Column(name = "likes")  //数据库  下划线
     private Integer likes;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<Integer> likedUserIds = new HashSet<>();
 
 
     @Basic

@@ -60,8 +60,8 @@ public class CommentController {
 
 //      点赞评价
     @PostMapping("/like/{id}")
-    public Response<String> likeComment(@PathVariable Integer id){
-        return Response.buildSuccess((commentService.likeComment(id)));
+    public Response<String> likeComment(@PathVariable Integer id,@RequestParam Integer userId){
+        return Response.buildSuccess((commentService.likeComment(id,userId)));
     }
 
 
