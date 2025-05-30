@@ -7,4 +7,5 @@ import java.util.List;
 public interface CheckinService {
     List<CheckinVO> getCheckinInfo(Integer userId);
     String setCheckin(Integer userId);
+    Boolean IScheckin(Integer userId);
 }

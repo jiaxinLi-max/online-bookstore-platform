@@ -40,4 +40,9 @@ public class checkinServicelmpl implements CheckinService {
         return "签到成功";
     }
 
+    @Override
+    public Boolean IScheckin(Integer userId){
+        return checkinRepository.existsByUserIdAndCheckinTime(userId,LocalDate.now());
+    }
+
 }
