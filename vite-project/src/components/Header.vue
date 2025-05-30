@@ -195,6 +195,7 @@ function logout() {
             <el-icon @click="goToCart" :size="35" color="white">
               <ShoppingCart /> <!-- 使用 Element Plus 的购物车图标 -->
             </el-icon>
+            <div class="icon-label">购物车</div>
           </router-link>
         </el-col>
       </template>
@@ -210,6 +211,7 @@ function logout() {
               <el-icon @click="navigate" :size="35" color="white">
                 <Plus />
               </el-icon>
+              <div class="icon-label">创建商品</div>
             </router-link>
         </el-col>
       </template>
@@ -233,16 +235,15 @@ function logout() {
 
 <style scoped>
 .custom-header {
-  background-color: #000000;
-
-
+  background-color: #3b3225; /* 深羊驼色 */
   display: flex;
   flex-direction: column;
 }
+
 .custom-tag {
-  background-color: #000000; /* 背景颜色改为黑色 */
-  color: white; /* 文字颜色改为白色 */
-  border-color: #000000; /* 边框颜色改为黑色 */
+  background-color: #3b3225;
+  color: white;
+  border-color: #3b3225;
 }
 
 .no-link {

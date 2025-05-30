@@ -113,7 +113,7 @@
         </div>
         <h3>{{ advertisement.title }}</h3>
         <p class="advertisement-content">{{ advertisement.content }}</p>
-        <p>点击查看详情</p>
+
         <div v-if="role === 'MANAGER'" class="manager-actions">
           <div class="management-buttons">
             <el-button type="primary" @click="openEditDialog(advertisement.id)">
@@ -453,7 +453,12 @@ onMounted(() => {
   padding: 6px 12px;
 }
 .bgimage {
-  background-color: rgba(0, 0, 0, 0.3);
-  background-image: url("../../assets/kenan.png");
+  background-image: url("../../assets/780.jpg");
+  background-position: center top;
+  background-size: 1500px auto; /* 或根据需求调整为 cover 或百分比 */
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* 关键属性：背景固定 */
+  background-color: #7b6b4d; /* 深羊驼色兜底 */
+  min-height: 100vh;
 }
 </style>

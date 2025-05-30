@@ -9,6 +9,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -49,6 +51,13 @@ public class Post {
     @Basic
     @Column(name = "dislike",nullable = false)
     private Integer dislike;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<Integer> likedUserIds = new HashSet<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<Integer> dislikedUserIds = new HashSet<>();
+
 
     public PostVO toVO(){
         PostVO postVO=new PostVO();

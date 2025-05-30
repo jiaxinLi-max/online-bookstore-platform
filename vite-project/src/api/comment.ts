@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {COMMENT_MODULE, PRODUCT_MODULE} from "./_prefix.ts";
+import {COMMENT_MODULE} from "./_prefix.ts";
 export interface Comment {
     id: number;
     productId: number;
@@ -102,14 +102,15 @@ export const deleteComment = (commentId: number) => {
         })
 }
 
-export const likeComment = (commentId: number) => {
+export const likeComment = (commentId: number, userId: number) => {
     const token = sessionStorage.getItem('token');
     return axios.post(`${COMMENT_MODULE}/like/${commentId}`, null, {
         headers: {
             'token': token
         },
         params: {
-            id: commentId
+            id: commentId,
+            userId: userId
         }
     })
 }

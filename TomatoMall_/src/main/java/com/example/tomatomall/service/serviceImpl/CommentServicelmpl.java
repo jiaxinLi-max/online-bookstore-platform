@@ -103,14 +103,23 @@ public class CommentServicelmpl implements CommentService {
         return "删除成功";
     }
     @Override
-    public String likeComment(Integer id){
+    public String likeComment(Integer id,Integer userId){
         Comment comment=commentRepository.findById(id).orElse(null);
         if(comment==null){
             throw TomatoMallException.commentNotExist();
         }
-        comment.setLikes(comment.getLikes()+1);
-        commentRepository.save(comment);
-        return "点赞成功";
+        if (comment.getLikedUserIds().contains(userId)) {
+            comment.setLikes(comment.getLikes()-1);
+            comment.getLikedUserIds().remove(userId);
+            commentRepository.save(comment);
+            return "取消点赞";
+        }else {
+            comment.setLikes(comment.getLikes()+1);
+            comment.getLikedUserIds().add(userId);
+            commentRepository.save(comment);
+            return "点赞成功";
+        }
+
     }
 
     @Override
