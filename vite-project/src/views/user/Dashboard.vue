@@ -7,7 +7,7 @@ import {ElMessage, UploadFile} from "element-plus";
 import {getImage} from "../../api/tools.ts";
 // import {UserFilled} from "@element-plus/icons-vue";
 // import { getAllStore,  Store } from '../../api/store';
-import { checkIn, getCheckinHistory } from "../../api/checkin.ts";
+import { checkIn, getCheckinHistory, getCheckinStatus } from "../../api/checkin.ts";
 
 // const stores = ref<Store[]>([]);
 const username = sessionStorage.getItem("username")
@@ -39,6 +39,7 @@ const credits = ref(0);
 const level = ref(0);
 
 const latestCheck = ref('');
+const isChecked = ref(false);
 
 const progressPercentage = computed(() => credits.value % 100);
 
@@ -120,6 +121,22 @@ function updateInfo() {
       })
     }
   })
+}
+
+async function checked() {
+  const res = await getCheckinStatus(Number(userId));
+  console.log(res.data.data);
+  if (res.data.code === '200') {
+    if (res.data.data) {
+      isChecked.value = true;
+      console.log("isChecked", isChecked.value)
+    }
+    else isChecked.value = false;
+    console.log("notChecked", isChecked.value)
+  }
+  else {
+    console.error("无法获取签到情况。");
+  }
 }
 
 function updatePassword() {
@@ -220,6 +237,7 @@ const handleCheckIn = async () => {
     await updateLevel(Number(userId));
     getUserInfo();
     await getLatestCheckIn();
+    await checked();
   }
   else {
     ElMessage.error('今日已签到！');
@@ -242,6 +260,7 @@ const getLatestCheckIn = async () => {
 onMounted(async () => {
   // await fetchStores(); // 首先获取商店列表
   await getUserInfo(); // 然后获取用户信息
+  await checked();
   await getLatestCheckIn();
 });
 </script>
@@ -327,7 +346,7 @@ onMounted(async () => {
         <p>最近签到日期：{{ latestCheck }}</p>
       </div>
 
-      <div class="checkInButton" v-if="role === 'CUSTOMER'" >
+      <div class="checkInButton" v-if="(role === 'CUSTOMER') && !isChecked" >
         <el-button @click="handleCheckIn">签到</el-button>
       </div>
     </el-card>
