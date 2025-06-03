@@ -121,7 +121,7 @@ public class OrderServiceLmpl implements OrderService {
     }
 
     @Override
-    public OrderVO payNotify(HttpServletRequest request, HttpServletResponse response){
+    public void payNotify(HttpServletRequest request, HttpServletResponse response){
         try{
 //            Map<String, String> params = new HashMap<>();
 //            Map<String, String[]> requestParams = request.getParameterMap();
@@ -162,7 +162,7 @@ public class OrderServiceLmpl implements OrderService {
                     orderRepository.save(order);
 
                     decreaseStockpile(order.getCartItemIds(),id);
-//                    response.getWriter().print("success");
+                    response.getWriter().print("success");
 
 
                 } else if ("TRADE_CLOSED".equals(tradeStatus)) {
@@ -176,12 +176,12 @@ public class OrderServiceLmpl implements OrderService {
 
                 }
                 System.out.println("支付回调处理成功: ");
-                return order.toVO();
+//                return order.toVO();
 
 
         } catch(Exception e){
             System.out.println("支付回调处理失败: " + e.getMessage());
-            return null; // 或者返回错误的 OrderVO
+//            return null; // 或者返回错误的 OrderVO
         }
     }
 

@@ -34,7 +34,7 @@ public class OrderController {
 //    }
     @PostMapping("/notify")
     public void payNotify(HttpServletRequest request,HttpServletResponse response){
-        Response.buildSuccess(orderService.payNotify(request,response));
+        orderService.payNotify(request,response);
     }
 
     @GetMapping("/status")

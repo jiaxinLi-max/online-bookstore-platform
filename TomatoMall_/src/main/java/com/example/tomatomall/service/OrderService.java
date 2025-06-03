@@ -12,7 +12,7 @@ public interface OrderService {
     //OrderVO createOrder(Integer userId, List<String> cartItemIds,Object shipping_address,String payment_method);
     OrderVO createOrder(OrderVO orderVO);
 
-    OrderVO payNotify(HttpServletRequest request,HttpServletResponse httpServletResponse);
+    void payNotify(HttpServletRequest request,HttpServletResponse httpServletResponse);
 
     OrderVO getOrderById(Integer order_id);
 }
