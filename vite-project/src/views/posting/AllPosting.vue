@@ -1,9 +1,7 @@
 
 <template>
   <el-main class="posting-list bgimage">
-    <div class="back-button-wrapper">
-      <el-button type="primary" icon="ArrowLeft" @click="goToAllProduct">返回主界面</el-button>
-    </div>
+
     <!-- 创建帖子按钮 -->
     <el-button
         class="create-posting-button"

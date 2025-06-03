@@ -6,23 +6,33 @@
     <el-form ref="form" label-width="120px" class="product-form">
       <!-- 基本信息 -->
       <el-form-item label="商品名称" prop="productName">
-        <el-input v-model="title" placeholder="请输入商品名称"></el-input>
+        <el-input v-model="title" placeholder="请输入商品名称"
+                  style="width: 400px;"
+        ></el-input>
       </el-form-item>
 
       <el-form-item label="商品价格" prop="productPrice">
-        <el-input v-model="price" placeholder="请输入商品价格" type="number"></el-input>
+        <el-input v-model="price" placeholder="请输入商品价格" type="number"
+                  style="width: 400px;"
+        ></el-input>
       </el-form-item>
 
       <el-form-item label="商品评分" prop="productRate">
-        <el-input v-model="rate" placeholder="请输入商品评分" type="number"></el-input>
+        <el-input v-model="rate" placeholder="请输入商品评分" type="number"
+                  style="width: 400px;"
+        ></el-input>
       </el-form-item>
 
       <el-form-item label="商品描述" prop="productDescription">
-        <el-input v-model="description" placeholder="请输入商品描述"></el-input>
+        <el-input v-model="description" placeholder="请输入商品描述"
+                  style="width: 400px;"
+        ></el-input>
       </el-form-item>
 
       <el-form-item label="商品详细说明" prop="productDetail">
-        <el-input v-model="detail" placeholder="请输入商品详细说明"></el-input>
+        <el-input v-model="detail" placeholder="请输入商品详细说明"
+                  style="width: 400px;"
+        ></el-input>
       </el-form-item>
 
       <!-- 规格说明类 -->
