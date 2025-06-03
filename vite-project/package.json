@@ -11,6 +11,7 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.3",
     "local-pkg": "^1.1.1",
+    "sass-embedded": "^1.89.1",
     "typescript": "~5.7.2",
     "unplugin-auto-import": "^19.1.1",
     "unplugin-vue-components": "^28.4.1",

@@ -6,11 +6,15 @@
     <el-form ref="form" label-width="120px" class="posting-form">
       <!-- 基本信息 -->
       <el-form-item label="帖子标题" prop="postingTitle">
-        <el-input v-model="title" placeholder="请输入帖子标题"></el-input>
+        <el-input v-model="title" placeholder="请输入帖子标题"
+                  style="width: 400px;"
+        ></el-input>
       </el-form-item>
 
       <el-form-item label="帖子内容" prop="postingContent">
-        <el-input v-model="content" placeholder="请输入内容"></el-input>
+        <el-input v-model="content" placeholder="请输入内容"
+                  style="width: 400px;"
+        ></el-input>
       </el-form-item>
 
       <!-- 商品封面 -->

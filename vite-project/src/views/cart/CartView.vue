@@ -1,97 +1,4 @@
-<!--<template>-->
-<!--  <div>-->
-<!--    <h2>购物车</h2>-->
-<!--    <div v-for="product in products" :key="product.productId" class="product-item">-->
-<!--      <img :src="product.cover" alt="商品封面" />-->
-<!--      <div>-->
-<!--        <h3>{{ product.title }}</h3>-->
-<!--        <p>价格: {{ product.price }}元</p>-->
-<!--        <input type="number" v-model="product.quantity" min="1" />-->
-<!--        <button @click="addToCart(product)">添加到购物车</button>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</template>-->
 
-<!--<script lang="ts">-->
-<!--import { onMounted, ref } from 'vue';-->
-
-<!--import { Cart,addCart,removeFromCart,getCartItems } from '../../api/cart.ts';-->
-
-<!--const products = ref<Cart[]>([]);-->
-<!--async function getAllInCart() {-->
-<!--  const userId=sessionStorage.getItem('userId');-->
-<!--  console.log("inCart",userId);-->
-<!--  try {-->
-<!--    const res = await getCartItems(userId);-->
-<!--    console.log("getAllInCart",res);-->
-<!--    if (res.data && Array.isArray(res.data.data)) {-->
-<!--      products.value = res.data.data;-->
-<!--      console.log(res.data);-->
-<!--    } else {-->
-<!--      console.error('获取数据失败：响应格式不符合预期');-->
-<!--    }-->
-<!--  } catch (error) {-->
-<!--    console.error('获取购物车列表失败:', error);-->
-<!--  }-->
-<!--}-->
-<!--// 在组件挂载时获取商店数据-->
-<!--onMounted(() => {-->
-<!--  getAllInCart();-->
-<!--});-->
-<!--// export default defineComponent({-->
-<!--//   setup() {-->
-<!--//     const products = ref([]); // 假设从后端获取商品列表-->
-<!--//-->
-<!--//     const addToCart = async (product) => {-->
-<!--//       const userId = sessionStorage.getItem(); // 假设用户ID为1-->
-<!--//       try {-->
-<!--//         await addCart(userId, product.productId, product.quantity);-->
-<!--//         // 提示用户添加成功-->
-<!--//       } catch (error) {-->
-<!--//         console.error('添加商品到购物车失败', error);-->
-<!--//       }-->
-<!--//     };-->
-<!--//-->
-<!--//     // 在这里可以添加获取商品列表的逻辑-->
-<!--//-->
-<!--//     return {-->
-<!--//       products,-->
-<!--//       addToCart-->
-<!--//     };-->
-<!--//   },-->
-<!--// });-->
-<!--</script>-->
-
-<!--<style scoped>-->
-<!--.product-item {-->
-<!--  display: flex;-->
-<!--  align-items: center;-->
-<!--  margin-bottom: 10px;-->
-<!--}-->
-<!--.product-item img {-->
-<!--  width: 100px;-->
-<!--  height: 100px;-->
-<!--  margin-right: 10px;-->
-<!--}-->
-<!--</style>-->
-
-
-
-
-
-<!--<template>-->
-<!--  <div>-->
-<!--    <h2>购物车</h2>-->
-<!--    <div v-for="product in products" :key="product.productId" class="product-item">-->
-<!--      <img :src="product.cover" alt="商品封面" />-->
-<!--      <div>-->
-<!--        <h3>{{ product.title }}</h3>-->
-<!--        <p>价格: {{ product.price }}元</p>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</template>-->
 <template>
   <el-main class="product-list bgimage">
     <el-card
@@ -418,9 +325,464 @@ export default {
 }
 .bgimage {
 
-  background-image: url("../../assets/kenan.png");
-  background-size: cover;
+  background-image: url("../../assets/780.jpg");
   background-position: center top;
+  background-size: 1500px auto; /* 或根据需求调整为 cover 或百分比 */
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* 关键属性：背景固定 */
+  background-color: #7b6b4d; /* 深羊驼色兜底 */
   min-height: 100vh;
 }
 </style>
+<!--<template>-->
+<!--  <el-main class="cart-container bgimage">-->
+<!--    <h2 class="cart-title">我的购物车</h2>-->
+<!--    <div class="product-row">-->
+<!--      <el-card-->
+<!--          v-for="product in products"-->
+<!--          :key="product.cartItemId"-->
+<!--          class="product-card"-->
+<!--      >-->
+<!--        <el-checkbox-->
+<!--            v-model="selectedProducts"-->
+<!--            :label="product.cartItemId"-->
+<!--            class="select-checkbox"-->
+<!--        ></el-checkbox>-->
+<!--        <div class="product-image">-->
+<!--          <img :src="product.cover" alt="商品封面" />-->
+<!--        </div>-->
+<!--        <div class="product-info">-->
+<!--          <h3 class="product-title">{{ product.title }}</h3>-->
+<!--          <p class="product-price">￥{{ product.price }}</p>-->
+<!--          <div class="quantity-controls">-->
+<!--            <el-button-->
+<!--                @click="updateQuantity(product.cartItemId, product.quantity - 1)"-->
+<!--                :disabled="product.quantity <= 1"-->
+<!--                size="mini"-->
+<!--                icon="el-icon-minus"-->
+<!--                circle-->
+<!--            ></el-button>-->
+<!--            <span class="product-quantity">{{ product.quantity }}</span>-->
+<!--            <el-button-->
+<!--                @click="updateQuantity(product.cartItemId, product.quantity + 1)"-->
+<!--                size="mini"-->
+<!--                icon="el-icon-plus"-->
+<!--                circle-->
+<!--            ></el-button>-->
+<!--          </div>-->
+<!--          <el-button-->
+<!--              type="danger"-->
+<!--              size="small"-->
+<!--              @click="removeFromCart(userIdNumber, product.cartItemId)"-->
+<!--              class="remove-button"-->
+<!--          >删除</el-button>-->
+<!--        </div>-->
+<!--      </el-card>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; 底部固定结算栏 &ndash;&gt;-->
+<!--    <div class="checkout-bar">-->
+<!--      <div class="total-info">-->
+<!--        已选 {{ selectedProducts.length }} 件商品，-->
+<!--        合计：￥<span class="total-price">{{ totalPrice.toFixed(2) }}</span>-->
+<!--      </div>-->
+<!--      <el-button-->
+<!--          type="primary"-->
+<!--          :disabled="selectedProducts.length === 0"-->
+<!--          @click="handleCheckout"-->
+<!--          class="checkout-button"-->
+<!--      >结算所选</el-button>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; 订单对话框 &ndash;&gt;-->
+<!--    <el-dialog-->
+<!--        title="填写订单信息"-->
+<!--        class="order-form"-->
+<!--        v-model="dialogVisible"-->
+<!--        width="500px"-->
+<!--        :before-close="handleCancel"-->
+<!--    >-->
+<!--      <el-form>-->
+<!--        <el-form-item label="收货姓名">-->
+<!--          <el-input v-model="name" placeholder="请输入姓名" />-->
+<!--        </el-form-item>-->
+<!--        <el-form-item-->
+<!--            :label="!hasTelInput ? '收货手机号' : (telLegal ? '收货手机号' : '手机号不合法')"-->
+<!--            :class="{ 'error-warn': hasTelInput && !telLegal }"-->
+<!--        >-->
+<!--          <el-input-->
+<!--              v-model="telephone"-->
+<!--              :class="{ 'error-warn-input': hasTelInput && !telLegal }"-->
+<!--              placeholder="请输入手机号"-->
+<!--          />-->
+<!--        </el-form-item>-->
+<!--        <el-form-item label="收货地址">-->
+<!--          <el-input v-model="location" placeholder="请输入地址" />-->
+<!--        </el-form-item>-->
+<!--      </el-form>-->
+<!--      <div class="order-actions">-->
+<!--        <el-button @click="handleCancel">取消</el-button>-->
+<!--        <el-button type="primary" @click="generateOrder" :disabled="!ableToOrder"-->
+<!--        >支付</el-button-->
+<!--        >-->
+<!--      </div>-->
+<!--    </el-dialog>-->
+<!--  </el-main>-->
+<!--</template>-->
+
+<!--<script lang="ts">-->
+<!--import { computed, onMounted, ref } from "vue";-->
+<!--import { getUserInfo } from "../../api/user.ts";-->
+<!--import {-->
+<!--  Cart,-->
+<!--  getCartItems,-->
+<!--  removeItemFromCart,-->
+<!--  updateCartItemQuantity,-->
+<!--  placeOrder,-->
+<!--} from "../../api/cart.ts";-->
+<!--import { ElMessage } from "element-plus";-->
+<!--import { useRouter } from "vue-router";-->
+
+<!--export default {-->
+<!--  setup() {-->
+<!--    const products = ref<Cart[]>([]);-->
+<!--    const userId = sessionStorage.getItem("userId");-->
+<!--    const userIdNumber = Number(userId);-->
+<!--    const router = useRouter();-->
+
+<!--    const dialogVisible = ref(false);-->
+
+<!--    const name = ref<string>("");-->
+<!--    const telephone = ref<string>("");-->
+<!--    const location = ref<string>("");-->
+
+<!--    const hasTelInput = computed(() => telephone.value !== "");-->
+<!--    const chinaMobileRegex =-->
+<!--        /^1(3[0-9]|4[579]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[189])\d{8}$/;-->
+<!--    const telLegal = computed(() => chinaMobileRegex.test(telephone.value));-->
+<!--    const hasNameInput = computed(() => name.value !== "");-->
+<!--    const hasLocationInput = computed(() => location.value !== "");-->
+<!--    const ableToOrder = computed(() => {-->
+<!--      return (-->
+<!--          hasTelInput.value &&-->
+<!--          telLegal.value &&-->
+<!--          hasNameInput.value &&-->
+<!--          hasLocationInput.value-->
+<!--      );-->
+<!--    });-->
+
+<!--    const selectedProducts = ref<number[]>([]); // 选中的商品 cartItemId 数组-->
+
+<!--    async function getAllInCart() {-->
+<!--      if (!userId) {-->
+<!--        console.error("用户未登录");-->
+<!--        return;-->
+<!--      }-->
+<!--      try {-->
+<!--        const res = await getCartItems(userIdNumber);-->
+<!--        if (res.data.data && Array.isArray(res.data.data.items)) {-->
+<!--          products.value = res.data.data.items;-->
+<!--        } else {-->
+<!--          console.error("获取数据失败：响应格式不符合预期");-->
+<!--        }-->
+<!--      } catch (error) {-->
+<!--        console.error("获取购物车列表失败:", error);-->
+<!--      }-->
+<!--    }-->
+
+<!--    const removeFromCart = async (userId: number, cartItemId: number) => {-->
+<!--      try {-->
+<!--        const res = await removeItemFromCart(userId, cartItemId);-->
+<!--        if (res.data.code === "200") {-->
+<!--          await getAllInCart();-->
+<!--          // 删除后从选中中移除-->
+<!--          selectedProducts.value = selectedProducts.value.filter(-->
+<!--              (id) => id !== cartItemId-->
+<!--          );-->
+<!--        } else {-->
+<!--          console.error("删除商品失败：响应格式不符合预期");-->
+<!--        }-->
+<!--      } catch (error) {-->
+<!--        console.error("删除商品失败:", error);-->
+<!--      }-->
+<!--    };-->
+
+<!--    const updateQuantity = async (cartItemId: number, newQuantity: number) => {-->
+<!--      if (newQuantity < 1) return;-->
+<!--      try {-->
+<!--        const res = await updateCartItemQuantity(-->
+<!--            userIdNumber,-->
+<!--            cartItemId,-->
+<!--            newQuantity-->
+<!--        );-->
+<!--        if (res.data.code === "200") {-->
+<!--          await getAllInCart();-->
+<!--        } else {-->
+<!--          ElMessage({-->
+<!--            message: res.data.msg,-->
+<!--            type: "error",-->
+<!--            center: true,-->
+<!--          });-->
+<!--        }-->
+<!--      } catch (error) {-->
+<!--        console.error("修改数量失败:", error);-->
+<!--      }-->
+<!--    };-->
+
+<!--    const BackToAllProducts = () => {-->
+<!--      router.push("/home/all-products");-->
+<!--    };-->
+
+<!--    const totalPrice = computed(() => {-->
+<!--      return products.value-->
+<!--          .filter((p) => selectedProducts.value.includes(p.cartItemId))-->
+<!--          .reduce((acc, p) => acc + p.price * p.quantity, 0);-->
+<!--    });-->
+
+<!--    const handleCheckout = () => {-->
+<!--      if (selectedProducts.value.length === 0) return;-->
+<!--      // 过滤出选中的商品，覆盖当前 products 只显示结算商品，或直接调用结算逻辑-->
+<!--      products.value = products.value.filter((p) =>-->
+<!--          selectedProducts.value.includes(p.cartItemId)-->
+<!--      );-->
+<!--      dialogVisible.value = true;-->
+<!--    };-->
+
+<!--    const generateOrder = async () => {-->
+<!--      if (selectedProducts.value.length === 0) {-->
+<!--        ElMessage({-->
+<!--          message: "请先选择商品",-->
+<!--          type: "warning",-->
+<!--          center: true,-->
+<!--        });-->
+<!--        return;-->
+<!--      }-->
+<!--      let orderId: number;-->
+<!--      let totalAmount: number = 0;-->
+<!--      let realAmount: number = 0;-->
+<!--      let createTime: string;-->
+<!--      const cartIds: number[] = selectedProducts.value;-->
+
+<!--      if (!userId) {-->
+<!--        console.error("用户未登录, 支付订单时");-->
+<!--        return;-->
+<!--      }-->
+
+<!--      const formData = {-->
+<!--        userId: Number(userId),-->
+<!--        cartItemIds: cartIds,-->
+<!--        shipping_address: {-->
+<!--          name: name.value,-->
+<!--          telephone: telephone.value,-->
+<!--          address: location.value,-->
+<!--        },-->
+<!--        payment_method: "ALIPAY",-->
+<!--      };-->
+
+<!--      try {-->
+<!--        const res = await placeOrder(formData);-->
+<!--        if (res.data.code === "200") {-->
+<!--          orderId = res.data.data.id;-->
+<!--          totalAmount = res.data.data.totalAmount;-->
+<!--          realAmount = res.data.data.realAmount;-->
+<!--          createTime = res.data.data.createTime;-->
+
+<!--          await router.push({-->
+<!--            name: "Order",-->
+<!--            params: {-->
+<!--              orderId: orderId,-->
+<!--              totalAmount: totalAmount,-->
+<!--              realAmount: realAmount,-->
+<!--              createTime: createTime,-->
+<!--            },-->
+<!--          });-->
+<!--        } else {-->
+<!--          console.error("获取订单ID失败");-->
+<!--        }-->
+<!--      } catch (error) {-->
+<!--        console.error("生成订单失败:", error);-->
+<!--      }-->
+<!--    };-->
+
+<!--    const handleCancel = () => {-->
+<!--      dialogVisible.value = false;-->
+<!--    };-->
+
+<!--    onMounted(() => {-->
+<!--      getAllInCart();-->
+<!--    });-->
+
+<!--    return {-->
+<!--      products,-->
+<!--      updateQuantity,-->
+<!--      removeFromCart,-->
+<!--      BackToAllProducts,-->
+<!--      userIdNumber,-->
+<!--      generateOrder,-->
+<!--      handleCancel,-->
+<!--      dialogVisible,-->
+<!--      name,-->
+<!--      telephone,-->
+<!--      location,-->
+<!--      hasTelInput,-->
+<!--      telLegal,-->
+<!--      hasNameInput,-->
+<!--      hasLocationInput,-->
+<!--      ableToOrder,-->
+<!--      selectedProducts,-->
+<!--      totalPrice,-->
+<!--      handleCheckout,-->
+<!--    };-->
+<!--  },-->
+<!--};-->
+<!--</script>-->
+
+<!--<style >-->
+<!--.cart-container {-->
+<!--  padding: 20px;-->
+<!--  position: relative;-->
+<!--  min-height: 80vh;-->
+<!--}-->
+
+<!--.cart-title {-->
+<!--  font-size: 24px;-->
+<!--  font-weight: 700;-->
+<!--  margin-bottom: 20px;-->
+<!--  color: #e4393c;-->
+<!--}-->
+
+<!--/* 横向排列容器 */-->
+<!--.product-row {-->
+<!--  display: flex;-->
+<!--  gap: 16px;-->
+<!--  overflow-x: auto;-->
+<!--  padding-bottom: 80px; /* 底部预留空间 */-->
+<!--}-->
+
+<!--/* 商品卡片 */-->
+<!--.product-card {-->
+<!--  min-width: 220px;-->
+<!--  background-color: #fff;-->
+<!--  border-radius: 10px;-->
+<!--  box-shadow: 0 1px 6px rgb(0 0 0 / 0.15);-->
+<!--  padding: 16px;-->
+<!--  display: flex;-->
+<!--  flex-direction: column;-->
+<!--  position: relative;-->
+<!--}-->
+
+<!--/* 选择框位置 */-->
+<!--.select-checkbox {-->
+<!--  position: absolute;-->
+<!--  top: 12px;-->
+<!--  left: 12px;-->
+<!--  z-index: 10;-->
+<!--}-->
+
+<!--/* 商品图片 */-->
+<!--.product-image {-->
+<!--  width: 100%;-->
+<!--  height: 160px;-->
+<!--  overflow: hidden;-->
+<!--  border-radius: 6px;-->
+<!--  margin-bottom: 12px;-->
+<!--  display: flex;-->
+<!--  justify-content: center;-->
+<!--  align-items: center;-->
+<!--}-->
+
+<!--.product-image img {-->
+<!--  max-width: 100%;-->
+<!--  max-height: 100%;-->
+<!--  object-fit: contain;-->
+<!--}-->
+
+<!--/* 商品信息 */-->
+<!--.product-info {-->
+<!--  flex: 1;-->
+<!--  display: flex;-->
+<!--  flex-direction: column;-->
+<!--}-->
+
+<!--.product-title {-->
+<!--  font-weight: 600;-->
+<!--  font-size: 16px;-->
+<!--  margin: 0 0 8px 0;-->
+<!--  color: #333;-->
+<!--}-->
+
+<!--.product-price {-->
+<!--  color: #e4393c;-->
+<!--  font-size: 18px;-->
+<!--  font-weight: 700;-->
+<!--  margin-bottom: 8px;-->
+<!--}-->
+
+<!--.quantity-controls {-->
+<!--  display: flex;-->
+<!--  align-items: center;-->
+<!--  margin-bottom: 12px;-->
+<!--}-->
+
+<!--.product-quantity {-->
+<!--  margin: 0 8px;-->
+<!--  min-width: 24px;-->
+<!--  text-align: center;-->
+<!--}-->
+
+<!--.remove-button {-->
+<!--  align-self: flex-start;-->
+<!--}-->
+
+<!--/* 底部结算栏 */-->
+<!--.checkout-bar {-->
+<!--  position: fixed;-->
+<!--  bottom: 0;-->
+<!--  left: 0;-->
+<!--  right: 0;-->
+<!--  background-color: #fff;-->
+<!--  box-shadow: 0 -1px 10px rgb(0 0 0 / 0.1);-->
+<!--  padding: 12px 24px;-->
+<!--  display: flex;-->
+<!--  justify-content: space-between;-->
+<!--  align-items: center;-->
+<!--  z-index: 100;-->
+<!--  border-top: 1px solid #eee;-->
+<!--}-->
+
+<!--.total-info {-->
+<!--  font-size: 16px;-->
+<!--  color: #333;-->
+<!--}-->
+
+<!--.total-price {-->
+<!--  color: #e4393c;-->
+<!--  font-weight: 700;-->
+<!--  font-size: 18px;-->
+<!--}-->
+
+<!--.checkout-button {-->
+<!--  min-width: 120px;-->
+<!--  font-size: 16px;-->
+<!--}-->
+
+<!--/* 订单表单错误警告 */-->
+<!--.error-warn {-->
+<!--  color: #f56c6c;-->
+<!--}-->
+
+<!--.error-warn-input {-->
+<!--  border-color: #f56c6c;-->
+<!--  box-shadow: 0 0 5px #f56c6c;-->
+<!--}-->
+<!--.bgimage {-->
+<!--  background-image: url("../../assets/780.jpg");-->
+<!--  background-position: center top;-->
+<!--  background-size: 1500px auto; /* 或 cover */-->
+<!--  background-repeat: no-repeat;-->
+<!--  background-attachment: fixed; /* 背景固定 */-->
+<!--  background-color: #7b6b4d; /* 深羊驼色兜底 */-->
+<!--  min-height: 100vh;-->
+<!--}-->
+
+<!--</style>-->

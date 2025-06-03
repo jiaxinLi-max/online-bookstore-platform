@@ -1,4 +1,4 @@
-import { CHECKIN_MODULE } from './_prefix';
+import {CHECKIN_MODULE, USER_MODULE} from './_prefix';
 import axios from "axios";
 
 export const checkIn = async(checkInId: number) => {
@@ -20,6 +20,20 @@ export const getCheckinHistory = async (checkInId: number) => {
     return axios.get(`${CHECKIN_MODULE}/${checkInId}`, {
         headers: {
             'token': token
+        }
+    })
+}
+
+// 获取签到情况
+export const getCheckinStatus = (userId: number) => {
+    const token = sessionStorage.getItem('token')
+    console.log("Getting checkin status:", userId)
+    return axios.get(`${CHECKIN_MODULE}/is/${userId}`, {
+        headers: {
+            'token': token
+        },
+        params: {
+            'userId': userId
         }
     })
 }
