@@ -11,7 +11,7 @@ public interface CommentService {
     String updateCommentInfo(CommentVO commentvo);
     String addComment(CommentVO commentVO);
     String deleteComment(Integer id);
-    String likeComment(Integer id);
+    String likeComment(Integer id,Integer userId);
     List<Comment>findAllByOrderByTimeDesc();
     List<Comment>findAllByOrderByLikesDesc();
     List<Comment>findAllByProductIdOrderByTimeDesc(Integer productId);

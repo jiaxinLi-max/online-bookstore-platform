@@ -52,8 +52,8 @@ public class PostController {
      * 点赞帖子
      */
     @PostMapping("/like")
-    public Response<String> likePost(@RequestParam Integer postId){
-        return Response.buildSuccess(postService.likePost(postId));
+    public Response<String> likePost(@RequestParam Integer postId,@RequestParam Integer userId){
+        return Response.buildSuccess(postService.likePost(postId,userId));
 
     }
 
@@ -61,8 +61,8 @@ public class PostController {
      * 删除帖子
      */
     @PostMapping("/dislike")
-    public Response<String> dislikePost(@RequestParam Integer postId){
-        return Response.buildSuccess(postService.dislikePost(postId));
+    public Response<String> dislikePost(@RequestParam Integer postId,@RequestParam Integer userId){
+        return Response.buildSuccess(postService.dislikePost(postId,userId));
 
     }
 }

@@ -17,9 +17,9 @@ public interface PostService {
 
     String deletePost(Integer postId);
 
-    String likePost(Integer postId);
+    String likePost(Integer postId,Integer userId);
 
-    String dislikePost(Integer postId);
+    String dislikePost(Integer postId,Integer userId);
 
     List<Post>findAllByOrderByTimeDesc();
     List<Post>findAllByOrderByLikeDesc();

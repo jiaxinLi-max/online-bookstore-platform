@@ -24,4 +24,8 @@ public class CheckinController {
     public Response<String> setCheckin(@PathVariable Integer userId){
         return Response.buildSuccess(checkinService.setCheckin(userId));
     }
+    @GetMapping("/is/{userId}")
+    public Response<Boolean> ISCheckin(@PathVariable Integer userId){
+        return Response.buildSuccess(checkinService.IScheckin(userId));
+    }
 }

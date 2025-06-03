@@ -93,6 +93,7 @@ const avatar = ref('')
 const time = ref('')
 const like = ref(0)
 const dislike = ref(0)
+const curUserId = sessionStorage.getItem('userId')
 
 function formatTime(timeStr: string): string {
   const date = new Date(timeStr)
@@ -152,11 +153,10 @@ async function handleDelete() {
 // 点赞处理
 async function handleLike() {
   try {
-    const res = await likePost(id)
+    const res = await likePost(id, Number(curUserId))
     if (res.data.code === '200') {
-      like.value++
-      console.log(like.value)
       ElMessage.success(res.data.data)
+      await getPost();
     }
   } catch (error) {
     ElMessage.error('点赞失败')
@@ -166,11 +166,10 @@ async function handleLike() {
 // 点踩处理
 async function handleDislike() {
   try {
-    const res = await dislikePost(id)
+    const res = await dislikePost(id, Number(curUserId))
     if (res.data.code === '200') {
-      dislike.value++
-      console.log(dislike.value)
       ElMessage.success(res.data.data)
+      await getPost();
     }
   } catch (error) {
     ElMessage.error('点踩失败')
