@@ -168,6 +168,12 @@ const router = createRouter({
                     meta: { title: '帖子列表' },
                 },
                 {
+                    path: '/home/search/:keyword',
+                    name: 'SearchResults',
+                    component: () => import('../views/search/SearchResult.vue'),
+                    props: true
+                },
+                {
                     path: 'rankings',
                     name: 'Rankings',
                     component: () => import('../views/ranking/AllRankings.vue')  // 示例
