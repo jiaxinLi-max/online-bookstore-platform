@@ -44,9 +44,9 @@ function goToProduct(id: number) {
 </script>
 
 <template>
-  <el-main class="search-results-page">
-    <div class="content-wrapper">
-      <h2>搜索结果：{{ keyword }}</h2>
+  <div class="bgimage"> <!-- 全屏背景容器 -->
+    <el-main class="search-results-page">
+
 
       <div v-if="loading">加载中...</div>
       <div v-if="error" class="error">{{ error }}</div>
@@ -62,17 +62,14 @@ function goToProduct(id: number) {
           </div>
         </div>
       </div>
-    </div>
-  </el-main>
+    </el-main>
+  </div>
 </template>
 
 
+
 <style scoped>
-.search-results-page {
-  max-width: 900px;
-  margin: 20px auto;
-  padding: 10px 15px;
-}
+
 
 .results-list {
   display: flex;
@@ -84,10 +81,10 @@ function goToProduct(id: number) {
   cursor: pointer;
   display: flex;
   width: 100%;
-  max-width: 400px;
+  max-width: 250px;
   border-radius: 8px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.85); /* 半透明白色 */
+  background-color: rgba(255, 248, 220, 0.8); /* 半透明白色 */
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   transition: box-shadow 0.3s;
   border: none; /* 去掉灰色边框 */
@@ -124,13 +121,24 @@ function goToProduct(id: number) {
 .error {
   color: red;
 }
+/* 让背景图铺满整个页面 */
 .bgimage {
   background-image: url("../../assets/780.jpg");
   background-position: center top;
-  background-size: 1500px auto; /* 或根据需求调整为 cover 或百分比 */
+  background-size: cover;
   background-repeat: no-repeat;
-  background-attachment: fixed; /* 关键属性：背景固定 */
-  background-color: #7b6b4d; /* 深羊驼色兜底 */
+  background-attachment: fixed;
+  background-color: #7b6b4d;
   min-height: 100vh;
+  width: 100%;
 }
+
+/* 内容宽度限制和居中 */
+.search-results-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+
 </style>

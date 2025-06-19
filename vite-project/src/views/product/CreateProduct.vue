@@ -219,7 +219,7 @@ async function handleCreateProduct() {
 }
 .bgimage {
   background-color: rgba(0, 0, 0, 0.3);
-  background-image: url("../../assets/kenan.png");
+  background-image: url("../../assets/780.jpg");
 
   background-size: cover;
   background-repeat: no-repeat;

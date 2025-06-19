@@ -21,17 +21,51 @@
       </div>
     </div>
 
-    <div class="comment-area">
-      <el-button type="success" @click="goToCreateComment">发表评论</el-button>
-      <el-button type="info" @click="viewAllComments">查看全部评价</el-button>
-    </div>
-
     <div class="action-area">
       <div v-if="role === 'CUSTOMER'" class="customer-actions-group">
         <div class="stock-display" v-if="stockAmount <= 10">库存紧张</div>
         <div class="action-row">
           <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>
-          <el-button type="primary" @click="addToCart">加入购物车</el-button>
+          <el-button class="btn-camel" @click="addToCart">加入购物车</el-button>
+        </div>
+
+        <!-- 评价按钮与表单（放在加入购物车下方） -->
+        <div class="comment-area">
+          <el-button class="btn-camel" @click="showCommentForm = !showCommentForm">
+            {{ showCommentForm ? '收起评论框' : '发表评论' }}
+          </el-button>
+          <el-button type="info" @click="viewAllComments">查看全部评价</el-button>
+        </div>
+
+
+
+        <div v-if="showCommentForm" class="create-comment-box">
+          <el-form label-width="120px" class="comment-form">
+            <el-form-item label="评价内容">
+              <el-input v-model="commentContent" placeholder="请输入评价内容" />
+            </el-form-item>
+
+            <el-form-item label="评分">
+              <el-rate
+                  v-model="commentScore"
+                  :allow-half="true"
+                  show-text
+                  :texts="['极差', '失望', '一般', '满意', '惊喜']"
+              />
+            </el-form-item>
+
+            <el-form-item>
+              <el-button
+                  @click.prevent="handleCreateComment"
+                  :disabled="!commentContent || !commentScore"
+                  type="primary"
+                  plain
+                  class="custom-black-button"
+              >
+                创建评价
+              </el-button>
+            </el-form-item>
+          </el-form>
         </div>
       </div>
 
@@ -48,7 +82,6 @@
         </div>
       </div>
     </div>
-  </div>
   <el-dialog
       v-model="showEditDialog"
       title="修改商品信息"
@@ -121,6 +154,7 @@
       </el-form-item>
     </el-form>
   </el-dialog>
+  </div>
 </template>
 
 <script lang="ts">
@@ -138,12 +172,44 @@ import { Specification } from "../../api/specification.ts";
 import {ElMessage, type UploadFile} from "element-plus";
 import {Plus} from "@element-plus/icons-vue";
 import {getImage} from "../../api/tools.ts";
+import { createComment } from '../../api/comment';
 
 export default defineComponent({
   name: 'ProductDetail',
   components: {Plus},
   methods: {updateProductInfo},
   setup() {
+    const showCommentForm = ref(false)
+    const commentContent = ref('')
+    const commentScore = ref<number>(0)
+
+    const handleCreateComment = async () => {
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        ElMessage.error('请先登录!');
+        return;
+      }
+      const payload = {
+        userId: Number(sessionStorage.getItem('userId')),
+        content: commentContent.value,
+        score: commentScore.value,
+        productId: Number(productId),
+      };
+      try {
+        const res = await createComment(payload);
+        if (res.data.code === '200') {
+          ElMessage.success('创建评价成功');
+          commentContent.value = '';
+          commentScore.value = 0;
+          showCommentForm.value = false;
+        } else {
+          ElMessage.error(res.data.message);
+        }
+      } catch (error) {
+        ElMessage.error('创建评价失败');
+      }
+    }
+
     const route = useRoute();
     const router = useRouter();
     function goToCreateComment() {
@@ -391,6 +457,10 @@ export default defineComponent({
       newSpecifications,
       goToCreateComment,
       viewAllComments,
+      showCommentForm,
+      commentContent,
+      commentScore,
+      handleCreateComment,
     };
   },
 });
@@ -406,7 +476,7 @@ html, body {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background-image: url("../../assets/kenan.png");
+  background-image: url("../../assets/780.jpg");
   background-size: cover;
   background-position: center top;
   min-height: 100vh;
@@ -565,4 +635,35 @@ html, body {
   height: auto;
   display: block;
 }
+
+.create-comment-box {
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 800px;
+}
+
+.custom-black-button {
+  background-color: #000 !important;
+  border-color: #000 !important;
+  color: white !important;
+}
+
+.comment-form .el-form-item__label {
+  color: #333;
+}
+.btn-camel {
+  background-color: #7b6b4d !important; /* 深羊驼色 */
+  color: #ffffff !important;
+  border-color: #7b6b4d !important;
+}
+
+.btn-camel:hover {
+  background-color: #5f543d !important; /* 深羊驼色 hover 变暗 */
+  border-color: #5f543d !important;
+  color: #ffffff !important;
+}
+
 </style>

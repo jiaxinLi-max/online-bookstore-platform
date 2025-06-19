@@ -234,7 +234,7 @@ function logout() {
         </el-col>
       </template>
 
-      <el-col :span="1">
+      <el-col :span="3">
       </el-col>
 
 <!--      <el-col :span="6" class="search-bar">-->

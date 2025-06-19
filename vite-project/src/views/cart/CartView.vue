@@ -561,23 +561,21 @@ export default {
       dialogVisible.value = true;
     };
 
+
     const generateOrder = async () => {
-      if (selectedProducts.value.length === 0) {
-        ElMessage({
-          message: "请先选择商品",
-          type: "warning",
-          center: true,
-        });
-        return;
-      }
       let orderId: number;
       let totalAmount: number = 0;
       let realAmount: number = 0;
       let createTime: string;
-      const cartIds: number[] = selectedProducts.value;
+      const cartIds: number[] = [];
+
+      for (const product of products.value) {
+        cartIds.push(product.cartItemId);
+      }
+      console.log("商品信息:", cartIds);
 
       if (!userId) {
-        console.error("用户未登录, 支付订单时");
+        console.error('用户未登录, 支付订单时');
         return;
       }
 
@@ -589,33 +587,36 @@ export default {
           telephone: telephone.value,
           address: location.value,
         },
-        payment_method: "ALIPAY",
-      };
+        payment_method: 'ALIPAY',
+      }
 
       try {
         const res = await placeOrder(formData);
-        if (res.data.code === "200") {
+        if (res.data.code === '200') {
           orderId = res.data.data.id;
           totalAmount = res.data.data.totalAmount;
           realAmount = res.data.data.realAmount;
           createTime = res.data.data.createTime;
+          console.log("订单ID:", res.data.data.id);
+          console.log("实际金额:", realAmount);
 
           await router.push({
-            name: "Order",
+            name: 'Order',
             params: {
               orderId: orderId,
               totalAmount: totalAmount,
               realAmount: realAmount,
               createTime: createTime,
-            },
+            }
           });
         } else {
-          console.error("获取订单ID失败");
+          console.error('获取订单ID失败');
         }
       } catch (error) {
-        console.error("生成订单失败:", error);
+        console.error('生成订单失败:', error);
       }
     };
+
 
     const handleCancel = () => {
       dialogVisible.value = false;

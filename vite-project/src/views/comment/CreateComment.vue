@@ -235,12 +235,7 @@ async function handleCreateComment() {
 }
 
 .bgimage {
-  //background-color: rgba(0, 0, 0, 0.3);
-  //background-image: url('../../assets/kenan.png');
-  //background-size: cover;
-  //background-repeat: no-repeat;
-  //background-position: center;
-  //min-height: 100vh;
+
   background-image: url("../../assets/780.jpg");
   background-position: center top;
   background-size: 1500px auto; /* 或根据需求调整为 cover 或百分比 */
