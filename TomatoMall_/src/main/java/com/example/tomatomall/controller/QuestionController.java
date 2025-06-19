@@ -40,4 +40,9 @@ public class QuestionController {
     public Response<List<QuestionVO>> getListUnanswered(@PathVariable(value="userId")Integer userId){
         return  Response.buildSuccess(questionService.getQuestionUnanswered(userId));
     }
+
+    @GetMapping("/userAnswer")
+    public Response<String> getAnswer(@RequestParam Integer questionId,@RequestParam Integer userId){
+        return Response.buildSuccess(questionService.getAnswer(userId,questionId));
+    }
 }

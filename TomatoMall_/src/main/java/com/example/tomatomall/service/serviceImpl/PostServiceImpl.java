@@ -28,8 +28,6 @@ public class PostServiceImpl implements PostService {
     @Autowired
     ProductService productService;
 
-    @Autowired
-    CommentService commentService;
 
 
     @Override

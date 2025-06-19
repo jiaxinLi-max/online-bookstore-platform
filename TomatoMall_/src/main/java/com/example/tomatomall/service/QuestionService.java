@@ -13,4 +13,5 @@ public interface QuestionService {
     QuestionVO getQuestion(Integer id);
     List<QuestionVO> getQuestionAnswered(Integer id);
     List<QuestionVO> getQuestionUnanswered(Integer id);
+    String getAnswer(Integer userId,Integer questionId);
 }

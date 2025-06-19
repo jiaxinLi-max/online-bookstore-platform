@@ -49,6 +49,7 @@ public class CartServiceImpl implements CartService {
             cart.setQuantity(quantity);
             cart.setUserId(userId);
             cart.setProductId(productId);
+            cart.setValid(true);
         }else{
             //购物车中有记录
             Integer newQuantity=cart.getQuantity()+quantity;
@@ -117,6 +118,10 @@ public class CartServiceImpl implements CartService {
             Product product = productService.findById(cart.getProductId());
             if(product==null){
                 throw TomatoMallException.productNotExist();
+            }
+
+            if(!cart.getValid()){
+                continue;
             }
 
             CartVO cartVO = cart.toVO();

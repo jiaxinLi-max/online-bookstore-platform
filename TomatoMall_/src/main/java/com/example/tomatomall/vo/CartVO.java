@@ -22,6 +22,7 @@ public class CartVO {
     private String cover;
     private String detail;
     private Integer quantity;//商品数量
+    private Boolean valid;
 
     public Cart toPO(){
         Cart cart=new Cart();
@@ -29,6 +30,7 @@ public class CartVO {
         cart.setUserId(this.userId);
         cart.setProductId(this.productId);
         cart.setQuantity(this.quantity);
+        cart.setValid(this.valid);
         return cart;
     }
 }

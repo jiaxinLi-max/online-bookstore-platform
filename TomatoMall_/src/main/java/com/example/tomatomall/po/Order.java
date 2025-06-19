@@ -32,6 +32,7 @@ public class Order {
     private List<Integer> cartItemIds;
 
 
+
 //    @Basic
 //    @Column(name ="cart_item_ids")
 //    private List<Integer> cartItemIds;
