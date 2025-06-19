@@ -85,12 +85,13 @@ public class OrderServiceLmpl implements OrderService {
     }
 
     @Override
-    public OrderVO sendPay(Integer order_id, HttpServletResponse httpResponse){
+    public OrderVO sendPay(Integer order_id,String returnUrl, HttpServletResponse httpResponse){
         try {
             AlipayClient alipayClient = new DefaultAlipayClient(serverUrl, appId,
                     privateKey, FORMAT, "utf-8", alipayPublicKey, "RSA2");
             AlipayTradePagePayRequest request = new AlipayTradePagePayRequest();  // 发送请求的 Request类
             request.setNotifyUrl(notifyUrl);
+            request.setReturnUrl(returnUrl);
             Order order = orderRepository.findById(order_id).orElseThrow(TomatoMallException::orderNotExist);
             JSONObject bizContent = new JSONObject();
             bizContent.put("out_trade_no", String.valueOf(order_id));

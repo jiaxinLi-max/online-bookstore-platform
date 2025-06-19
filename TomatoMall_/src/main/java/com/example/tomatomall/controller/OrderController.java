@@ -24,8 +24,9 @@ public class OrderController {
 
 
     @PostMapping("/{order_id}/pay")
-    public Response<OrderVO> getUser(@PathVariable(value="order_id")Integer order_id, HttpServletResponse httpResponse) {
-        return Response.buildSuccess(orderService.sendPay(order_id,httpResponse));
+    public Response<OrderVO> getUser(@PathVariable(value="order_id")Integer order_id,@RequestParam("returnUrl") String returnUrl,
+                                     HttpServletResponse httpResponse) {
+        return Response.buildSuccess(orderService.sendPay(order_id,returnUrl,httpResponse));
     }
 
 //    @PostMapping("/{order_id}/pay")
