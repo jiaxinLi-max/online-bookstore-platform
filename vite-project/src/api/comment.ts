@@ -114,3 +114,14 @@ export const likeComment = (commentId: number, userId: number) => {
         }
     })
 }
+
+export const getSubComments = (parentId: number) => {
+    const token = sessionStorage.getItem('token');
+    // 根据新文档，路径为 /api/comment/reply, 参数为 id
+    return axios.get(`${COMMENT_MODULE}/reply`, {
+        headers: { 'token': token },
+        params: {
+            commentId: parentId
+        }
+    });
+}
