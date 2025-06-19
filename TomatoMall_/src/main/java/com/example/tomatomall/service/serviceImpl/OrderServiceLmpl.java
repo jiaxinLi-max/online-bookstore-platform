@@ -240,6 +240,7 @@ public class OrderServiceLmpl implements OrderService {
                     throw TomatoMallException.exceedAmount();
                 }
                 stockpile.setFrozen(stockpile.getFrozen()-cartItem.getQuantity());
+                cartItem.setValid(false);
                 CartsOrdersRelation cartsOrdersRelation_new=new CartsOrdersRelation();
                 cartsOrdersRelation_new.setOrderId(orderId);
                 cartsOrdersRelation_new.setCartitemId(cartItemId);
@@ -262,6 +263,14 @@ public class OrderServiceLmpl implements OrderService {
                 }
             }
         }
+    }
+
+    @Override
+    public List<OrderVO> getSuccessOrder(Integer userId){
+        List<Order> successOrders = orderRepository.findByUserIdAndStatus(userId, "TRADE_SUCCESS");
+        return successOrders.stream()
+                .map(Order::toVO)
+                .collect(Collectors.toList());
     }
 
 

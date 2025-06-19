@@ -3,12 +3,12 @@ package com.example.tomatomall.controller;
 
 import com.alipay.api.internal.util.AlipaySignature;
 import com.example.tomatomall.service.OrderService;
-import com.example.tomatomall.vo.AccountVO;
+
 import com.example.tomatomall.vo.OrderVO;
-import com.example.tomatomall.vo.QuestionVO;
+
 import com.example.tomatomall.vo.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,8 +46,8 @@ public class OrderController {
     }
 
     @GetMapping("/List/{userId}")
-    public Response<List<QuestionVO>> getSuccessList(@PathVariable(value="userId")Integer userId){
-        return  Response.buildSuccess(orderService.);
+    public Response<List<OrderVO>> getSuccessList(@PathVariable(value="userId")Integer userId){
+        return  Response.buildSuccess(orderService.getSuccessOrder(userId));
     }
 
 }

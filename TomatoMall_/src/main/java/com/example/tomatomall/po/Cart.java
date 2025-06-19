@@ -29,12 +29,17 @@ public class Cart {
     @Column(name="quantity",nullable = false)
     private Integer quantity;//商品数量
 
+    @Basic
+    @Column(name = "valid")
+    private Boolean valid;
+
     public CartVO toVO(){
         CartVO cartVO=new CartVO();
         cartVO.setCartItemId(this.cartItemId);
         cartVO.setProductId(this.productId);
         cartVO.setUserId(this.userId);
         cartVO.setQuantity(this.quantity);
+        cartVO.setValid(this.valid);
         return cartVO;
     }
 
