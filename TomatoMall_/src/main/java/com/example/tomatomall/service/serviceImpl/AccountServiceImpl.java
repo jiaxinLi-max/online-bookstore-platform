@@ -111,6 +111,9 @@ public class AccountServiceImpl implements AccountService {
         if(accountVO.getLocation()!=null){
             account.setLocation(accountVO.getLocation());
         }
+        if(accountVO.getAddressBook()!=null){
+            account.setAddressBook(accountVO.getAddressBook());
+        }
         accountRepository.save(account);
         return  true;
     }

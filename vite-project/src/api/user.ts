@@ -7,6 +7,12 @@ type LoginInfo = {
     password: string
 }
 
+export interface Address {
+    name: string;
+    phone: string;
+    address: string;
+}
+
 type RegisterInfo = {
     username: string,
     password: string,
@@ -16,6 +22,7 @@ type RegisterInfo = {
     telephone?: string,
     email?: string,
     location?: string,
+    addressBook?: Address[]
 }
 
 type UpdateInfo = {
@@ -27,6 +34,7 @@ type UpdateInfo = {
     telephone?: string,
     email?: string,
     location?: string,
+    addressBook?: Address[]
 }
 
 // 如果有“Vue: This may be converted to an async function”警告，可以不管
