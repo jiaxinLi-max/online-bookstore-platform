@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -188,15 +189,18 @@ public class ProductServiceImpl implements ProductService {
     //搜索书籍
     @Override
     public List<ProductVO> searchProducts(String keyword) {
-        Set<Character> chars = keyword.toLowerCase().chars()
-                .mapToObj(c -> (char) c)
-                .collect(Collectors.toSet());
+        String lowerKeyword = keyword.toLowerCase();
 
+        // 完全匹配的排在前面，其次是模糊匹配
         return productRepository.findAll().stream()
-                .filter(product -> {
+                .filter(product -> product.getTitle() != null)
+                .sorted(Comparator.comparingInt(product -> {
                     String title = product.getTitle().toLowerCase();
-                    return chars.stream().anyMatch(ch -> title.contains(String.valueOf(ch)));
-                })
+                    if (title.equals(lowerKeyword)) return 0; // 完全匹配优先
+                    if (title.contains(lowerKeyword)) return 1; // 模糊匹配其次
+                    return 2; // 其他丢弃
+                }))
+                .filter(product -> product.getTitle().toLowerCase().contains(lowerKeyword))
                 .map(Product::toVO)
                 .collect(Collectors.toList());
     }

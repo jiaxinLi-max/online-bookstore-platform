@@ -1,8 +1,8 @@
 <template>
   <el-main class="comment-list bgimage">
-    <div class="back-button-wrapper">
-      <el-button type="primary" icon="ArrowLeft" @click="goToProductDetail">返回商品详情</el-button>
-    </div>
+<!--    <div class="back-button-wrapper">-->
+<!--      <el-button type="primary" icon="ArrowLeft" @click="goToProductDetail">返回商品详情</el-button>-->
+<!--    </div>-->
     <div class="sort-select-wrapper">
       <el-select v-model="sortOption" placeholder="选择排序方式" @change="fetchCommentsBySort" class="sort-select">
         <el-option label="按时间排序" value="time" />
@@ -194,7 +194,7 @@ onMounted(() => {
 
 .bgimage {
   background-color: rgba(0, 0, 0, 0.3);
-  background-image: url("../../assets/kenan.png");
+  background-image: url("../../assets/780.jpg");
   background-size: cover;
   background-position: center;
   padding: 40px 0;

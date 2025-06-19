@@ -364,7 +364,7 @@ onMounted(() => {
   min-height: 800px;
   padding: 20px;
   background-color: rgba(0, 0, 0, 0.3);
-  background-image: url("../../assets/kenan.png");
+  background-image: url("../../assets/780.jpg");
   background-size: cover;
   background-position: center;
 

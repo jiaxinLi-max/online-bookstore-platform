@@ -337,7 +337,7 @@ onMounted(() => {
 }
 .bgimage {
   min-height: 100vh;
-  background-image: url("../../assets/kenan.png");
+  background-image: url("../../assets/780.jpg");
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;

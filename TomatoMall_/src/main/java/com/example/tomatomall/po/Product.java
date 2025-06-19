@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 //用来和数据库进行交互
@@ -37,9 +39,11 @@ public class Product {
     @Column(name="description")
     private String description;
 
-    @Basic
-    @Column(name = "cover")
-    private String cover;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "product_covers", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "cover_url")
+    private List<String> cover = new ArrayList<>();
+
 
     @Basic
     @Column(name = "detail")

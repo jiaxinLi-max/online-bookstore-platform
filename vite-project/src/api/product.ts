@@ -10,7 +10,7 @@ export interface Product {
     price: number;
     rate:number;
     description: string;
-    cover: string;
+    cover: string[];
     detail: string;
     specifications:Specification[];
     // bookTitle: string,
