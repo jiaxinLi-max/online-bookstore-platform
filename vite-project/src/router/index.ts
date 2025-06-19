@@ -263,7 +263,13 @@ const router = createRouter({
                     name: "AllColumns",
                     component: () => import('../views/columns/AllColumns.vue'),
                     meta: { title: '所有栏目' }
-                }
+                },
+                {
+                    path: 'columns/:id',
+                    name: 'ColumnDetail',
+                    component: () => import('../views/columns/ColumnDetail.vue'),
+                    meta: { title: '栏目详情' }
+                },
             ],
         },
         {
