@@ -12,9 +12,22 @@
           @click="goToColumnDetail(column.id)"
           shadow="hover"
       >
-        <div class="column-image">
-          <img :src="Array.isArray(column.covers) && column.covers.length > 0 ? column.covers[0] : ''" alt="Column Cover" />
+        <el-carousel
+            v-if="Array.isArray(column.covers) && column.covers.length > 0"
+            class="column-image"
+            height="180px"
+            indicator-position="none"
+            :autoplay="false"
+            arrow="hover"
+        >
+          <el-carousel-item v-for="(coverUrl, index) in column.covers" :key="index">
+            <img :src="coverUrl" alt="Column Cover" class="carousel-image" />
+          </el-carousel-item>
+        </el-carousel>
+        <div v-else class="column-image no-image-placeholder">
+          <span>暂无封面</span>
         </div>
+
         <div class="column-info">
           <h3 class="column-theme">{{ column.theme }}</h3>
           <p class="column-description">{{ column.description }}</p>
@@ -94,6 +107,7 @@ onMounted(() => {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   display: flex;
   flex-direction: column;
+  padding: 0;
 }
 .column-card:hover {
   transform: translateY(-5px);
@@ -102,11 +116,21 @@ onMounted(() => {
 .column-image {
   width: 100%;
   height: 180px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  overflow: hidden;
 }
-.column-image img {
+.carousel-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+.no-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f7fa;
+  color: #c0c4cc;
 }
 .column-info {
   padding: 14px;
@@ -121,11 +145,10 @@ onMounted(() => {
   font-size: 0.9em;
   color: #666;
   line-height: 1.4;
-  /* 多行文字溢出显示省略号 */
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 2; /* 显示两行 */
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 .bgimage {

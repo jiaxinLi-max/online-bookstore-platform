@@ -54,7 +54,7 @@
               list-type="picture-card"
               :auto-upload="false"
               :file-list="fileList"
-              :on-success="handleSuccess"
+              :on-change="handleChange"
               :on-remove="handleRemove"
               :on-preview="handlePictureCardPreview"
               multiple
@@ -84,6 +84,7 @@ import { getAllColumns, getProductsByColumn, updateColumns, deleteColumns, remov
 import { ElMessage, ElMessageBox, type UploadFile, type UploadFiles } from 'element-plus';
 import { Plus } from '@element-plus/icons-vue';
 import type { Product } from '../../api/product';
+import {getImage} from "../../api/tools.ts";
 
 const route = useRoute();
 const router = useRouter();
@@ -177,28 +178,28 @@ const handleUpdateColumn = async () => {
   }
 };
 
-// 【关键修正】: 删除旧的 handleChange 函数, 实现新的 handleSuccess
-const handleSuccess = (responseData: any, uploadFile: UploadFile, uploadFiles: UploadFiles) => {
-  if (responseData.code === '200') {
-    editForm.value.covers.push(responseData.data);
-    uploadFile.url = responseData.data;
-    ElMessage.success('上传成功');
-  } else {
-    ElMessage.error(responseData.msg || '上传失败');
-    const failedFileIndex = uploadFiles.findIndex(f => f.uid === uploadFile.uid);
-    if(failedFileIndex > -1) {
-      uploadFiles.splice(failedFileIndex, 1);
-    }
-  }
-  fileList.value = uploadFiles;
-};
+async function handleChange(file: UploadFile) {
+  if (!editForm.value.covers) editForm.value.covers = [];
+  const rawFile = file.raw;
+  if (!rawFile) return;
+  try {
+    const res = await getImage(rawFile);
+    if (res && res.code === '200') {
+      console.log("上传");
+      editForm.value.covers.push(res.data);
+      ElMessage.success('新封面上传成功');
+    } else { ElMessage.error('上传失败'); }
+  } catch (error) { ElMessage.error('上传异常'); }
+}
 
-const handleRemove = (file: UploadFile, newFileList: UploadFiles) => {
+const handleRemove = (file: UploadFile) => {
   const urlToRemove = file.url;
-  if (urlToRemove) {
+  if (urlToRemove && editForm.value.covers) {
+    console.log("删除", editForm.value.covers);
     editForm.value.covers = editForm.value.covers.filter(url => url !== urlToRemove);
+    console.log(urlToRemove);
+    console.log(editForm.value.covers);
   }
-  fileList.value = newFileList;
 };
 
 const handlePictureCardPreview = (file: UploadFile) => {
