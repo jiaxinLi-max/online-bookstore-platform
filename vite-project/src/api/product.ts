@@ -21,7 +21,7 @@ export interface Product {
     // pages: number,
     // publicationDate: string,
     // publisher: string,
-
+    columnIds?: number[];
 }
 
 import {PRODUCT_MODULE,RANK_MODULE} from './_prefix';

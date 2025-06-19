@@ -60,3 +60,12 @@ export const getAllColumns = () => {
         return res;
     })
 }
+
+export const getProductsByColumn = (id: number) => {
+    const token = sessionStorage.getItem("token");
+    return axios.get(`${COLUMNS_MODULE}/${id}`, {
+        headers: {
+            'token': token
+        }
+    });
+}

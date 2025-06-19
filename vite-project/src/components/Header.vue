@@ -335,9 +335,9 @@ function logout() {
   <!-- 分类子导航栏 -->
   <div v-if="showSubNav" class="sub-nav">
     <div class="nav-item" @click="router.push('/home/all-products')">全部</div>
-    <div class="nav-item" @click="router.push('/home/categories')">栏目</div>
+    <div class="nav-item" @click="router.push('/home/all-columns')">栏目</div>
     <div class="nav-item" @click="router.push('/home/rankings')">热销榜</div>
-    <div class="nav-item" @click="router.push('/home/about')">关于我们</div>
+<!--    <div class="nav-item" @click="router.push('/home/about')">关于我们</div>-->
   </div>
 
 </template>

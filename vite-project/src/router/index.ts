@@ -258,7 +258,12 @@ const router = createRouter({
                     component: () => import('../views/columns/CreateColumns.vue'), // 确保路径正确
                     meta: { title: '创建栏目' },
                 },
-
+                {
+                    path: 'all-columns',
+                    name: "AllColumns",
+                    component: () => import('../views/columns/AllColumns.vue'),
+                    meta: { title: '所有栏目' }
+                }
             ],
         },
         {
