@@ -1,9 +1,26 @@
 <template>
   <div class="product-detail">
     <div class="product-info">
+<!--      <div class="product-image">-->
+<!--        <img :src="product.cover" alt="Cover Image" class="cover-image" />-->
+<!--      </div>-->
       <div class="product-image">
-        <img :src="product.cover" alt="Cover Image" class="cover-image" />
+        <el-carousel
+            v-if="product.cover && product.cover.length > 0"
+            height="400px"
+            indicator-position="outside"
+            arrow="always"
+            class="cover-carousel"
+        >
+          <el-carousel-item v-for="(img, idx) in product.cover" :key="idx">
+            <img :src="img" class="carousel-image" alt="书籍图片" />
+          </el-carousel-item>
+        </el-carousel>
+        <div v-else>
+          <img :src="product.cover" alt="Cover Image" class="cover-image" />
+        </div>
       </div>
+
       <div class="product-details">
         <h1>{{ product.title }}</h1>
         <div class="price">价格: ¥{{ product.price }}</div>
@@ -256,6 +273,7 @@ export default defineComponent({
       rate: product.value.rate,
       description: product.value.description,
       cover: product.value.cover,
+
       detail: product.value.detail,
     });
 
@@ -264,12 +282,14 @@ export default defineComponent({
         const response = await getProduct(productId);
         const productData = response.data.data;
 
+
         product.value = {
           title: productData.title,
           price: productData.price,
           rate: productData.rate,
           description: productData.description,
-          cover: productData.cover,
+          cover: productData.cover,         // 旧兼容
+
           detail: productData.detail,
         };
 
@@ -664,6 +684,20 @@ html, body {
   background-color: #5f543d !important; /* 深羊驼色 hover 变暗 */
   border-color: #5f543d !important;
   color: #ffffff !important;
+}
+.cover-carousel {
+  margin: 20px 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.carousel-image {
+  width: 100%;
+  height: 400px;
+  object-fit: contain;
+  border-radius: 8px;
+  user-select: none;
+  pointer-events: none;
 }
 
 </style>
