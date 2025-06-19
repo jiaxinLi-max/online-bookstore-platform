@@ -1,12 +1,15 @@
 package com.example.tomatomall.service.serviceImpl;
 
 import com.example.tomatomall.exception.TomatoMallException;
+import com.example.tomatomall.po.Comment;
 import com.example.tomatomall.po.Post;
 
 import com.example.tomatomall.po.Product;
 import com.example.tomatomall.repository.PostRepository;
+import com.example.tomatomall.service.CommentService;
 import com.example.tomatomall.service.PostService;
 import com.example.tomatomall.service.ProductService;
+import com.example.tomatomall.vo.CommentVO;
 import com.example.tomatomall.vo.PostVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,7 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     ProductService productService;
+
 
 
     @Override

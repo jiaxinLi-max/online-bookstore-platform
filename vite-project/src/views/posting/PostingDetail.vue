@@ -1,15 +1,12 @@
 <template>
   <div class="post">
     <div class="posting-detail-container">
-      <!-- 返回按钮 -->
       <el-button type="primary" @click="backToAllPosting" class="back-button">
         <el-icon><ArrowLeft /></el-icon>
         返回帖子列表
       </el-button>
 
-      <!-- 帖子内容卡片 -->
       <el-card class="detail-card" v-if="title">
-        <!-- 用户信息头部 -->
         <div class="post-header">
           <div class="user-info">
             <el-avatar :src="avatar" size="large" />
@@ -30,14 +27,34 @@
           </el-button>
         </div>
 
-        <!-- 帖子主要内容 -->
         <div class="post-content">
           <h2 class="post-title">{{ title }}</h2>
-          <img v-if="cover" :src="cover" alt="封面图" class="cover-image" />
+          <el-carousel
+              v-if="Array.isArray(covers) && covers.length > 0"
+              :interval="4000"
+              type="card"
+              height="300px"
+              class="covers-carousel"
+          >
+            <el-carousel-item v-for="(img, index) in covers" :key="index">
+              <img :src="img" alt="帖子图片" class="carousel-image"/>
+            </el-carousel-item>
+          </el-carousel>
           <div class="content-text" v-html="content"></div>
         </div>
 
-        <!-- 互动按钮 -->
+        <div v-if="linkedProducts.length > 0" class="linked-products">
+          <h3>帖子中提到的书籍</h3>
+          <div class="products-list">
+            <el-card v-for="product in linkedProducts" :key="product.id" class="product-card" @click="goToProductDetail(product.id)" shadow="hover">
+              <div class="product-image">
+                <img :src="Array.isArray(product.cover) && product.cover.length > 0 ? product.cover[0] : ''" alt="Product Cover" />
+              </div>
+              <h4 class="product-title">{{ product.title }}</h4>
+            </el-card>
+          </div>
+        </div>
+
         <div class="action-buttons">
           <el-button
               v-if="role === 'CUSTOMER'"
@@ -61,7 +78,6 @@
         </div>
       </el-card>
 
-      <!-- 加载状态 -->
       <div v-else class="loading-container">
         <el-icon class="loading-icon"><Loading /></el-icon>
         正在加载帖子详情...
@@ -77,37 +93,50 @@ import { ArrowLeft, Delete, Loading } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { getPostingDetail, deletePost, likePost, dislikePost} from '../../api/posting.ts'
 import { getUserInfo } from '../../api/user.ts'
+import { getProduct, Product } from '../../api/product.ts'
 
 const router = useRouter()
 const route = useRoute()
 const role = sessionStorage.getItem('role')
 const id = Number(route.params.id)
 
-// 响应式数据
 const userId = ref('')
 const userName = ref('')
 const title = ref('')
 const content = ref('')
-const cover = ref('')
+const covers = ref<string[]>([]) // 修正: covers 是一个数组
 const avatar = ref('')
 const time = ref('')
 const like = ref(0)
 const dislike = ref(0)
 const curUserId = sessionStorage.getItem('userId')
+const linkedProducts = ref<Product[]>([])
 
 function formatTime(timeStr: string): string {
   const date = new Date(timeStr)
-
   const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0') // 月份从 0 开始
+  const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   const hours = String(date.getHours()).padStart(2, '0')
   const minutes = String(date.getMinutes()).padStart(2, '0')
-
   return `${year}年${month}月${day}日 ${hours}时${minutes}分`
 }
 
-// 获取帖子详情
+const goToProductDetail = (productId: number) => {
+  router.push({ path: `/home/product/${productId}` });
+}
+
+const fetchLinkedProducts = async (productIds: number[]) => {
+  if (!productIds || productIds.length === 0) return;
+  try {
+    const productRequests = productIds.map(pid => getProduct(String(pid)));
+    const productResponses = await Promise.all(productRequests);
+    linkedProducts.value = productResponses.map(res => res.data.data);
+  } catch (error) {
+    console.error("获取关联商品失败:", error);
+  }
+}
+
 async function getPost() {
   try {
     const res = await getPostingDetail(id)
@@ -115,19 +144,19 @@ async function getPost() {
       const postData = res.data.data
       title.value = postData.title
       content.value = postData.content
-      cover.value = postData.cover
-      time.value = formatTime(postData.time)  // 使用time字段
+      covers.value = Array.isArray(postData.covers) ? postData.covers : [] // 确保 covers 是一个数组
+      time.value = formatTime(postData.time)
       like.value = Number(postData.like) || 0
       dislike.value = Number(postData.dislike) || 0
       userId.value = postData.userId
+      if (postData.productIds) {
+        fetchLinkedProducts(postData.productIds);
+      }
 
-      // 获取用户信息
       const userRes = await getUserInfo(Number(userId.value))
       if (userRes.data.code === '200') {
         userName.value = userRes.data.data.username
         avatar.value = userRes.data.data.avatar
-        console.log(userName.value)
-        console.log(avatar.value)
       }
     }
   } catch (error) {
@@ -135,7 +164,6 @@ async function getPost() {
   }
 }
 
-// 删除处理
 async function handleDelete() {
   try {
     const res = await deletePost(id)
@@ -143,14 +171,13 @@ async function handleDelete() {
       ElMessage.success('帖子删除成功')
       await router.push({name: 'AllPostings'})
     } else {
-      console.error("Error in deleting comment:", res.data.msg);
+      console.error("Error in deleting post:", res.data.msg);
     }
   } catch (error) {
     ElMessage.error('删除失败')
   }
 }
 
-// 点赞处理
 async function handleLike() {
   try {
     const res = await likePost(id, Number(curUserId))
@@ -163,7 +190,6 @@ async function handleLike() {
   }
 }
 
-// 点踩处理
 async function handleDislike() {
   try {
     const res = await dislikePost(id, Number(curUserId))
@@ -176,7 +202,6 @@ async function handleDislike() {
   }
 }
 
-// 返回帖子列表
 function backToAllPosting() {
   router.push({ name: 'AllPostings' })
 }
@@ -187,99 +212,23 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.posting-detail-container {
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 20px;
-}
-
-.post {
-  background-image: url("../../assets/login.png");
-}
-
-.back-button {
-  margin-bottom: 30px;
-}
-
-.detail-card {
-  padding: 30px;
-}
-
-.post-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.user-meta {
-  display: flex;
-  flex-direction: column;
-}
-
-.username {
-  margin: 0;
-  font-size: 1.3em;
-}
-
-.post-time {
-  color: #888;
-  font-size: 0.9em;
-}
-
-.post-content {
-  margin-top: 20px;
-}
-
-.post-title {
-  font-size: 2em;
-  margin-bottom: 20px;
-  color: #333;
-}
-
-.cover-image {
-  max-width: 100%;
-  max-height: 500px;
-  border-radius: 8px;
-  margin: 20px 0;
-  object-fit: contain;
-}
-
-.content-text {
-  font-size: 16px;
-  line-height: 1.8;
-  color: #444;
-}
-
-.action-buttons {
-  margin-top: 40px;
-  display: flex;
-  gap: 20px;
-}
-
-.loading-container {
-  text-align: center;
-  padding: 50px;
-  font-size: 18px;
-}
-
-.loading-icon {
-  animation: rotating 2s linear infinite;
-  margin-right: 10px;
-}
-
-@keyframes rotating {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.delete-btn {
-  margin-left: auto;
-}
+.posting-detail-container { max-width: 1200px; margin: 20px auto; padding: 20px; }
+.post { background-image: url("../../assets/login.png"); }
+.back-button { margin-bottom: 30px; }
+.detail-card { padding: 30px; }
+.post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+.user-info { display: flex; align-items: center; gap: 15px; }
+.user-meta { display: flex; flex-direction: column; }
+.username { margin: 0; font-size: 1.3em; }
+.post-time { color: #888; font-size: 0.9em; }
+.post-content { margin-top: 20px; }
+.post-title { font-size: 2em; margin-bottom: 20px; color: #333; }
+.covers-carousel { margin: 20px 0; }
+.carousel-image { width: 100%; height: 100%; object-fit: contain; }
+.content-text { font-size: 16px; line-height: 1.8; color: #444; }
+.action-buttons { margin-top: 40px; display: flex; gap: 20px; }
+.loading-container { text-align: center; padding: 50px; font-size: 18px; }
+.loading-icon { animation: rotating 2s linear infinite; margin-right: 10px; }
+@keyframes rotating { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.delete-btn { margin-left: auto; }
 </style>

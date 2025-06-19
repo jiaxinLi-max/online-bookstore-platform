@@ -1,10 +1,7 @@
-
-
 <template>
   <div class="create_product bgimage">
     <h1 class="create-product-title">创建商品</h1>
     <el-form ref="form" label-width="120px" class="product-form">
-      <!-- 基本信息 -->
       <el-form-item label="商品名称" prop="productName">
         <el-input v-model="title" placeholder="请输入商品名称"
                   style="width: 400px;"
@@ -35,7 +32,22 @@
         ></el-input>
       </el-form-item>
 
-      <!-- 规格说明类 -->
+      <el-form-item label="所属栏目" prop="columnIds">
+        <el-select
+            v-model="selectedColumnIds"
+            multiple
+            placeholder="请选择商品所属的栏目"
+            style="width: 400px;"
+        >
+          <el-option
+              v-for="column in allColumns"
+              :key="column.id"
+              :label="column.theme"
+              :value="column.id"
+          />
+        </el-select>
+      </el-form-item>
+
       <el-form-item label="规格说明" prop="specifications">
         <div v-for="(spec, index) in specifications" :key="index" class="specification-item">
           <el-input
@@ -50,24 +62,19 @@
           ></el-input>
           <el-button type="danger" @click="removeSpecification(index)">删除</el-button>
         </div>
-<!--        <el-button type="primary" @click="addSpecification">添加规格</el-button>-->
+        <el-button type="primary" @click="addSpecification" style="margin-top: 10px;">添加规格</el-button>
       </el-form-item>
 
-      <!-- 添加规格按钮另起一行 -->
-      <el-form-item>
-        <el-button type="primary" @click="addSpecification">添加规格</el-button>
-      </el-form-item>
-
-      <!-- 商品封面 -->
-      <el-form-item label="商品封面" prop="cover">
+      <el-form-item label="商品封面" prop="covers">
         <el-upload
             action="http://localhost:8080/api/images"
             list-type="picture-card"
-            :auto-upload="true"
+            :auto-upload="false"
             :file-list="fileList"
             :on-change="handleChange"
             :on-remove="handleRemove"
             :on-preview="handlePictureCardPreview"
+            multiple
         >
           <el-icon><Plus /></el-icon>
           <div>点击上传商品封面</div>
@@ -77,7 +84,6 @@
         </el-dialog>
       </el-form-item>
 
-      <!-- 按钮 -->
       <el-form-item>
         <el-button @click.prevent="handleCreateProduct" :disabled="createDisabled" type="primary" plain>
           创建商品
@@ -88,77 +94,88 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import type { UploadFile } from 'element-plus';
 import { createProduct } from "../../api/product";
+import { getAllColumns } from "../../api/columns"; // 导入获取栏目的API
 import { Plus } from '@element-plus/icons-vue';
 import { getImage } from '../../api/tools';
-import { Specification } from "../../api/specification.ts"; // 导入 Specification 接口
+import { Specification } from "../../api/specification.ts";
 
+// 商品基本信息
 const title = ref('');
 const description = ref('');
 const detail = ref('');
 const price = ref<number | null>(null);
 const rate = ref<number | null>(null);
-const cover = ref('');
+const specifications = ref<Specification[]>([]);
+
+// 【修改点1】: 封面改为数组
+const covers = ref<string[]>([]);
+
+// 【新增点1】: 栏目相关状态
+const allColumns = ref<{id: number, theme: string}[]>([]); // 存储所有栏目
+const selectedColumnIds = ref<number[]>([]); // 存储选中的栏目ID
+
+// el-upload 相关状态
 const fileList = ref<UploadFile[]>([]);
 const dialogImageUrl = ref('');
 const dialogVisible = ref(false);
-const amount = ref<number | null>(null); // 库存数量
-const frozen = ref<number | null>(null); // 冻结库存数量
-const specifications = ref<Specification[]>([]); // 用于存储规格说明
 
 // 计算属性，检查输入状态
 const createDisabled = computed(() => {
-  return !title.value || !description.value || price.value === null || specifications.value.length === 0 || !cover.value;
+  return !title.value || !description.value || price.value === null || covers.value.length === 0;
 });
 
-const productId = ref(''); // 设置产品 ID
-
+// 添加和删除规格的函数
 function addSpecification() {
-  specifications.value.push({
-    //id: productId, // 生成唯一的 id
-    item: '',     // 新规格的名称
-    value: '',    // 新规格的值
-    //productId: productId.value, // 设置与产品的关联
-  });
+  specifications.value.push({ item: '', value: '' });
 }
-
-// 删除规格说明
 function removeSpecification(index: number) {
-  specifications.value.splice(index, 1); // 删除指定索引的规格
+  specifications.value.splice(index, 1);
 }
 
-async function handleChange(file: UploadFile, fileListNew: UploadFile[]) {
+// 【修改点2】: 更新handleChange以支持多图
+async function handleChange(file: UploadFile, newFileList: UploadFile[]) {
   const rawFile = file.raw;
-  if (!rawFile) {
-    ElMessage.error('无法获取文件');
-    return;
-  }
+  if (!rawFile) return;
 
   try {
     const res = await getImage(rawFile);
     if (res && res.code === '200') {
-      cover.value = res.data; // 设置封面
-      fileListNew[0].url = cover.value; // 更新文件列表的URL
-      fileList.value = fileListNew; // 更新文件列表
+      console.log("上传");
+      covers.value.push(res.data); // 添加URL到数组
+      file.url = res.data;
+      fileList.value = newFileList;
       ElMessage.success('上传成功');
     } else {
-      ElMessage.error('上传失败，请重试');
+      newFileList.pop(); // 移除上传失败的文件
+      fileList.value = newFileList;
+      ElMessage.error('上传失败');
     }
   } catch (error) {
-    ElMessage.error('上传失败，请重试');
+    newFileList.pop();
+    fileList.value = newFileList;
+    ElMessage.error('上传异常');
   }
 }
+
+// 【修改点3】: 更新handleRemove以支持多图
+const handleRemove = (file: UploadFile) => {
+  const urlToRemove = file.url;
+  // 从两个数组中都移除
+  fileList.value = fileList.value.filter(item => item.uid !== file.uid);
+  if (urlToRemove) {
+    covers.value = covers.value.filter(url => url !== urlToRemove);
+    console.log(urlToRemove);
+    console.log(covers.value);
+  }
+};
 
 const handlePictureCardPreview = (file: UploadFile) => {
   dialogImageUrl.value = file.url || '';
   dialogVisible.value = true;
-};
-
-const handleRemove = (file: UploadFile) => {
-  fileList.value = fileList.value.filter(item => item.uid !== file.uid);
 };
 
 async function handleCreateProduct() {
@@ -168,70 +185,84 @@ async function handleCreateProduct() {
     return;
   }
 
+  // 【修改点4】: 更新payload以包含covers和columnIds
   const payload = {
     title: title.value,
     price: price.value ?? 0,
     rate: rate.value ?? 0,
     description: description.value,
-    cover: cover.value,
+    cover: covers.value, // 发送图片URL数组
     detail: detail.value,
-    specifications: specifications.value, // 添加规格信息
-    amount: amount.value ?? 0, // 库存数量
-    frozen: frozen.value ?? 0, // 冻结库存数量
+    specifications: specifications.value,
+    columnIds: selectedColumnIds.value, // 发送栏目ID数组
+    // amount和frozen如果不需要可以不传
   };
 
   try {
     const res = await createProduct(payload);
     if (res.data.code === '200') {
       ElMessage.success('创建商品成功');
-      // 重置输入框
+      // 重置表单
       title.value = '';
       description.value = '';
       detail.value = '';
       price.value = null;
       rate.value = null;
-      cover.value = '';
+      covers.value = [];
       fileList.value = [];
-      amount.value = null; // 重置库存数量
-      frozen.value = null; // 重置冻结库存数量
-      specifications.value = []; // 重置规格
+      specifications.value = [];
+      selectedColumnIds.value = [];
     } else {
-      ElMessage.error(res.data.message);
+      ElMessage.error(res.data.message || '创建失败');
     }
   } catch (error) {
     console.log("error",error);
     ElMessage.error('创建商品失败');
   }
 }
+
+// 【新增点2】: 组件挂载时获取所有栏目
+onMounted(async () => {
+  try {
+    const res = await getAllColumns();
+    if (res.data.code === '200') {
+      allColumns.value = res.data.data;
+    } else {
+      ElMessage.error("获取栏目列表失败");
+    }
+  } catch (error) {
+    ElMessage.error("获取栏目列表失败");
+  }
+});
 </script>
 
 <style scoped>
+/* 样式与CreateAdvertisement.vue保持一致 */
 .create-product-title {
-  margin-left: 25%;
+  text-align: center;
+  margin-bottom: 20px;
+  color: white;
 }
-
+.product-form {
+  max-width: 600px;
+  margin: auto;
+}
 .dialog-image {
   max-width: 100%;
 }
-
 .specification-item {
+  display: flex;
   margin-bottom: 10px;
 }
 .bgimage {
-  background-color: rgba(0, 0, 0, 0.3);
   background-image: url("../../assets/780.jpg");
-
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
   min-height: 100vh;
-
+  padding: 20px;
 }
-.create-product-title {
-  margin-left: 25%;
-  color: white; /* ← 加上这一句 */
-}
-::v-deep(.el-form-item__label) {
+:deep(.el-form-item__label) {
   color: white;
 }
 </style>

@@ -248,5 +248,25 @@ public class ProductServiceImpl implements ProductService {
         stockpileRepository.save(stockpile);
     }
 
+    @Override
+    @Transactional
+    public String removeProductFromColumn(Integer productId, Integer columnId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> TomatoMallException.productNotExist());
+        Columns column = columnsService.findById(columnId);
+        if (column == null) {
+            throw TomatoMallException.columnsNotExist();
+        }
+
+        boolean removed = product.getColumns().remove(column);
+        if (removed) {
+            productRepository.save(product);
+            return "从栏目移除商品成功";
+        } else {
+            return "商品不属于该栏目";
+        }
+    }
+
+
 
 }

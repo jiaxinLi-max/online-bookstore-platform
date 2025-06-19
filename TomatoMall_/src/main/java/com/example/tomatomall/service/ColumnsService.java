@@ -18,4 +18,6 @@ public interface ColumnsService {
     Columns findById(Integer id);
 
     List<ProductVO> getAllProductsInC(Integer id);
+
+
 }

@@ -18,5 +18,5 @@ public interface CommentService {
     List<Comment>findAllByProductIdOrderByLikesDesc(Integer productId);
 
 
-
+    List<CommentVO> getReplies(Integer commentId);
 }

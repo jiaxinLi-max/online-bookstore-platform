@@ -28,9 +28,10 @@ public class CommentServicelmpl implements CommentService {
 
     @Override
     public List<CommentVO> getAllCommentInfo(Integer productId){
-        List<Comment> comments = commentRepository.findByProductId(productId);
-        // 假设你有一个工具方法或构造器能把 Comment 转成 CommentVO
-        return comments.stream().map(Comment::toVO).collect(Collectors.toList());
+        List<Comment> comments = commentRepository.findByProductIdAndParentIsNull(productId);
+        return comments.stream()
+                .map(Comment::toVO)
+                .collect(Collectors.toList());
     }
     @Override
     public CommentVO getCommentInfo(Integer id){
@@ -83,7 +84,14 @@ public class CommentServicelmpl implements CommentService {
 
     @Override
     public String addComment(CommentVO commentVO){
-        Comment comment=commentVO.toPO();
+        Comment parent = null;
+        if (commentVO.getParentId() != null) {
+            parent = commentRepository.findById(commentVO.getParentId()).orElse(null);
+            if (parent == null) {
+                throw TomatoMallException.parentCommentNotExist();
+            }
+        }
+        Comment comment=commentVO.toPO(parent);
         comment.setLikes(0);
         comment.setTime(LocalDateTime.now());
         commentRepository.save(comment);
@@ -138,5 +146,13 @@ public class CommentServicelmpl implements CommentService {
     @Override
     public  List<Comment>findAllByProductIdOrderByLikesDesc(Integer productId){
         return commentRepository.findAllByProductIdOrderByLikesDesc(productId);
+    }
+
+    @Override
+    public List<CommentVO>getReplies(Integer commentId){
+        List<Comment> replies = commentRepository.findByParent_Id(commentId);
+        return replies.stream()
+                .map(Comment::toVO)
+                .collect(Collectors.toList());
     }
 }

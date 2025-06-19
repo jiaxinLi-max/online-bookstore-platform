@@ -1,6 +1,7 @@
 package com.example.tomatomall.po;
 
 
+import com.example.tomatomall.vo.CommentVO;
 import com.example.tomatomall.vo.PostVO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
@@ -70,6 +71,10 @@ public class Post {
     )
     private Set<Product> products = new HashSet<>();
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "post_id")  // 维护外键在 comment 表里
+    private Set<Comment> comments = new HashSet<>();
+
 
 
     public PostVO toVO(){
@@ -88,6 +93,7 @@ public class Post {
                     .collect(Collectors.toList());
             postVO.setProductIds(productIds);
         }
+
         return postVO;
     }
 }

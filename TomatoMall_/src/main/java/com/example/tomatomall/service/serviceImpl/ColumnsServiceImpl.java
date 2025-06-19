@@ -6,12 +6,17 @@ import com.example.tomatomall.po.Columns;
 import com.example.tomatomall.po.Product;
 import com.example.tomatomall.repository.ColumnsRepository;
 import com.example.tomatomall.service.ColumnsService;
+import com.example.tomatomall.service.ProductService;
 import com.example.tomatomall.vo.ColumnsVO;
 import com.example.tomatomall.vo.ProductVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,6 +24,8 @@ public class ColumnsServiceImpl implements ColumnsService {
 
     @Autowired
     ColumnsRepository columnsRepository;
+
+
 
     @Override
     public ColumnsVO addColumn(ColumnsVO columnsVO){
@@ -33,10 +40,13 @@ public class ColumnsServiceImpl implements ColumnsService {
 
     @Override
     public String deleteColumn(Integer id){
-        Columns columns=columnsRepository.findById(id).orElse(null);
-        if(columns==null){
-            throw TomatoMallException.columnsNotExist();
+        Columns columns = columnsRepository.findById(id)
+                .orElseThrow(() -> TomatoMallException.columnsNotExist());
+        if (!columns.getProducts().isEmpty()) {
+            throw TomatoMallException.cannotDelete();
         }
+        // 删除栏目
+
         columnsRepository.delete(columns);
         return "删除成功";
 
@@ -51,6 +61,7 @@ public class ColumnsServiceImpl implements ColumnsService {
         columns.setTheme(columnsVO.getTheme());
         columns.setDescription(columnsVO.getDescription());
         columns.setCovers(columnsVO.getCovers());
+        columnsRepository.save(columns);
         return "更新成功";
     }
 

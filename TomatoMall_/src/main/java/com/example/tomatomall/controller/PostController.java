@@ -2,6 +2,7 @@ package com.example.tomatomall.controller;
 
 
 import com.example.tomatomall.service.PostService;
+import com.example.tomatomall.vo.CommentVO;
 import com.example.tomatomall.vo.PostVO;
 import com.example.tomatomall.vo.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,4 +66,6 @@ public class PostController {
         return Response.buildSuccess(postService.dislikePost(postId,userId));
 
     }
+
+
 }

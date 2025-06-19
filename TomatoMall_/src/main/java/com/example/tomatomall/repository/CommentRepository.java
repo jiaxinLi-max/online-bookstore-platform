@@ -11,4 +11,6 @@ public interface CommentRepository extends JpaRepository<Comment,Integer> {
     List<Comment>findAllByOrderByLikesDesc();
     List<Comment>findAllByProductIdOrderByTimeDesc(Integer productId);
     List<Comment>findAllByProductIdOrderByLikesDesc(Integer productId);
+    List<Comment> findByParent_Id(Integer parentId);
+    List<Comment> findByProductIdAndParentIsNull(Integer productId);
 }

@@ -33,7 +33,7 @@
         <el-upload
             action="http://localhost:8080/api/images"
             list-type="picture-card"
-            :auto-upload="true"
+            :auto-upload="false"
             :file-list="fileList"
             :on-change="handleChange"
             :on-remove="handleRemove"
