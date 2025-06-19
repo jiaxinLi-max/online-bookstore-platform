@@ -8,7 +8,9 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -32,6 +34,10 @@ public class Columns {
     @CollectionTable(name = "columns_covers", joinColumns = @JoinColumn(name = "columns_id"))
     @Column(name = "cover_url")
     private List<String> covers = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "columns")
+    private Set<Product> products = new HashSet<>();
+
 
     public ColumnsVO toVO(){
         ColumnsVO columnsVO=new ColumnsVO();

@@ -9,8 +9,11 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -35,9 +38,10 @@ public class Post {
     @Column(name = "content",nullable = false)
     private String content;
 
-    @Basic
-    @Column(name = "cover",nullable = false)
-    private String cover;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "post_covers", joinColumns = @JoinColumn(name = "post_id"))
+    @Column(name = "cover_url")
+    private List<String> covers = new ArrayList<>();
 
     @Basic
     @Column(name = "time",nullable = false)
@@ -58,6 +62,15 @@ public class Post {
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Integer> dislikedUserIds = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "post_product", // 中间表名字
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
+    private Set<Product> products = new HashSet<>();
+
+
 
     public PostVO toVO(){
         PostVO postVO=new PostVO();
@@ -65,10 +78,16 @@ public class Post {
         postVO.setUserId(this.userId);
         postVO.setTitle(this.title);
         postVO.setContent(this.content);
-        postVO.setCover(this.cover);
+        postVO.setCovers(this.covers);
         postVO.setTime(this.time);
         postVO.setLike(this.like);
         postVO.setDislike(this.dislike);
+        if (this.products != null) {
+            List<Integer> productIds = this.products.stream()
+                    .map(Product::getId)
+                    .collect(Collectors.toList());
+            postVO.setProductIds(productIds);
+        }
         return postVO;
     }
 }

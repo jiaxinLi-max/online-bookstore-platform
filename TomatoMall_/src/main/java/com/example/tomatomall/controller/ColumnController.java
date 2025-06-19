@@ -3,6 +3,7 @@ package com.example.tomatomall.controller;
 
 import com.example.tomatomall.service.ColumnsService;
 import com.example.tomatomall.vo.ColumnsVO;
+import com.example.tomatomall.vo.ProductVO;
 import com.example.tomatomall.vo.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -35,4 +36,10 @@ public class ColumnController {
     public Response<List<ColumnsVO>>getAllColumns(){
         return Response.buildSuccess(columnService.getAllColumns());
     }
+
+    @GetMapping("/{id}")
+    public Response<List<ProductVO>>getAllProductsInC(@PathVariable Integer id){
+        return Response.buildSuccess(columnService.getAllProductsInC(id));
+    }
+
 }

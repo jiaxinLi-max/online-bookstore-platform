@@ -241,19 +241,19 @@ export const placeOrder = (Form: form) => {
     });
 }
 
-export const postOrder = (orderId: number) => {
+export const postOrder = (orderId: number, returnUrl: String) => {
     const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
 
     // 构建请求的 URL
     const url = `${ORDER_MODULE}/${orderId}/pay`; // 只需 cartItemId 作为路径参数
 
-    return axios.post(url, { orderId },{
+    return axios.post(url, null,{
         headers: {
             'token': token, // 使用 'token' 作为请求头
         },
-        // params: {
-        //     orderId: order,
-        // }
+        params: {
+            returnUrl: returnUrl
+        }
     }).then(res => {
         console.log("发起支付成功, Response:", res);
         return res; // 返回响应数据

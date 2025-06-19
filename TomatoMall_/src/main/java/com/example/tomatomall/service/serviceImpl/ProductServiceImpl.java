@@ -2,12 +2,14 @@ package com.example.tomatomall.service.serviceImpl;
 
 
 import com.example.tomatomall.exception.TomatoMallException;
+import com.example.tomatomall.po.Columns;
 import com.example.tomatomall.po.Product;
 import com.example.tomatomall.po.Specification;
 import com.example.tomatomall.po.Stockpile;
 import com.example.tomatomall.repository.ProductRepository;
 import com.example.tomatomall.repository.SpecificationRepository;
 import com.example.tomatomall.repository.StockpileRepository;
+import com.example.tomatomall.service.ColumnsService;
 import com.example.tomatomall.service.ProductService;
 import com.example.tomatomall.vo.ProductVO;
 import com.example.tomatomall.vo.StockpileVO;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,6 +35,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     SpecificationRepository specificationRepository;
+
+    @Autowired
+    ColumnsService columnsService;
 
     //获取商品列表
     @Override
@@ -81,6 +87,15 @@ public class ProductServiceImpl implements ProductService {
             specifications.add(spec); // 添加到原有集合
         }
 
+        //  更新栏目关联关系
+        if (productVO.getColumnIds() != null) {
+            Set<Columns> columns = productVO.getColumnIds().stream()
+                    .map(id -> columnsService.findById(id))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+            product.setColumns(columns);
+        }
+
         productRepository.save(product);
         return "更新成功";
     }
@@ -88,14 +103,25 @@ public class ProductServiceImpl implements ProductService {
     //添加商品
     @Override
     public ProductVO addProduct(ProductVO productVO){
+        // 1. 判断商品是否已存在
         Product product = productRepository.findByTitle(productVO.getTitle());
         if (product != null) {
             throw TomatoMallException.titleAlreadyExist();
         }
-        Product newProduct = productVO.toPO();
+
+        // 2. 查找栏目集合
+        Set<Columns> columnSet = productVO.getColumnIds().stream()
+                .map(id -> columnsService.findById(id))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        // 3. 构建 Product 实体对象并设置栏目
+        Product newProduct = productVO.toPO(columnSet);
         productRepository.save(newProduct);
-        return newProduct.toVO();
+
+        return newProduct.toVO(); // 返回保存后的 ProductVO
     }
+
 
     //删除商品
     @Override

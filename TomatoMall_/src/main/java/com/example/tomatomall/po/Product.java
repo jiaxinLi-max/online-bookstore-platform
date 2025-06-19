@@ -8,8 +8,10 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 //用来和数据库进行交互
 @Getter
@@ -57,6 +59,15 @@ public class Product {
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Stockpile stockpile;
 
+    @ManyToMany
+    @JoinTable(
+            name = "product_columns",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "columns_id")
+    )
+    private Set<Columns> columns = new HashSet<>();
+
+
     public void setSpecifications(Set<Specification> specifications) {
 
         for (Specification spec : specifications) {
@@ -75,6 +86,13 @@ public class Product {
         productVO.setTitle(this.title);
         productVO.setDescription(this.description);
         productVO.setSpecifications(this.specifications);
+        if (this.columns != null) {
+            List<Integer> columnIds = this.columns.stream()
+                    .map(Columns::getId)
+                    .collect(Collectors.toList());
+            productVO.setColumnIds(columnIds);
+        }
+
         return productVO;
     }
 }
