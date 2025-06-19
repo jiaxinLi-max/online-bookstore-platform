@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -19,7 +20,7 @@ public class ProductVO {
     private BigDecimal price;   // 商品价格
     private Float rate;        // 评分
     private String description; // 商品描述
-    private String cover;       // 商品封面URL
+    private List<String> cover;       // 商品封面URL
     private String detail;      // 商品详情
     private Set<Specification> specifications = new HashSet<>();; // 商品规格信息
 

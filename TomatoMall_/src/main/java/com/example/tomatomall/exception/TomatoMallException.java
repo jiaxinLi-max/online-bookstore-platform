@@ -48,4 +48,8 @@ public class TomatoMallException extends RuntimeException {
   public static TomatoMallException postNotExist(){return new TomatoMallException("帖子不存在","400");}
 
   public static TomatoMallException checkinExist(){return new TomatoMallException("今日已签到","000");}
+
+  public static TomatoMallException columnsAlreadyExist(){return new TomatoMallException("栏目名已经存在","000");}
+
+  public static TomatoMallException columnsNotExist(){return new TomatoMallException("栏目不存在","400");}
 }

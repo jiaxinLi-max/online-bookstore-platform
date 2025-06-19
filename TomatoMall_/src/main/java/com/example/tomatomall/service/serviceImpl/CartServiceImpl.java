@@ -64,7 +64,7 @@ public class CartServiceImpl implements CartService {
         cartVO.setTitle(product.getTitle());
         cartVO.setPrice(product.getPrice());
         cartVO.setDescription(product.getDescription());
-        cartVO.setCover(product.getCover());
+        cartVO.setCover(product.getCover().get(0));
         cartVO.setDetail(product.getDetail());
 
         return cartVO;
@@ -123,7 +123,7 @@ public class CartServiceImpl implements CartService {
             cartVO.setTitle(product.getTitle());
             cartVO.setPrice(product.getPrice());
             cartVO.setDescription(product.getDescription());
-            cartVO.setCover(product.getCover());
+            cartVO.setCover(product.getCover().get(0));
             cartVO.setDetail(product.getDetail());
 
             cartVOList.add(cartVO);
