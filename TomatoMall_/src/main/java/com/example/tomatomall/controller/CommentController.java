@@ -64,5 +64,4 @@ public class CommentController {
         return Response.buildSuccess((commentService.likeComment(id,userId)));
     }
 
-
 }

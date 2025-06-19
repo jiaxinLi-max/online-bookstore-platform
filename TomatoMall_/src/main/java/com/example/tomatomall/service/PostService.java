@@ -1,6 +1,7 @@
 package com.example.tomatomall.service;
 
 import com.example.tomatomall.po.Post;
+import com.example.tomatomall.vo.CommentVO;
 import com.example.tomatomall.vo.PostVO;
 
 
@@ -23,4 +24,5 @@ public interface PostService {
 
     List<Post>findAllByOrderByTimeDesc();
     List<Post>findAllByOrderByLikeDesc();
+
 }

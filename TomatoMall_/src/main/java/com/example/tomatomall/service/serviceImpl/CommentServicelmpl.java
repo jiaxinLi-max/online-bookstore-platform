@@ -83,7 +83,14 @@ public class CommentServicelmpl implements CommentService {
 
     @Override
     public String addComment(CommentVO commentVO){
-        Comment comment=commentVO.toPO();
+        Comment parent = null;
+        if (commentVO.getParentId() != null) {
+            parent = commentRepository.findById(commentVO.getParentId()).orElse(null);
+            if (parent == null) {
+                throw TomatoMallException.parentCommentNotExist();
+            }
+        }
+        Comment comment=commentVO.toPO(parent);
         comment.setLikes(0);
         comment.setTime(LocalDateTime.now());
         commentRepository.save(comment);

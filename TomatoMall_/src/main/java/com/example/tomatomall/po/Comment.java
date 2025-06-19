@@ -52,6 +52,15 @@ public class Comment {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime time;
 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id") // 父评论 ID（可为空）
+    private Comment parent;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Comment> replies = new HashSet<>();
+
+
     public CommentVO toVO(){
         CommentVO commentVO=new CommentVO();
 
@@ -62,6 +71,8 @@ public class Comment {
         commentVO.setContent(this.content);
         commentVO.setLikes(this.likes);
         commentVO.setTime(this.time);
+        commentVO.setParentId(parent != null ? parent.getId() : null);
+
         return  commentVO;
     }
 }
