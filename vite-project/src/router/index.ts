@@ -174,6 +174,12 @@ const router = createRouter({
                     meta: { title: '帖子列表' },
                 },
                 {
+                    path: 'all-questions', // 子路由路径，去掉前导斜杠
+                    name: 'AllQuestions',
+                    component: () => import('../views/question/AllQuestions.vue'),
+                    meta: { title: '问题列表' },
+                },
+                {
                     path: '/home/search/:keyword',
                     name: 'SearchResults',
                     component: () => import('../views/search/SearchResult.vue'),
@@ -207,6 +213,12 @@ const router = createRouter({
                     name: 'CreateComment',
                     component: () => import('../views/comment/CreateComment.vue'),
                     meta: { title: '撰写评价' },
+                },
+                {
+                    path: 'create-question',
+                    name: 'CreateQuestion',
+                    component: () => import('../views/question/CreateQuestion.vue'), // 确保路径正确
+                    meta: { title: '创建问题' },
                 },
 
 

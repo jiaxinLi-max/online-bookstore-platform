@@ -9,6 +9,9 @@ import {userInfo} from "../api/user.ts";
  // 导入 Plus 图标
 import {ref,  onMounted,computed} from 'vue';
 import { Cart } from '../api/cart.ts';
+import { Document } from '@element-plus/icons-vue';
+
+
 const username = sessionStorage.getItem("username");
 const role = ref<string>('');
 console.log('roleHeader:', role);
@@ -225,6 +228,15 @@ function logout() {
 <!--      </el-col>-->
       <template v-if="role === 'CUSTOMER'">
         <el-col :span="1" class="header-icon">
+          <router-link to="/home/all-questions" class="no-link">
+            <el-icon :size="35" color="white">
+              <Document />
+            </el-icon>
+            <div class="icon-label">每日一问</div>
+          </router-link>
+        </el-col>
+
+        <el-col :span="1" class="header-icon">
           <router-link to="/home/all-postings" class="no-link">
             <el-icon :size="35" color="white">
               <ChatSquare />
@@ -275,7 +287,7 @@ function logout() {
       </div>
 
 
-      <el-col :span="6">
+      <el-col :span="5">
       </el-col>
 
       <template v-if="role === 'CUSTOMER'">
