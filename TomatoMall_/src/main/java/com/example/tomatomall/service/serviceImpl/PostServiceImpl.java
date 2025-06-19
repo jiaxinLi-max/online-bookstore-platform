@@ -3,20 +3,27 @@ package com.example.tomatomall.service.serviceImpl;
 import com.example.tomatomall.exception.TomatoMallException;
 import com.example.tomatomall.po.Post;
 
+import com.example.tomatomall.po.Product;
 import com.example.tomatomall.repository.PostRepository;
 import com.example.tomatomall.service.PostService;
+import com.example.tomatomall.service.ProductService;
 import com.example.tomatomall.vo.PostVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class PostServiceImpl implements PostService {
     @Autowired
     PostRepository postRepository;
+
+    @Autowired
+    ProductService productService;
 
 
     @Override
@@ -37,7 +44,12 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public String createPost(PostVO postVO){
-        Post newPost=postVO.toPO();
+        Set<Product> products = postVO.getProductIds().stream()
+                .map(id -> productService.findById(id))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        Post newPost=postVO.toPO(products);
         newPost.setLike(0);
         newPost.setDislike(0);
         newPost.setTime(LocalDateTime.now());
