@@ -15,13 +15,23 @@
           v-for="product in products"
           :key="product.id"
           class="product-card"
-          @click="goToProductDetail(product.id)"
           shadow="hover"
       >
-        <div class="product-image">
-          <img :src="Array.isArray(product.cover) && product.cover.length > 0 ? product.cover[0] : ''" alt="Product Cover" />
+        <el-button
+            v-if="isAdmin"
+            class="remove-product-btn"
+            type="danger"
+            icon="el-icon-delete"
+            circle
+            size="small"
+            @click.stop="handleRemoveProduct(product.id)"
+        ></el-button>
+        <div @click="goToProductDetail(product.id)" class="card-clickable-content">
+          <div class="product-image">
+            <img :src="Array.isArray(product.cover) && product.cover.length > 0 ? product.cover[0] : ''" alt="Product Cover" />
+          </div>
+          <h3 class="product-title">{{ product.title }}</h3>
         </div>
-        <h3 class="product-title">{{ product.title }}</h3>
       </el-card>
     </div>
     <el-empty v-else description="该栏目下还没有书籍"></el-empty>
@@ -70,7 +80,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { getAllColumns, getProductsByColumn, updateColumns, deleteColumns } from '../../api/columns';
+import { getAllColumns, getProductsByColumn, updateColumns, deleteColumns, removeProductFromColumn } from '../../api/columns';
 import { ElMessage, ElMessageBox, type UploadFile, type UploadFiles } from 'element-plus';
 import { Plus } from '@element-plus/icons-vue';
 import type { Product } from '../../api/product';
@@ -195,6 +205,32 @@ const handlePictureCardPreview = (file: UploadFile) => {
   dialogImageUrl.value = file.url || '';
   dialogVisible.value = true;
 };
+
+const handleRemoveProduct = async (productId: number) => {
+  try {
+    await ElMessageBox.confirm('确定要将此商品移出该栏目吗？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    });
+
+    const res = await removeProductFromColumn(productId, columnId);
+
+    if (res.data.code == 200) {
+      ElMessage.success('移除成功');
+      // 从前端列表直接移除，实现页面刷新
+      products.value = products.value.filter(p => p.id !== productId);
+    } else {
+      ElMessage.error(res.data.msg || '移除失败');
+    }
+  } catch(error) {
+    if (error !== 'cancel') {
+      ElMessage.error('操作失败');
+    } else {
+      ElMessage.info('已取消操作');
+    }
+  }
+};
 </script>
 
 <style scoped>
@@ -211,4 +247,11 @@ const handlePictureCardPreview = (file: UploadFile) => {
 .product-title { font-size: 13px; padding: 8px 4px 0; text-align: center; }
 .bgimage { background-image: url("../../assets/780.jpg"); background-attachment: fixed; background-size: cover; min-height: 100vh; }
 .dialog-image { max-width: 100%; }
+.card-clickable-content { cursor: pointer; }
+.remove-product-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  z-index: 10;
+}
 </style>

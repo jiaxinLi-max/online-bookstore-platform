@@ -1,4 +1,4 @@
-import {COLUMNS_MODULE} from "./_prefix.ts";
+import {COLUMNS_MODULE, PRODUCT_MODULE} from "./_prefix.ts";
 import axios from "axios";
 
 type columnsInfo = {
@@ -67,6 +67,17 @@ export const getAllColumns = () => {
 export const getProductsByColumn = (id: number) => {
     const token = sessionStorage.getItem("token");
     return axios.get(`${COLUMNS_MODULE}/${id}`, {
+        headers: {
+            'token': token
+        }
+    });
+}
+
+export const removeProductFromColumn = (productId: number, columnId: number) => {
+    const token = sessionStorage.getItem("token");
+    // 路径: /api/products/{productId}/columns/{columnId}
+    const url = `${PRODUCT_MODULE}/${productId}/columns/${columnId}`;
+    return axios.delete(url, {
         headers: {
             'token': token
         }
