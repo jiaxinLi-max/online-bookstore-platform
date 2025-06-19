@@ -5,6 +5,7 @@ import com.alipay.api.internal.util.AlipaySignature;
 import com.example.tomatomall.service.OrderService;
 import com.example.tomatomall.vo.AccountVO;
 import com.example.tomatomall.vo.OrderVO;
+import com.example.tomatomall.vo.QuestionVO;
 import com.example.tomatomall.vo.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -42,4 +44,10 @@ public class OrderController {
     public Response<OrderVO> getOrderStatus(@RequestParam("orderId") Integer orderId){
         return Response.buildSuccess(orderService.getOrderById(orderId));
     }
+
+    @GetMapping("/List/{userId}")
+    public Response<List<QuestionVO>> getSuccessList(@PathVariable(value="userId")Integer userId){
+        return  Response.buildSuccess(orderService.);
+    }
+
 }
