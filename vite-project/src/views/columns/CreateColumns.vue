@@ -145,7 +145,7 @@ async function handleCreateColumn() {
 
   try {
     const res = await createColumns(payload);
-    if (res.data.code === "200" || res.status === 200) {
+    if (res.data.code === "200") {
       ElMessage.success('创建栏目成功');
       // 重置表单
       theme.value = '';

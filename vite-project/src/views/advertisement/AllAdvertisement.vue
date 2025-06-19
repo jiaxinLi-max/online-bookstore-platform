@@ -106,7 +106,7 @@
       >
         <div class="advertisement-image">
           <img
-              :src="advertisement.imgUrl"
+              :src="advertisement.imageUrl"
               alt="Advertisement Cover"
               @click="goToProductDetail(advertisement.productId)"
           />
