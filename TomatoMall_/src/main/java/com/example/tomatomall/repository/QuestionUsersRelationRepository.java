@@ -10,4 +10,5 @@ import java.util.List;
 public interface QuestionUsersRelationRepository extends JpaRepository<QuestionUsersRelation,Integer> {
     Boolean existsByUserIdAndQuestionId(Integer userId,Integer questionId);
     List<QuestionUsersRelation> findAllByUserId(Integer userId);
+    QuestionUsersRelation findByUserIdAndQuestionId(Integer userId,Integer questionId);
 }

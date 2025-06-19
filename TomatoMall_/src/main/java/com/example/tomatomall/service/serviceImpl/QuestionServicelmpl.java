@@ -84,4 +84,10 @@ public class QuestionServicelmpl implements QuestionService {
         List<Question> questions = questionRepository.findByIdNotIn(answeredIds);
         return questions.stream().map(Question::toVO).collect(Collectors.toList());
     }
+
+    @Override
+    public String getAnswer(Integer userId,Integer questionId){
+        QuestionUsersRelation questionUsersRelation=questionUsersRelationRepository.findByUserIdAndQuestionId(userId,questionId);
+        return questionUsersRelation.getAnswer();
+    }
 }
