@@ -63,28 +63,22 @@ export default {
 
     const confirmOrder = async () => {
       try {
-        const response = await postOrder(Number(orderId));
+        // 调用修改后的 postOrder 函数，并传入当前页面的URL
+        const response = await postOrder(Number(orderId), window.location.href); // <-- 修改这一行
+
         if (response.data.code === '200') {
           console.log(response.data.data);
-          // 设置 HTML 表单
-          // payFormHtml.value = response.data.data.paymentForm;
-          //
-          // // 等待 DOM 渲染完成后触发表单提交
-          // await nextTick(); // 确保 HTML 被插入页面
-          // const formEl = formContainer.value?.querySelector('form') as HTMLFormElement;
-          // if (formEl) {
-          //   formEl.submit(); // 自动提交表单，跳转到支付宝
-          // } else {
-          //   console.warn('找不到表单元素');
-          // }
 
           const paymentForm = response.data.data.paymentForm;
-
           const payWindow = window.open('', '_blank');
-          payWindow.document.open();
-          payWindow.document.write(paymentForm);
-          startPolling();
-          payWindow.document.close();
+          if (payWindow) {
+            payWindow.document.open();
+            payWindow.document.write(paymentForm);
+            startPolling();
+            payWindow.document.close();
+          } else {
+            ElMessage.error("无法打开新窗口，请检查浏览器设置");
+          }
         } else {
           ElMessage.error("支付失败！");
           console.error("支付失败！:", response.data);
