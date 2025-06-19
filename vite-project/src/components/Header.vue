@@ -310,7 +310,7 @@ function logout() {
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item @click="router.push('/home/create-product')">创建书籍</el-dropdown-item>
-                <el-dropdown-item @click="router.push('/home/create-category')">创建栏目</el-dropdown-item>
+                <el-dropdown-item @click="router.push('/home/create-columns')">创建栏目</el-dropdown-item>
                 <el-dropdown-item @click="router.push('/home/all-advertisements')">广告管理</el-dropdown-item>
               </el-dropdown-menu>
             </template>

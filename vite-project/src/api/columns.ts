@@ -1,17 +1,18 @@
 import {COLUMNS_MODULE} from "./_prefix.ts";
+import axios from "axios";
 
 type columnsInfo = {
     theme: string,
     description: string,
-    covers: List<String>
+    covers: String[]
 }
 
 type updateColumnsInfo = {
     id: number,
     theme: string,
     description: string,
-    covers: List<String>
-}
+    covers: String[]
+};
 
 export const createColumns = (info: columnsInfo) => {
     const token = localStorage.getItem('token')
@@ -27,7 +28,7 @@ export const createColumns = (info: columnsInfo) => {
 
 export const deleteColumns = (id: number) => {
     const token = sessionStorage.getItem("token");
-    return axios.delete(`${COLUMNS_MODULE}/${id}`, null, {
+    return axios.delete(`${COLUMNS_MODULE}/${id}`, {
         params: { id },
         headers: {
             'token': token

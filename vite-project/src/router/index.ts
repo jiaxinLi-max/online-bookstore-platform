@@ -251,7 +251,13 @@ const router = createRouter({
                     name: 'CommentDetail',
                     component: () => import('../views/comment/CommentDetail.vue'),
                     meta: { title: '评价详情' }
-                }
+                },
+                {
+                    path: 'create-columns',
+                    name: 'CreateColumns',
+                    component: () => import('../views/columns/CreateColumns.vue'), // 确保路径正确
+                    meta: { title: '创建栏目' },
+                },
 
             ],
         },
