@@ -256,6 +256,7 @@ export const postOrder = (orderId: number, returnUrl: String) => {
         }
     }).then(res => {
         console.log("发起支付成功, Response:", res);
+        console.log(res.data);
         return res; // 返回响应数据
     }).catch(error => {
         console.error("发起支付失败:", error);
