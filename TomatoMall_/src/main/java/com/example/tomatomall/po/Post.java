@@ -93,13 +93,6 @@ public class Post {
                     .collect(Collectors.toList());
             postVO.setProductIds(productIds);
         }
-        if (this.comments != null && !this.comments.isEmpty()) {
-            postVO.setComments(
-                    this.comments.stream()
-                            .map(Comment::toVO)
-                            .collect(Collectors.toList())
-            );
-        }
 
         return postVO;
     }

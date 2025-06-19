@@ -56,4 +56,6 @@ public class TomatoMallException extends RuntimeException {
   public static TomatoMallException AlreadyAnswer(){return new TomatoMallException("已回答过该问题","000");}
 
   public static TomatoMallException questionNotExist(){return new TomatoMallException("不存在该问题","000");}
+
+  public static TomatoMallException parentCommentNotExist(){return new TomatoMallException("父评论不存在","400");}
 }

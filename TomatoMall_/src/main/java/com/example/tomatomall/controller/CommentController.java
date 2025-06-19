@@ -64,4 +64,10 @@ public class CommentController {
         return Response.buildSuccess((commentService.likeComment(id,userId)));
     }
 
+    //获得该评价的所有回复
+    @GetMapping("/reply")
+    public Response<List<CommentVO>>getReplies(@RequestParam Integer commentId){
+        return Response.buildSuccess(commentService.getReplies(commentId));
+    }
+
 }
