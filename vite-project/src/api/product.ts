@@ -36,7 +36,7 @@ type productInfo = {
     price: number;
     rate:number;
     description: string;
-    cover: string;
+    cover?: string[];
     detail: string;
     specifications:Specification[];
 
@@ -58,7 +58,7 @@ type UpdateInfo = {
     price?: number,
     rate?: number,
     description?: string,
-    cover?: string,
+    cover?: string[],
     detail?: string,
     specifications?: Specification[],
 }
@@ -73,6 +73,7 @@ type StockPile = {
 export const createProduct = (productInfo: productInfo) => {
     // 使用反引号来构建 URL
     const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
+    console.log("图片数量:" + productInfo.cover.length)
     return axios.post(`${PRODUCT_MODULE}/`, productInfo, {
         headers: {
             'Content-Type': 'application/json',
@@ -157,6 +158,7 @@ export const getProduct = (productId: string) => {
 
 export const updateProductInfo = (updateInfo: UpdateInfo) => {
     const token = sessionStorage.getItem('token');
+    console.log("更新参数:" + updateInfo.cover)
     return axios.put(`${PRODUCT_MODULE}`, updateInfo, {
         headers: {
             'Content-Type': 'application/json',

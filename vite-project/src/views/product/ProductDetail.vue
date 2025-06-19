@@ -135,7 +135,7 @@
         </el-form-item>
         <el-form-item><el-button type="primary" @click="addSpecification">添加规格</el-button></el-form-item>
         <el-form-item label="商品封面" prop="cover">
-          <el-upload action="http://localhost:8080/api/images" list-type="picture-card" :auto-upload="true" :file-list="fileList" :on-change="handleChange" :on-remove="handleRemove" :on-preview="handlePictureCardPreview" multiple>
+          <el-upload action="http://localhost:8080/api/images" list-type="picture-card" :auto-upload="false" :file-list="fileList" :on-change="handleChange" :on-remove="handleRemove" :on-preview="handlePictureCardPreview" multiple>
             <el-icon><Plus /></el-icon>
             <div>点击上传或修改封面</div>
           </el-upload>
@@ -222,6 +222,7 @@ export default defineComponent({
       try {
         const res = await getImage(rawFile);
         if (res && res.code === '200') {
+          console.log("上传");
           editForm.value.cover.push(res.data);
           ElMessage.success('新封面上传成功');
         } else { ElMessage.error('上传失败'); }
@@ -231,7 +232,10 @@ export default defineComponent({
     const handleRemove = (file: UploadFile) => {
       const urlToRemove = file.url;
       if (urlToRemove && editForm.value.cover) {
+        console.log("删除", editForm.value.cover);
         editForm.value.cover = editForm.value.cover.filter(url => url !== urlToRemove);
+        console.log(urlToRemove);
+        console.log(editForm.value.cover);
       }
     };
 

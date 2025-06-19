@@ -69,7 +69,7 @@
         <el-upload
             action="http://localhost:8080/api/images"
             list-type="picture-card"
-            :auto-upload="true"
+            :auto-upload="false"
             :file-list="fileList"
             :on-change="handleChange"
             :on-remove="handleRemove"
@@ -144,6 +144,7 @@ async function handleChange(file: UploadFile, newFileList: UploadFile[]) {
   try {
     const res = await getImage(rawFile);
     if (res && res.code === '200') {
+      console.log("上传");
       covers.value.push(res.data); // 添加URL到数组
       file.url = res.data;
       fileList.value = newFileList;
@@ -167,6 +168,8 @@ const handleRemove = (file: UploadFile) => {
   fileList.value = fileList.value.filter(item => item.uid !== file.uid);
   if (urlToRemove) {
     covers.value = covers.value.filter(url => url !== urlToRemove);
+    console.log(urlToRemove);
+    console.log(covers.value);
   }
 };
 
@@ -188,7 +191,7 @@ async function handleCreateProduct() {
     price: price.value ?? 0,
     rate: rate.value ?? 0,
     description: description.value,
-    covers: covers.value, // 发送图片URL数组
+    cover: covers.value, // 发送图片URL数组
     detail: detail.value,
     specifications: specifications.value,
     columnIds: selectedColumnIds.value, // 发送栏目ID数组

@@ -19,7 +19,7 @@
           shadow="hover"
       >
         <div class="product-image">
-          <img :src="Array.isArray(product.cover) && product.cover.length > 0 ? product.cover[0] : product.cover" alt="Product Cover" />
+          <img :src="Array.isArray(product.cover) && product.cover.length > 0 ? product.cover[0] : ''" alt="Product Cover" />
         </div>
         <h3 class="product-title">{{ product.title }}</h3>
       </el-card>
@@ -42,9 +42,9 @@
           <el-upload
               action="http://localhost:8080/api/images"
               list-type="picture-card"
-              :auto-upload="true"
+              :auto-upload="false"
               :file-list="fileList"
-              :on-change="handleChange"
+              :on-success="handleSuccess"
               :on-remove="handleRemove"
               :on-preview="handlePictureCardPreview"
               multiple
@@ -71,36 +71,30 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getAllColumns, getProductsByColumn, updateColumns, deleteColumns } from '../../api/columns';
-import { ElMessage, ElMessageBox, type UploadFile } from 'element-plus';
-import { getImage } from '../../api/tools';
+import { ElMessage, ElMessageBox, type UploadFile, type UploadFiles } from 'element-plus';
 import { Plus } from '@element-plus/icons-vue';
 import type { Product } from '../../api/product';
 
-// 基础状态和路由
 const route = useRoute();
 const router = useRouter();
 const columnId = Number(route.params.id);
 
-// 数据状态
 const columnInfo = ref({ id: columnId, theme: '加载中...', description: '', covers: [] as string[] });
 const products = ref<Product[]>([]);
 const isAdmin = computed(() => sessionStorage.getItem('role') === 'MANAGER');
 
-// 编辑弹窗相关状态
 const showEditDialog = ref(false);
 const editForm = ref({ id: columnId, theme: '', description: '', covers: [] as string[] });
 const fileList = ref<UploadFile[]>([]);
 const dialogImageUrl = ref('');
 const dialogVisible = ref(false);
 
-// --- 数据获取 ---
 const fetchColumnData = async () => {
   try {
     const [productsRes, columnsRes] = await Promise.all([
       getProductsByColumn(columnId),
       getAllColumns()
     ]);
-
     if (productsRes.data.code === '200') {
       products.value = productsRes.data.data;
     }
@@ -118,12 +112,10 @@ const fetchColumnData = async () => {
 
 onMounted(fetchColumnData);
 
-// --- 页面跳转 ---
 const goToProductDetail = (productId: number) => {
   router.push({ path: `/home/product/${productId}` });
 };
 
-// --- 管理员功能 ---
 const handleDeleteColumn = async () => {
   try {
     await ElMessageBox.confirm('此操作将永久删除该栏目，但不会删除栏目内的书籍。是否继续?', '警告', {
@@ -131,16 +123,15 @@ const handleDeleteColumn = async () => {
       cancelButtonText: '取消',
       type: 'warning',
     });
-
     const res = await deleteColumns(columnId);
-    if (res.data.code === 200) { // 注意，您文档中code是数字200
+    // 修正2: 使用 '200' 字符串进行判断
+    if (res.data.code === '200') {
       ElMessage.success('删除成功!');
-      router.push({ name: 'AllColumns' }); // 删除后跳转回所有栏目页
+      router.push({ name: 'AllColumns' });
     } else {
       ElMessage.error(res.data.msg || '删除失败');
     }
   } catch (error) {
-    // 如果用户点击取消，会进入catch，需要判断是否是取消操作
     if (error !== 'cancel') {
       ElMessage.error('删除操作失败');
     } else {
@@ -150,7 +141,7 @@ const handleDeleteColumn = async () => {
 };
 
 const openEditDialog = () => {
-  editForm.value = JSON.parse(JSON.stringify(columnInfo.value)); // 深拷贝当前栏目信息
+  editForm.value = JSON.parse(JSON.stringify(columnInfo.value));
   fileList.value = editForm.value.covers.map((url, index) => ({
     name: `cover${index}.jpg`,
     url: url,
@@ -163,10 +154,11 @@ const openEditDialog = () => {
 const handleUpdateColumn = async () => {
   try {
     const res = await updateColumns(editForm.value);
-    if (res.data.code === "200") {
+    // 修正3: 使用 '200' 字符串进行判断
+    if (res.data.code === '200') {
       ElMessage.success('更新成功!');
       showEditDialog.value = false;
-      await fetchColumnData(); // 重新获取数据以刷新页面
+      await fetchColumnData();
     } else {
       ElMessage.error(res.data.msg || '更新失败');
     }
@@ -175,24 +167,28 @@ const handleUpdateColumn = async () => {
   }
 };
 
-// --- 编辑弹窗内的图片上传逻辑 ---
-const handleChange = async (file: UploadFile) => {
-  const rawFile = file.raw;
-  if (!rawFile) return;
-  try {
-    const res = await getImage(rawFile);
-    if (res && res.data.code === '200') {
-      editForm.value.covers.push(res.data.data);
-      ElMessage.success('新封面上传成功');
-    } else { ElMessage.error('上传失败'); }
-  } catch (error) { ElMessage.error('上传异常'); }
+// 【关键修正】: 删除旧的 handleChange 函数, 实现新的 handleSuccess
+const handleSuccess = (responseData: any, uploadFile: UploadFile, uploadFiles: UploadFiles) => {
+  if (responseData.code === '200') {
+    editForm.value.covers.push(responseData.data);
+    uploadFile.url = responseData.data;
+    ElMessage.success('上传成功');
+  } else {
+    ElMessage.error(responseData.msg || '上传失败');
+    const failedFileIndex = uploadFiles.findIndex(f => f.uid === uploadFile.uid);
+    if(failedFileIndex > -1) {
+      uploadFiles.splice(failedFileIndex, 1);
+    }
+  }
+  fileList.value = uploadFiles;
 };
 
-const handleRemove = (file: UploadFile) => {
+const handleRemove = (file: UploadFile, newFileList: UploadFiles) => {
   const urlToRemove = file.url;
   if (urlToRemove) {
     editForm.value.covers = editForm.value.covers.filter(url => url !== urlToRemove);
   }
+  fileList.value = newFileList;
 };
 
 const handlePictureCardPreview = (file: UploadFile) => {
@@ -202,72 +198,17 @@ const handlePictureCardPreview = (file: UploadFile) => {
 </script>
 
 <style scoped>
-/* 样式与 AllProduct.vue 和 AllColumns.vue 保持一致 */
-.column-detail-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  padding: 20px;
-}
-.column-header {
-  text-align: center;
-  color: white;
-  background-color: rgba(0, 0, 0, 0.4);
-  padding: 20px 40px;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 900px;
-}
-.column-title {
-  font-size: 2.5em;
-  margin: 0 0 10px 0;
-}
-.column-description {
-  font-size: 1.1em;
-  color: #f0f0f0;
-}
-.admin-actions {
-  margin-top: 20px;
-}
-.product-list-title {
-  color: white;
-  font-size: 1.8em;
-}
-.products-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  justify-content: center;
-  width: 100%;
-  max-width: 960px;
-}
-.product-card {
-  width: 140px;
-  height: 200px;
-  cursor: pointer;
-  background-color: rgba(255, 248, 220, 0.9);
-  border-radius: 10px;
-  transition: transform 0.2s ease;
-}
+.column-detail-container { display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 20px; }
+.column-header { text-align: center; color: white; background-color: rgba(0, 0, 0, 0.4); padding: 20px 40px; border-radius: 12px; width: 100%; max-width: 900px; }
+.column-title { font-size: 2.5em; margin: 0 0 10px 0; }
+.column-description { font-size: 1.1em; color: #f0f0f0; }
+.admin-actions { margin-top: 20px; }
+.product-list-title { color: white; font-size: 1.8em; }
+.products-list { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; width: 100%; max-width: 960px; }
+.product-card { width: 140px; height: 200px; cursor: pointer; background-color: rgba(255, 248, 220, 0.9); border-radius: 10px; transition: transform 0.2s ease; }
 .product-card:hover { transform: scale(1.05); }
-.product-image img {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-}
-.product-title {
-  font-size: 13px;
-  padding: 8px 4px 0;
-  text-align: center;
-}
-.bgimage {
-  background-image: url("../../assets/780.jpg");
-  background-attachment: fixed;
-  background-size: cover;
-  min-height: 100vh;
-}
-.dialog-image {
-  max-width: 100%;
-}
+.product-image img { width: 100%; height: 150px; object-fit: cover; }
+.product-title { font-size: 13px; padding: 8px 4px 0; text-align: center; }
+.bgimage { background-image: url("../../assets/780.jpg"); background-attachment: fixed; background-size: cover; min-height: 100vh; }
+.dialog-image { max-width: 100%; }
 </style>
