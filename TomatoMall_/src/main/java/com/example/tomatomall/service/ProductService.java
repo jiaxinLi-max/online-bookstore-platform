@@ -40,4 +40,6 @@ public interface ProductService {
 
 
     List<ProductVO> searchProducts(String keyword);
+
+    String removeProductFromColumn(Integer productId, Integer columnId);
 }

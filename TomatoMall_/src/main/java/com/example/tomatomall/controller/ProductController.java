@@ -93,5 +93,10 @@ public class ProductController {
         return Response.buildSuccess(productService.searchProducts(keyword));
     }
 
+    @DeleteMapping("/{productId}/columns/{columnId}")
+    public Response<String> removeColumnFromProduct(@PathVariable Integer productId, @PathVariable Integer columnId) {
+        return Response.buildSuccess(productService.removeProductFromColumn(productId,columnId));
+    }
+
 
 }

@@ -58,4 +58,6 @@ public class TomatoMallException extends RuntimeException {
   public static TomatoMallException questionNotExist(){return new TomatoMallException("不存在该问题","000");}
 
   public static TomatoMallException parentCommentNotExist(){return new TomatoMallException("父评论不存在","400");}
+
+  public static TomatoMallException cannotDelete(){return new TomatoMallException("栏目中还有商品，不可删除","400");}
 }
