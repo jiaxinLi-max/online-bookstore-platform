@@ -39,17 +39,17 @@ public class Question {
 
     private String analysis;
 
-    public QuestionVO toVO(Question po) {
+    public QuestionVO toVO() {
         QuestionVO vo = new QuestionVO();
-        vo.setId(po.getId());
-        vo.setContent(po.getContent());
-        vo.setCreateTime(po.getCreateTime());
-        vo.setDdl(po.getDdl());
-        vo.setAnswer(po.getAnswer());
-        vo.setAnalysis(po.getAnalysis());
+        vo.setId(this.getId());
+        vo.setContent(this.getContent());
+        vo.setCreateTime(this.getCreateTime());
+        vo.setDdl(this.getDdl());
+        vo.setAnswer(this.getAnswer());
+        vo.setAnalysis(this.getAnalysis());
 
         // JSON 字符串 → List<String>
-        List<String> options = new Gson().fromJson(po.getOptions(), new TypeToken<List<String>>(){}.getType());
+        List<String> options = new Gson().fromJson(this.getOptions(), new TypeToken<List<String>>(){}.getType());
         vo.setOptions(options);
 
         return vo;

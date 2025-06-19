@@ -31,13 +31,13 @@ public class QuestionUsersRelation {
     @Column(name = "answer", nullable = false)
     private String answer;
 
-    public QuestionUserVO toVO(QuestionUsersRelation po) {
+    public QuestionUserVO toVO() {
         QuestionUserVO vo = new QuestionUserVO();
-        vo.setId(po.getId());
-        vo.setQuestionId(po.getQuestionId());
-        vo.setUserId(po.getUserId());
-        vo.setAnswerTime(po.getAnswerTime());
-        vo.setAnswer(po.getAnswer());
+        vo.setId(this.getId());
+        vo.setQuestionId(this.getQuestionId());
+        vo.setUserId(this.getUserId());
+        vo.setAnswerTime(this.getAnswerTime());
+        vo.setAnswer(this.getAnswer());
         return vo;
     }
 }

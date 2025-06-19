@@ -2,6 +2,7 @@ package com.example.tomatomall.vo;
 
 import com.alibaba.fastjson.JSON;
 import com.example.tomatomall.po.Question;
+import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,17 +22,17 @@ public class QuestionVO {
     private List<String> options; // 实际前端/后端传递是 List 格式
     private String analysis;
 
-    public Question toPO(QuestionVO vo) {
+    public Question toPO() {
         Question po = new Question();
-        po.setId(vo.getId());
-        po.setContent(vo.getContent());
-        po.setCreateTime(vo.getCreateTime());
-        po.setDdl(vo.getDdl());
-        po.setAnswer(vo.getAnswer());
-        po.setAnalysis(vo.getAnalysis());
+        po.setId(this.getId());
+        po.setContent(this.getContent());
+        po.setCreateTime(this.getCreateTime());
+        po.setDdl(this.getDdl());
+        po.setAnswer(this.getAnswer());
+        po.setAnalysis(this.getAnalysis());
 
         // List<String> → JSON 字符串
-        String optionsJson = new Gson().toJson(vo.getOptions());
+        String optionsJson = new Gson().toJson(this.getOptions());
         po.setOptions(optionsJson);
 
         return po;

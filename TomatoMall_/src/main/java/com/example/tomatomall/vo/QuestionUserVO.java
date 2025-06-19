@@ -19,13 +19,13 @@ public class QuestionUserVO {
     private LocalDateTime answerTime;
 
     private String answer;
-    public QuestionUsersRelation toPO(QuestionUserVO vo) {
+    public QuestionUsersRelation toPO() {
         QuestionUsersRelation po = new QuestionUsersRelation();
-        po.setId(vo.getId());
-        po.setQuestionId(vo.getQuestionId());
-        po.setUserId(vo.getUserId());
-        po.setAnswerTime(vo.getAnswerTime());
-        po.setAnswer(vo.getAnswer());
+        po.setId(this.getId());
+        po.setQuestionId(this.getQuestionId());
+        po.setUserId(this.getUserId());
+        po.setAnswerTime(this.getAnswerTime());
+        po.setAnswer(this.getAnswer());
         return po;
     }
 }
