@@ -28,7 +28,7 @@ public class ColumnController {
         return Response.buildSuccess(columnService.addColumn(columnVO));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public Response<String> deleteColumn(@RequestParam Integer id){
         return Response.buildSuccess(columnService.deleteColumn(id));
     }
