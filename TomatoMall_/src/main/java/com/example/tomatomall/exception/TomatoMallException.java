@@ -52,4 +52,8 @@ public class TomatoMallException extends RuntimeException {
   public static TomatoMallException columnsAlreadyExist(){return new TomatoMallException("栏目名已经存在","000");}
 
   public static TomatoMallException columnsNotExist(){return new TomatoMallException("栏目不存在","400");}
+
+  public static TomatoMallException AlreadyAnswer(){return new TomatoMallException("已回答过该问题","000");}
+
+  public static TomatoMallException questionNotExist(){return new TomatoMallException("不存在该问题","000");}
 }

@@ -8,11 +8,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 public interface OrderService {
-    OrderVO sendPay(Integer order_id, HttpServletResponse httpResponse);
+    OrderVO sendPay(Integer order_id, String ReturnUrl,HttpServletResponse httpResponse);
     //OrderVO createOrder(Integer userId, List<String> cartItemIds,Object shipping_address,String payment_method);
     OrderVO createOrder(OrderVO orderVO);
 
-    OrderVO payNotify(HttpServletRequest request,HttpServletResponse httpServletResponse);
+    void payNotify(HttpServletRequest request,HttpServletResponse httpServletResponse);
 
     OrderVO getOrderById(Integer order_id);
 }

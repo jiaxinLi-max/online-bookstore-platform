@@ -1,11 +1,13 @@
 package com.example.tomatomall.vo;
 
 import com.example.tomatomall.po.Account;
+import com.example.tomatomall.po.Address;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -20,6 +22,8 @@ public class AccountVO {
     private String telephone;
     private String email;
     private String location;
+    private List<Address> addressBook;
+
 
     //积分模块
     private BigDecimal score;
@@ -38,6 +42,7 @@ public class AccountVO {
         account.setLocation(this.location);
         account.setGrade(this.grade);
         account.setScore(this.score);
+        account.setAddressBook(this.addressBook);
         return  account;
     }
 }

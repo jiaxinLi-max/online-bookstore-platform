@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -59,6 +61,14 @@ public class Account {
     @Column(name = "grade")
     private Integer grade;
 
+    @ElementCollection
+    @CollectionTable(
+            name = "account_address",
+            joinColumns = @JoinColumn(name = "account_id")
+    )
+    private List<Address> addressBook;
+
+
     public AccountVO toVO(){
         AccountVO accountVO=new AccountVO();
 
@@ -73,6 +83,7 @@ public class Account {
         accountVO.setLocation(this.location);
         accountVO.setScore(this.score);
         accountVO.setGrade(this.grade);
+        accountVO.setAddressBook(this.addressBook);
         return  accountVO;
     }
 }
