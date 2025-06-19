@@ -41,6 +41,7 @@ import {postOrder, getStatus, Cart, getCartItems } from '../../api/cart.ts';
 import { ElMessage } from "element-plus";
 import { useRoute, useRouter } from 'vue-router';
 import {parseRole} from "../../utils"; // 引入路由相关
+
 // 定义组件
 export default {
   methods: {parseRole},
@@ -63,8 +64,8 @@ export default {
 
     const confirmOrder = async () => {
       try {
-        // 调用修改后的 postOrder 函数，并传入当前页面的URL
-        const response = await postOrder(Number(orderId), window.location.href); // <-- 修改这一行
+        // 调用修改后的 postOrder 函数
+        const response = await postOrder(Number(orderId), "http://localhost:3000/#/login"); // <-- 修改这一行
 
         if (response.data.code === '200') {
           console.log(response.data.data);

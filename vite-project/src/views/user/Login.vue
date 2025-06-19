@@ -221,11 +221,14 @@ import { ElForm, ElFormItem, ElInput, ElButton, ElMessage } from 'element-plus'
 import { ref, computed } from 'vue'
 import { router } from '../../router'
 import { userInfo, userLogin } from '../../api/user.ts'
+import { useRoute } from 'vue-router';
+import { onMounted } from 'vue';
 
 // 输入框值（需要在前端拦截不合法输入：是否为空+额外规则）
 const username = ref('')
 
 const password = ref('')
+const route = useRoute();
 
 // 用户名是否为空
 const hasUsernameInput = computed(() => username.value != '')
@@ -282,6 +285,16 @@ function handleLogin() {
     }
   })
 }
+
+onMounted(() => {
+  // 检查URL的查询参数中是否同时存在 out_trade_no 和 trade_no
+  // 这是判断是否为支付宝回调的关键
+  if (route.query.out_trade_no && route.query.trade_no) {
+    console.log('Alipay return detected, closing window.');
+    // 如果是，则直接关闭当前窗口
+    window.close();
+  }
+});
 </script>
 
 <!--<style scoped>-->

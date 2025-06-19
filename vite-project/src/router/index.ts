@@ -127,6 +127,12 @@ const router = createRouter({
             meta: { title: '用户注册' },
         },
         {
+            path: '/alipay/return', // 这是我们将用于支付宝回调的URL
+            name: 'AlipayReturn',
+            component: () => import('../views/Order/AlipayReturn.vue'),
+            meta: { title: '支付处理中' }
+        },
+        {
             path: '/home',
             redirect: '/dashboard', // 访问 home 时重定向到 dashboard
             component: () => import('../views/Home.vue'),
