@@ -217,7 +217,7 @@ import { getTheAllComment, getSubComments, createComment, deleteComment, likeCom
 import { getUserInfo } from "../../api/user.ts";
 import { sortByTime, sortByLike } from '../../api/tools.ts';
 import { Specification } from "../../api/specification.ts";
-import { ElMessage, ElMessageBox, type UploadFile, type UploadFiles } from "element-plus";
+import { ElMessage, ElMessageBox, type UploadFile } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
 import { getImage } from "../../api/tools.ts";
 import type { Product } from '../../api/product';
@@ -453,37 +453,41 @@ export default defineComponent({
     };
 
     // --- 原有其他方法 ---
-    const handleChange = async (file: UploadFile, newFileList: UploadFiles) => {
-      if (file.status !== 'ready') return;
-      if (!editForm.value.cover) editForm.value.cover = [];
+    // 【修改点2】: 更新handleChange以支持多图
+    async function handleChange(file: UploadFile, newFileList: UploadFile[]) {
       const rawFile = file.raw;
-      if (!rawFile) {
-        ElMessage.error('无法获取文件');
-        fileList.value = newFileList.filter(f => f.uid !== file.uid);
-        return;
-      }
+      if (!rawFile) return;
+
       try {
         const res = await getImage(rawFile);
-        if (res && res.data.code == 200) {
-          const imageUrl = res.data.data;
-          editForm.value.cover.push(imageUrl);
-          file.url = imageUrl;
-          ElMessage.success('新封面上传成功');
+        if (res && res.code === '200') {
+          console.log("上传");
+          editForm.value.cover.push(res.data); // 添加URL到数组
+          file.url = res.data;
+          fileList.value = newFileList;
+          ElMessage.success('上传成功');
         } else {
+          newFileList.pop(); // 移除上传失败的文件
+          fileList.value = newFileList;
           ElMessage.error('上传失败');
-          fileList.value = newFileList.filter(f => f.uid !== file.uid);
         }
       } catch (error) {
+        newFileList.pop();
+        fileList.value = newFileList;
         ElMessage.error('上传异常');
-        fileList.value = newFileList.filter(f => f.uid !== file.uid);
       }
-    };
-    const handleRemove = (file: UploadFile, newFileList: UploadFiles) => {
+    }
+
+// 【修改点3】: 更新handleRemove以支持多图
+    const handleRemove = (file: UploadFile) => {
       const urlToRemove = file.url;
-      if (urlToRemove && editForm.value.cover) {
+      // 从两个数组中都移除
+      fileList.value = fileList.value.filter(item => item.uid !== file.uid);
+      if (urlToRemove) {
         editForm.value.cover = editForm.value.cover.filter(url => url !== urlToRemove);
+        console.log(urlToRemove);
+        console.log(editForm.value.cover);
       }
-      fileList.value = newFileList;
     };
     const handlePictureCardPreview = (file: UploadFile) => {
       dialogImageUrl.value = file.url || '';
