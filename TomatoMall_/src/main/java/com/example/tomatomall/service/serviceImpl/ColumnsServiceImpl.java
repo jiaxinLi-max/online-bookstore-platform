@@ -3,9 +3,11 @@ package com.example.tomatomall.service.serviceImpl;
 
 import com.example.tomatomall.exception.TomatoMallException;
 import com.example.tomatomall.po.Columns;
+import com.example.tomatomall.po.Product;
 import com.example.tomatomall.repository.ColumnsRepository;
 import com.example.tomatomall.service.ColumnsService;
 import com.example.tomatomall.vo.ColumnsVO;
+import com.example.tomatomall.vo.ProductVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,5 +57,19 @@ public class ColumnsServiceImpl implements ColumnsService {
     @Override
     public List<ColumnsVO>getAllColumns(){
         return columnsRepository.findAll().stream().map(Columns::toVO).collect(Collectors.toList());
+
+    }
+
+    @Override
+    public Columns findById(Integer id){
+        return columnsRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public List<ProductVO>getAllProductsInC(Integer id){
+        List<Product> products = columnsRepository.findProductsByColumnId(id);
+        return products.stream()
+                .map(Product::toVO)
+                .collect(Collectors.toList());
     }
 }

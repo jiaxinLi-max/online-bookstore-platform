@@ -2,11 +2,13 @@ package com.example.tomatomall.vo;
 
 
 import com.example.tomatomall.po.Columns;
+import com.example.tomatomall.po.Product;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
