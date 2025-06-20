@@ -22,4 +22,8 @@ export const RANK_MODULE = `${API_MODULE}/rank`
 
 export const CHECKIN_MODULE = `${API_MODULE}/checkin`
 
+
 export const COLUMNS_MODULE = `${API_MODULE}/columns`
+
+export const QUESTION_MODULE = `${API_MODULE}/question`
+

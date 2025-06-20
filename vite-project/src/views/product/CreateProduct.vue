@@ -112,7 +112,7 @@ const rate = ref<number | null>(null);
 const specifications = ref<Specification[]>([]);
 
 // 【修改点1】: 封面改为数组
-const covers = ref<string[]>([]);
+const cover = ref<string[]>([]);
 
 // 【新增点1】: 栏目相关状态
 const allColumns = ref<{id: number, theme: string}[]>([]); // 存储所有栏目
@@ -125,7 +125,7 @@ const dialogVisible = ref(false);
 
 // 计算属性，检查输入状态
 const createDisabled = computed(() => {
-  return !title.value || !description.value || price.value === null || covers.value.length === 0;
+  return !title.value || !description.value || price.value === null || cover.value.length === 0;
 });
 
 // 添加和删除规格的函数
@@ -144,8 +144,8 @@ async function handleChange(file: UploadFile, newFileList: UploadFile[]) {
   try {
     const res = await getImage(rawFile);
     if (res && res.code === '200') {
-      console.log("上传");
-      covers.value.push(res.data); // 添加URL到数组
+      console.log("上传",res.data);
+      cover.value.push(res.data); // 添加URL到数组
       file.url = res.data;
       fileList.value = newFileList;
       ElMessage.success('上传成功');
@@ -167,9 +167,9 @@ const handleRemove = (file: UploadFile) => {
   // 从两个数组中都移除
   fileList.value = fileList.value.filter(item => item.uid !== file.uid);
   if (urlToRemove) {
-    covers.value = covers.value.filter(url => url !== urlToRemove);
+    cover.value = cover.value.filter(url => url !== urlToRemove);
     console.log(urlToRemove);
-    console.log(covers.value);
+    console.log(cover.value);
   }
 };
 
@@ -191,7 +191,7 @@ async function handleCreateProduct() {
     price: price.value ?? 0,
     rate: rate.value ?? 0,
     description: description.value,
-    cover: covers.value, // 发送图片URL数组
+    cover: cover.value, // 发送图片URL数组
     detail: detail.value,
     specifications: specifications.value,
     columnIds: selectedColumnIds.value, // 发送栏目ID数组
@@ -208,7 +208,7 @@ async function handleCreateProduct() {
       detail.value = '';
       price.value = null;
       rate.value = null;
-      covers.value = [];
+      cover.value = [];
       fileList.value = [];
       specifications.value = [];
       selectedColumnIds.value = [];

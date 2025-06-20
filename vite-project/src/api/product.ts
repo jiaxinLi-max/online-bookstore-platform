@@ -10,7 +10,7 @@ export interface Product {
     price: number;
     rate:number;
     description: string;
-    cover?: string[];
+    cover: string[];
     detail: string;
     specifications:Specification[];
     // bookTitle: string,
@@ -24,7 +24,7 @@ export interface Product {
     columnIds?: number[];
 }
 
-import {PRODUCT_MODULE,RANK_MODULE} from './_prefix';
+import {POSTING_MODULE, PRODUCT_MODULE, RANK_MODULE} from './_prefix';
 export interface Specification {
     id: string; // 规格的唯一标识符
     item: string; // 规格的名称（例如 "作者" 或 "副标题"）
@@ -73,7 +73,6 @@ type StockPile = {
 export const createProduct = (productInfo: productInfo) => {
     // 使用反引号来构建 URL
     const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
-    console.log("图片数量:" + productInfo.cover.length)
     return axios.post(`${PRODUCT_MODULE}/`, productInfo, {
         headers: {
             'Content-Type': 'application/json',
@@ -84,6 +83,7 @@ export const createProduct = (productInfo: productInfo) => {
         return res;
     });
 };
+
 // 获取所有商店
 // export const getAllProduct = () => {
 //     // 使用反引号来构建 URL
