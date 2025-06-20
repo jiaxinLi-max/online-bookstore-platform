@@ -1,5 +1,5 @@
 //import {axios} from '../utils/request'
-import {USER_MODULE} from './_prefix'
+import {USER_MODULE, ORDER_MODULE} from './_prefix'
 import axios from 'axios';
 
 type LoginInfo = {
@@ -155,4 +155,21 @@ export const updateLevel = (userId: number) => {
         .catch(error => {
             console.error("Error updating level:", error);
         })
+}
+
+// 获取历史订单
+export const getHistoryOrders = (userId: number) => {
+    console.log("getHistoryOrders", userId)
+    const token = sessionStorage.getItem('token')
+    return axios.get(`${ORDER_MODULE}/List/${userId}`, {
+        headers: {
+            'token': token
+        }
+    }).then(res => {
+        console.log("getHistoryOrders data:", res.data)
+        return res
+    }).catch(error => {
+        console.error("Error getHistoryOrders error:", error);
+        throw error;
+    })
 }

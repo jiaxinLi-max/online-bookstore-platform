@@ -1,7 +1,7 @@
 <template>
   <el-main class="posting-list bgimage">
     <el-button class="create-posting-button" @click="goToCreatePosting" style="margin-bottom: 20px;" v-if="role === 'CUSTOMER'">
-      发帖子
+      发笔记
     </el-button>
     <div style="margin-bottom: 20px;">
       <el-radio-group v-model="sortOption" @change="fetchPostings">
@@ -52,7 +52,7 @@ async function fetchPostings() {
     }
   } catch (error) {
     console.error('获取帖子失败:', error);
-    ElMessage.error('获取帖子失败');
+    ElMessage.error('获取笔记失败');
   }
 }
 function goToPostingDetail(postingId: number) {

@@ -7,7 +7,7 @@
       <p><strong>订单 ID：</strong>{{ orderId }}</p>
       <p><strong>总金额：</strong>{{ totalAmount }}元</p>
       <p><strong>实际金额：</strong>{{ realAmount }}元</p>
-      <p><strong>创建时间：</strong>{{ createTime }}</p>
+      <p><strong>创建时间：</strong>{{ formatTime(createTime) }}</p>
     </div>
 
     <el-card
@@ -61,6 +61,39 @@ export default {
     const realAmount: number = Number(route.params.realAmount);
 
     // const formContainer = ref<HTMLElement | null>(null);
+
+    function formatTime(isoString: String) {
+      // 1. 检查输入是否为空或无效，如果是则返回提示
+      if (!isoString) {
+        console.log('无')
+        return '无';
+      }
+
+      // 2. 使用 ISO 字符串创建一个 Date 对象。
+      //    JavaScript 的 Date 对象会自动将 UTC 时间转换为运行环境的本地时区。
+      const date = new Date(isoString);
+
+      // 3. 检查转换后的日期是否有效
+      if (isNaN(date.getTime())) {
+        console.log('无效日期')
+        return '无效日期';
+      }
+
+      // 4. 从 Date 对象中获取年、月、日、时、分、秒
+      const year = date.getFullYear();
+
+      // getMonth() 返回的月份是从 0 开始的（0-11），所以需要加 1
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+
+      // 5. 拼接成最终的字符串格式
+      console.log('有效')
+      return `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
+    }
 
     const confirmOrder = async () => {
       try {
@@ -168,6 +201,7 @@ export default {
       closeOrder,
       products,
       realAmount,
+      formatTime
     };
   }
 };

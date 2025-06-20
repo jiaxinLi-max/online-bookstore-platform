@@ -130,7 +130,7 @@
 <template>
   <div class="main-frame bgimage">
     <div class="login-form">
-      <h2>侦探小说网 登录</h2>
+      <h2>真相书局 登录</h2>
       <el-form>
         <el-form-item>
 <!--          <label v-if="!hasTelInput" for="tel">注册手机号</label>-->

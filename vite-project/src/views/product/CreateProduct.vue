@@ -110,6 +110,7 @@ const detail = ref('');
 const price = ref<number | null>(null);
 const rate = ref<number | null>(null);
 const specifications = ref<Specification[]>([]);
+const MAX_SIZE = 1024 * 1024; // 1MB
 
 // 【修改点1】: 封面改为数组
 const cover = ref<string[]>([]);
@@ -140,6 +141,10 @@ function removeSpecification(index: number) {
 async function handleChange(file: UploadFile, newFileList: UploadFile[]) {
   const rawFile = file.raw;
   if (!rawFile) return;
+  if (rawFile.size > MAX_SIZE) {
+    ElMessage.error('文件超过最大大小限制（1MB）');
+    return;
+  }
 
   try {
     const res = await getImage(rawFile);

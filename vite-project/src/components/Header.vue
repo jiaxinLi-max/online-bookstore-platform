@@ -192,7 +192,7 @@ function logout() {
 <!--      </el-col>-->
       <el-col :span="3" class="header-icon">
         <div @click="router.push('/home/all-products')" class="header-text" style="cursor: pointer">
-          番茄侦探小说城
+          真相书局
         </div>
         <div style="display: flex; gap: 10px; margin-top: 4px;">
           <div @click="router.push('/home/all-products')" class="back-button" style="cursor: pointer; color: white; font-size: 14px;">
@@ -241,7 +241,7 @@ function logout() {
             <el-icon :size="35" color="white">
               <ChatSquare />
             </el-icon>
-            <div class="icon-label">帖子</div>
+            <div class="icon-label">真相笔记</div>
           </router-link>
         </el-col>
       </template>
