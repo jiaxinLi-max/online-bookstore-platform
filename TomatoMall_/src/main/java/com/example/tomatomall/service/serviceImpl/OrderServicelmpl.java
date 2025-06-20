@@ -147,8 +147,8 @@ public class OrderServicelmpl implements OrderService {
 
                 String tradeStatus = params.get("trade_status");
                 String orderId = params.get("out_trade_no");
-                Integer id = Integer.valueOf(orderId);
-                Order order = orderRepository.findById(Integer.parseInt(orderId))
+                Integer id = Integer.valueOf(orderId)-100;
+                Order order = orderRepository.findById(id)
                         .orElseThrow(TomatoMallException::orderNotExist);
                 if ("TRADE_SUCCESS".equals(tradeStatus)) {
                     // TODO: 处理支付成功逻辑
