@@ -22,4 +22,6 @@ public interface CartService {
     CartResponseVO getPInCart(Integer userId);
 
     Cart findById(Integer id);
+
+    CartVO findCartById(Integer id);
 }

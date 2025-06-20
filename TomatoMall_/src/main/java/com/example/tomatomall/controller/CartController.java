@@ -58,4 +58,10 @@ public class CartController {
     Response<OrderVO> createOrder(@RequestBody OrderVO orderVO){
         return Response.buildSuccess(orderService.createOrder(orderVO));
     }
+
+    @GetMapping("/getCart/{id}")
+    Response<CartVO>getCart(@PathVariable(value="id")Integer id){
+        return Response.buildSuccess(cartService.findCartById(id));
+    }
+
 }

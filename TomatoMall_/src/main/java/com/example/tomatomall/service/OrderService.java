@@ -18,5 +18,5 @@ public interface OrderService {
 
     List<OrderVO> getSuccessOrder(Integer userId);
 
-    OrderVO getOrder(Integer orderId);
+
 }
