@@ -152,7 +152,7 @@ const showSubNav = computed(() => {
   const pathsToShow = [
     '/home/all-products',
     '/home/rankings',
-    '/home/categories'
+    '/home/all-columns'
   ];
   return pathsToShow.includes(route.path);
 });
