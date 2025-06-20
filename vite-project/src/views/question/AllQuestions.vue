@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-4xl mx-auto mt-8 p-6 bg-white rounded-xl shadow bgimage">
-    <h2 class="text-xl font-semibold mb-4">问题列表</h2>
+
 
     <el-table :data="questions" border style="width: 100%">
       <el-table-column prop="id" label="ID" width="60" />
