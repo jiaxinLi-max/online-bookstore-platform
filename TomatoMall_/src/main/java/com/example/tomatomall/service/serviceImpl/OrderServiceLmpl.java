@@ -273,5 +273,13 @@ public class OrderServiceLmpl implements OrderService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public OrderVO getOrder(Integer orderId){
+        Order order=orderRepository.findById(orderId).orElse(null);
+        if(order==null){
+            throw TomatoMallException.orderNotExist();
+        }
+        return order.toVO();
+    }
 
 }

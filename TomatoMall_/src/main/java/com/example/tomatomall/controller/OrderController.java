@@ -50,4 +50,9 @@ public class OrderController {
         return  Response.buildSuccess(orderService.getSuccessOrder(userId));
     }
 
+    @GetMapping("/get/{orderId}")
+    public Response<OrderVO> getOrder(@PathVariable(value="orderId")Integer orderId){
+        return  Response.buildSuccess(orderService.getOrder(orderId));
+    }
+
 }
