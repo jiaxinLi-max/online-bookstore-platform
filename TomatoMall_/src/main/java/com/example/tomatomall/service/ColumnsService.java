@@ -20,4 +20,5 @@ public interface ColumnsService {
     List<ProductVO> getAllProductsInC(Integer id);
 
 
+    ColumnsVO getColumnInfo(Integer id);
 }

@@ -8,13 +8,19 @@
     <el-card class="detail-card" v-if="question">
       <h2 class="question-title">{{ question.content }}</h2>
 
-      <el-radio-group v-model="selectedAnswer" class="options-list" v-if="!isExpired">
+      <el-radio-group
+          v-model="selectedAnswer"
+          class="options-list"
+          v-if="!isExpired"
+          :disabled="submitted"
+      >
+
         <el-radio
             v-for="(opt, index) in question.options"
             :key="index"
-            :label="opt"
+            :label="optionLabel(index)"
         >
-          {{ opt }}
+        {{ optionLabel(index) }}. {{ opt }}
         </el-radio>
       </el-radio-group>
 
@@ -35,8 +41,10 @@
       >
         提交答案
       </el-button>
-      <div v-if="submitted && !isExpired" style="margin-top: 10px; color: green;">
-        <strong>您已提交答案：</strong> {{ selectedAnswer }}
+      <div v-if="submitted && !isExpired" class="after-submit" style="margin-top: 20px;">
+        <p><strong>正确答案：</strong> {{ question.answer }}</p>
+        <p><strong>解析：</strong> {{ question.analysis || '暂无解析' }}</p>
+        <p><strong>您的答案：</strong> {{ selectedAnswer }}</p>
       </div>
 
       <div v-if="isExpired" class="expired-info" style="margin-top: 20px;">
@@ -69,16 +77,19 @@ import { getQuestionDetail, submitAnswera, getUserAnswera } from '../../api/ques
 import { ElMessage } from 'element-plus'
 import { ArrowLeft, Loading } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
+import { addCredit, updateLevel } from '../../api/user.ts'
 
 const route = useRoute()
 const router = useRouter()
 const questionId = Number(route.params.id)
 const userId = Number(sessionStorage.getItem('userId'))
-
+const userId1 = sessionStorage.getItem("userId");
 const question = ref<any | null>(null)
 const notFound = ref(false)
 const submitted = ref(false)
 const selectedAnswer = ref<string>('')
+
+const optionLabel = (index: number) => String.fromCharCode(65 + index) // A, B, C, ...
 
 const formatDate = (dateStr: string) => {
   return dayjs(dateStr).format('YYYY-MM-DD HH:mm:ss')
@@ -103,6 +114,15 @@ const submitAnswer = async () => {
     if (res.data.code === '200') {
       ElMessage.success('提交成功！')
       submitted.value = true
+      console.log("quesanswer", question.value.answer)
+      if (selectedAnswer.value === question.value.answer) {
+        ElMessage.success('回答正确，已为您加分')
+        // 加分（例如 +2 分）
+        await addCredit(Number(userId1), 5);
+        await updateLevel(Number(userId1));
+      } else {
+        ElMessage.warning('回答错误，本题不加分')
+      }
     } else {
       ElMessage.warning(res.data.msg || '提交失败')
     }
@@ -114,8 +134,9 @@ const submitAnswer = async () => {
 const loadUserAnswer = async () => {
   try {
     const res = await getUserAnswera(questionId,userId )
-    if (res.data.code === "200" && res.data.data) {
+    console.log("myanswer", res.data)
 
+    if (res.data.code === "200" && res.data.data) {
       selectedAnswer.value = res.data.data  // 直接填入已答答案
       submitted.value = true
     }
