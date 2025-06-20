@@ -259,6 +259,13 @@ const router = createRouter({
                     meta: { title: '帖子详情' },
                 },
                 {
+                    path: 'questions/:id',
+                    name: 'QuestionDetail',
+                    component: () => import('../views/question/QuestionDetail.vue'),
+                    meta: { title: '问题详情' },
+                },
+
+                {
                     path: 'product/:productId/comments',
                     name: 'ProductComments',
                     component: () => import('../views/comment/TheAllComment.vue'),

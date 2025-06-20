@@ -1,128 +1,114 @@
 <template>
-  <div class="daily-question-container">
-    <el-card class="question-card">
-      <div class="header">
-        <h2>每日一问</h2>
-        <p class="date">{{ currentDate }}</p>
-      </div>
+  <div class="max-w-4xl mx-auto mt-8 p-6 bg-white rounded-xl shadow bgimage">
+    <h2 class="text-xl font-semibold mb-4">问题列表</h2>
 
-      <div v-if="question" class="question-content">
-        <h3 class="question-title">{{ question.title }}</h3>
-        <p class="question-body">{{ question.content }}</p>
-      </div>
-      <div v-else class="no-question">今日还未发布问题。</div>
+    <el-table :data="questions" border style="width: 100%">
+      <el-table-column prop="id" label="ID" width="60" />
+      <el-table-column prop="content" label="问题内容" />
+      <el-table-column prop="createTime" label="创建时间" width="180" />
+      <el-table-column prop="ddl" label="截止时间" width="180" />
+      <el-table-column label="状态" width="100">
+        <template #default="{ row }">
+          <el-tag :type="isExpired(row.ddl) ? 'danger' : 'success'">
+            {{ isExpired(row.ddl) ? '已截止' : '进行中' }}
+          </el-tag>
+        </template>
+      </el-table-column>
 
-      <div v-if="role === 'MANAGER'" class="admin-actions">
-        <el-button type="primary" @click="goToCreate">发布新问题</el-button>
-        <el-button type="success" @click="goToEdit" :disabled="!question">编辑</el-button>
-        <el-button type="danger" @click="handleDelete" :disabled="!question">删除</el-button>
-      </div>
-    </el-card>
+      <!-- 新增“回答状态”列 -->
+      <el-table-column label="回答状态" width="100">
+        <template #default="{ row }">
+          <el-tag :type="row.answered ? 'success' : 'info'">
+            {{ row.answered ? '已回答' : '未回答' }}
+          </el-tag>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="操作" width="120">
+        <template #default="{ row }">
+          <el-button type="primary" size="small" @click="goToDetail(row.id)">
+            查看详情
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { getTodayQuestion, deleteQuestion } from '../../api/question'; // 你需要定义对应接口
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ref, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
+import { getAllQuestions, getAnsweredQuestions } from '../../api/question'
 
-const router = useRouter();
-const role = sessionStorage.getItem('role');
+interface Question {
+  id: number
+  content: string
+  createTime: string
+  ddl: string
+  answered?: boolean // 新增字段，表示是否已回答
+}
 
-const question = ref<{ id: number, title: string, content: string } | null>(null);
-const currentDate = new Date().toLocaleDateString('zh-CN', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric'
-});
+const questions = ref<Question[]>([])
+const router = useRouter()
 
-const fetchQuestion = async () => {
+const userId = Number(sessionStorage.getItem('userId'))
+
+onMounted(async () => {
+  if (!userId) {
+    ElMessage.error('请先登录')
+    return
+  }
   try {
-    const res = await getTodayQuestion();
-    if (res.data.code === '200') {
-      question.value = res.data.data;
-    } else {
-      question.value = null;
+    // 同时请求所有问题和已回答问题
+    const [allRes, answeredRes] = await Promise.all([
+      getAllQuestions(),
+      getAnsweredQuestions(userId)
+    ])
+
+    if (allRes.data.code !== '200') {
+      ElMessage.error(allRes.data.msg || '获取所有问题失败')
+      return
     }
-  } catch (error) {
-    ElMessage.error('获取问题失败');
-  }
-};
-
-const goToCreate = () => {
-  router.push({ name: 'CreateQuestion' });
-};
-
-const goToEdit = () => {
-  if (question.value) {
-    router.push({ name: 'EditQuestion', params: { id: question.value.id } });
-  }
-};
-
-const handleDelete = async () => {
-  if (!question.value) return;
-  try {
-    await ElMessageBox.confirm('确定要删除今天的问题吗？', '提示', {
-      type: 'warning'
-    });
-    const res = await deleteQuestion(question.value.id);
-    if (res.data.code === '200') {
-      ElMessage.success('删除成功');
-      question.value = null;
-    } else {
-      ElMessage.error(res.data.message);
+    if (answeredRes.data.code !== '200') {
+      ElMessage.error(answeredRes.data.msg || '获取已回答问题失败')
+      return
     }
-  } catch (err) {
-    // 用户取消删除
-  }
-};
 
-onMounted(fetchQuestion);
+    const allQuestions: Question[] = allRes.data.data
+    const answeredQuestions: Question[] = answeredRes.data.data
+
+    // 取出已回答的问题ID集合，方便判断
+    const answeredIds = new Set(answeredQuestions.map(q => q.id))
+
+    // 标记每个问题是否已回答
+    questions.value = allQuestions.map(q => ({
+      ...q,
+      answered: answeredIds.has(q.id)
+    }))
+
+  } catch (e) {
+    ElMessage.error('请求失败')
+    console.error(e)
+  }
+})
+
+const isExpired = (ddl: string): boolean => {
+  return new Date(ddl).getTime() < new Date().getTime()
+}
+
+const goToDetail = (questionId: number) => {
+  router.push({ name: 'QuestionDetail', params: { id: questionId } })
+}
 </script>
 
 <style scoped>
-.daily-question-container {
-  max-width: 800px;
-  margin: 40px auto;
-  padding: 20px;
-  background-color: #fdfdfd;
-}
-
-.question-card {
-  padding: 20px;
-  background-color: #ffffff;
-  border-radius: 10px;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.question-title {
-  font-size: 1.5em;
-  font-weight: bold;
-  color: #333;
-}
-
-.question-body {
-  font-size: 1.2em;
-  margin-top: 10px;
-  color: #555;
-}
-
-.no-question {
-  font-style: italic;
-  color: #888;
-  margin: 20px 0;
-}
-
-.admin-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
+.bgimage {
+  min-height: 100vh;
+  background-image: url("../../assets/780.jpg");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  padding: 20px; /* 让内容不会贴边 */
 }
 </style>

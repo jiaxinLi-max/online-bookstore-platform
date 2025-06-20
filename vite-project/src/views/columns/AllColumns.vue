@@ -1,8 +1,8 @@
 <template>
   <el-main class="all-columns-container bgimage">
-    <div class="page-header">
-      <h1 class="page-title">所有栏目</h1>
-    </div>
+<!--    <div class="page-header">-->
+<!--      <h1 class="page-title">所有栏目</h1>-->
+<!--    </div>-->
 
     <div v-if="columns.length > 0" class="columns-list">
       <el-card
