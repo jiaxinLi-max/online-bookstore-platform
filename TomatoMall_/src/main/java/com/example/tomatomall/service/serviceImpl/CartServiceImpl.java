@@ -65,7 +65,12 @@ public class CartServiceImpl implements CartService {
         cartVO.setTitle(product.getTitle());
         cartVO.setPrice(product.getPrice());
         cartVO.setDescription(product.getDescription());
-        cartVO.setCover(product.getCover().get(0));
+        List<String> covers = product.getCover();
+        if (covers != null && !covers.isEmpty()) {
+            cartVO.setCover(covers.get(0));
+        } else {
+            cartVO.setCover(null); // 或设置默认图片
+        }
         cartVO.setDetail(product.getDetail());
 
         return cartVO;
@@ -120,7 +125,7 @@ public class CartServiceImpl implements CartService {
                 throw TomatoMallException.productNotExist();
             }
 
-            if(!cart.getValid()){
+            if(cart.getValid() == null||!cart.getValid()){
                 continue;
             }
 
@@ -128,7 +133,12 @@ public class CartServiceImpl implements CartService {
             cartVO.setTitle(product.getTitle());
             cartVO.setPrice(product.getPrice());
             cartVO.setDescription(product.getDescription());
-            cartVO.setCover(product.getCover().get(0));
+            List<String> covers = product.getCover();
+            if (covers != null && !covers.isEmpty()) {
+                cartVO.setCover(covers.get(0));
+            } else {
+                cartVO.setCover(null); // 或设置默认图片
+            }
             cartVO.setDetail(product.getDetail());
 
             cartVOList.add(cartVO);
