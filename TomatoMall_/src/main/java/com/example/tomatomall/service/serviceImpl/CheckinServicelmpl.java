@@ -2,7 +2,6 @@ package com.example.tomatomall.service.serviceImpl;
 
 import com.example.tomatomall.exception.TomatoMallException;
 import com.example.tomatomall.po.Checkin;
-import com.example.tomatomall.po.Comment;
 import com.example.tomatomall.repository.CheckinRepository;
 import com.example.tomatomall.service.CheckinService;
 import com.example.tomatomall.vo.CheckinVO;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class checkinServicelmpl implements CheckinService {
+public class CheckinServicelmpl implements CheckinService {
     @Autowired
     CheckinRepository checkinRepository;
 

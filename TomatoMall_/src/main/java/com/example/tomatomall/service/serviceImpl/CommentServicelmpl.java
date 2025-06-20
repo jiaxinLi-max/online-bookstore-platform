@@ -33,6 +33,7 @@ public class CommentServicelmpl implements CommentService {
                 .map(Comment::toVO)
                 .collect(Collectors.toList());
     }
+
     @Override
     public CommentVO getCommentInfo(Integer id){
         try {
@@ -46,6 +47,7 @@ public class CommentServicelmpl implements CommentService {
             throw TomatoMallException.invalidProductId();
         }
     }
+
     @Override
     public String updateCommentInfo(CommentVO commentVO){
         Comment comment = commentRepository.findById(commentVO.getId()).orElse(null);
@@ -98,6 +100,7 @@ public class CommentServicelmpl implements CommentService {
         update_new_score(comment.getProductId());
         return "创建成功";
     }
+
     @Override
     public String deleteComment(Integer id){
         Comment comment=commentRepository.findById(id).orElse(null);
@@ -110,6 +113,7 @@ public class CommentServicelmpl implements CommentService {
         commentRepository.deleteById(id);
         return "删除成功";
     }
+
     @Override
     public String likeComment(Integer id,Integer userId){
         Comment comment=commentRepository.findById(id).orElse(null);
@@ -130,14 +134,41 @@ public class CommentServicelmpl implements CommentService {
 
     }
 
+    /**
+     *获取指定评论的所有回复（子评论）
+     *
+     * 本方法通过给定的父评论ID，从数据库中查询出所有以该评论为父评论的子评论（即回复），
+     * 然后将这些评论实体对象（Comment）转换为用于前端展示的视图对象（CommentVO）列表返回
+     *
+     * 变更前的需求：评论是“单层结构”，仅支持商品的评论（顶层评论），无嵌套
+     * 变更后的需求：评论支持“层级结构”，允许用户对某条评论进行回复（即“子评论”或“嵌套评论”）
+     *
+     * @param commentId 父评论id
+     * @return CommentVO 列表，每个元素代表一条回复的视图信息
+     */
+    @Override
+    public List<CommentVO>getReplies(Integer commentId){
+        //根据productId获取该评论的回复
+        List<Comment> replies = commentRepository.findByParent_Id(commentId);
+
+        // 使用 Java Stream 对查询结果进行转换：
+        // 将每个 Comment 实体对象映射为 CommentVO 视图对象，
+        // 最终收集为 List 返回
+        return replies.stream()
+                .map(Comment::toVO)
+                .collect(Collectors.toList());
+    }
+
     @Override
     public List<Comment>findAllByOrderByTimeDesc(){
         return commentRepository.findAllByOrderByTimeDesc();
     }
+
     @Override
     public List<Comment>findAllByOrderByLikesDesc(){
         return commentRepository.findAllByOrderByLikesDesc();
     }
+
     @Override
     public List<Comment>findAllByProductIdOrderByTimeDesc(Integer productId){
         return commentRepository.findAllByProductIdOrderByTimeDesc(productId);
@@ -148,11 +179,5 @@ public class CommentServicelmpl implements CommentService {
         return commentRepository.findAllByProductIdOrderByLikesDesc(productId);
     }
 
-    @Override
-    public List<CommentVO>getReplies(Integer commentId){
-        List<Comment> replies = commentRepository.findByParent_Id(commentId);
-        return replies.stream()
-                .map(Comment::toVO)
-                .collect(Collectors.toList());
-    }
+
 }
