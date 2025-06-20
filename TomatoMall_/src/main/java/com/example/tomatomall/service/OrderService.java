@@ -17,4 +17,6 @@ public interface OrderService {
     OrderVO getOrderById(Integer order_id);
 
     List<OrderVO> getSuccessOrder(Integer userId);
+
+    OrderVO getOrder(Integer orderId);
 }
