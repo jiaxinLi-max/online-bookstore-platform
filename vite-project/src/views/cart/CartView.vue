@@ -179,12 +179,12 @@ export default {
           getUserInfo(userIdNumber)
         ]);
 
-        if (cartRes.data.code == 200 && Array.isArray(cartRes.data.data.items)) {
+        if (cartRes.data.code == '200' && Array.isArray(cartRes.data.data.items)) {
           products.value = cartRes.data.data.items;
-          console.log(product.value);
+          console.log(products.value);
         } else { console.error("获取购物车数据失败"); }
 
-        if (userRes.data.code == 200 && Array.isArray(userRes.data.data.addressBook)) {
+        if (userRes.data.code == '200' && Array.isArray(userRes.data.data.addressBook)) {
           addressBook.value = userRes.data.data.addressBook;
         }
       } catch (error) { console.error("获取初始数据失败:", error); }
@@ -193,7 +193,7 @@ export default {
     const removeFromCart = async (userId: number, cartItemId: number) => {
       try {
         const res = await removeItemFromCart(userId, cartItemId);
-        if (res.data.code == 200) {
+        if (res.data.code == '200') {
           await fetchInitialData();
           selectedProducts.value = selectedProducts.value.filter(id => id !== cartItemId);
         } else { console.error("删除商品失败"); }
