@@ -111,6 +111,7 @@ const like = ref(0)
 const dislike = ref(0)
 const curUserId = sessionStorage.getItem('userId')
 const linkedProducts = ref<Product[]>([])
+const MAX_SIZE = 1024 * 1024; // 1MB
 
 function formatTime(timeStr: string): string {
   const date = new Date(timeStr)

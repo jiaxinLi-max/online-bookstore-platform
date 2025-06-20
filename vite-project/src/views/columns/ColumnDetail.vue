@@ -99,6 +99,7 @@ const editForm = ref({ id: columnId, theme: '', description: '', covers: [] as s
 const fileList = ref<UploadFile[]>([]);
 const dialogImageUrl = ref('');
 const dialogVisible = ref(false);
+const MAX_SIZE = 1024 * 1024; // 1MB
 
 const fetchColumnData = async () => {
   try {
@@ -182,6 +183,10 @@ async function handleChange(file: UploadFile) {
   if (!editForm.value.covers) editForm.value.covers = [];
   const rawFile = file.raw;
   if (!rawFile) return;
+  if (rawFile.size > MAX_SIZE) {
+    ElMessage.error('文件超过最大大小限制（1MB）');
+    return;
+  }
   try {
     const res = await getImage(rawFile);
     if (res && res.code === '200') {

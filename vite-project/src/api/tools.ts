@@ -15,7 +15,7 @@ export const getImage = async (file: File) => {
         console.log("response", response);
         return response.data; // 根据 API 的返回格式调整
     } catch (error) {
-        console.error('获取用户头像 失败:', error);
+        console.error('获取图片失败:', error);
         throw error; // 重新抛出错误
     }
 };

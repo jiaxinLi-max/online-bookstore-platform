@@ -76,12 +76,18 @@ const selectedProductIds = ref<number[]>([]);
 const createDisabled = computed(() => {
   return !title.value || !content.value || covers.value.length === 0;
 });
+const MAX_SIZE = 1024 * 1024; // 1MB
 
 // 修正3: 使用带状态判断的 handleChange，解决重复上传问题
 async function handleChange(file: UploadFile, newFileList: UploadFile[]) {
   const rawFile = file.raw;
   if (!rawFile) {
     ElMessage.error('无法获取文件');
+    return;
+  }
+
+  if (rawFile.size > MAX_SIZE) {
+    ElMessage.error('文件超过最大大小限制（1MB）');
     return;
   }
 

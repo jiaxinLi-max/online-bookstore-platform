@@ -39,6 +39,7 @@
         <el-tab-pane label="修改个人信息" name="info"></el-tab-pane>
         <el-tab-pane label="修改密码" name="password"></el-tab-pane>
         <el-tab-pane label="我的地址簿" name="addressBook"></el-tab-pane>
+        <el-tab-pane label="我的历史订单" name="historyOrders"></el-tab-pane>
       </el-tabs>
 
       <div v-if="activeTab === 'info'">
@@ -82,6 +83,33 @@
         </el-table>
         <el-button type="primary" @click="submitAllUserInfo" style="margin-top: 20px;">保存地址簿改动</el-button>
       </div>
+
+      <div v-if="activeTab === 'historyOrders'">
+        <el-table :data="historyOrders" stripe style="width: 100%" height="350" empty-text="暂无历史订单">
+          <el-table-column prop="id" label="订单号" width="100" sortable />
+          <el-table-column label="下单时间">
+            <template #default="scope">
+              {{ formatTime(scope.row.createTime) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="totalAmount" label="订单金额" width="120">
+            <template #default="scope">
+              ￥{{ scope.row.totalAmount.toFixed(2) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="realAmount" label="实付金额" width="120">
+            <template #default="scope">
+              ￥{{ scope.row.realAmount.toFixed(2) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="120" fixed="right">
+            <template #default="scope">
+              <el-button type="primary" link size="small" @click="showOrderDetail(scope.row)">查看详情</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+
     </el-card>
 
     <el-dialog v-model="addressDialogVisible" :title="isAddressEditing ? '编辑地址' : '新增地址'" width="400px">
@@ -96,12 +124,28 @@
       </template>
     </el-dialog>
     <el-dialog v-model="dialogVisible"><img class="dialog-image" :src="dialogImageUrl" alt="Preview" /></el-dialog>
+
+    <el-dialog v-model="orderDetailDialogVisible" title="订单详情" width="500px">
+      <div v-if="selectedOrder">
+        <el-descriptions :column="1" border>
+          <el-descriptions-item label="订单号">{{ selectedOrder.id }}</el-descriptions-item>
+          <el-descriptions-item label="下单时间">{{ formatTime(selectedOrder.createTime) }}</el-descriptions-item>
+          <el-descriptions-item label="订单金额">￥{{ selectedOrder.totalAmount.toFixed(2) }}</el-descriptions-item>
+          <el-descriptions-item label="实付金额">￥{{ selectedOrder.realAmount.toFixed(2) }}</el-descriptions-item>
+        </el-descriptions>
+      </div>
+      <template #footer>
+        <el-button type="primary" @click="orderDetailDialogVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
+
   </el-main>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive } from 'vue';
-import { userInfo, userInfoUpdate, addCredit, updateLevel } from '../../api/user.ts';
+// 【新功能】导入 getHistoryOrders
+import { userInfo, userInfoUpdate, addCredit, updateLevel, getHistoryOrders } from '../../api/user.ts';
 import { parseRole } from "../../utils";
 import { router } from '../../router';
 import { ElMessage, ElMessageBox, type UploadFile } from "element-plus";
@@ -129,7 +173,7 @@ const editForm = reactive({
   telephone: '',
   location: '',
   email: '',
-  addressBook: [] as { name: string; telephone: string; address: string }[]
+  addressBook: [] as { name: string; phone: string; address: string }[]
 });
 
 const password = ref('');
@@ -151,7 +195,48 @@ const dialogVisible = ref(false);
 const latestCheck = ref('');
 const isChecked = ref(false);
 
+// 【新功能】历史订单相关状态
+const historyOrders = ref([]);
+const orderDetailDialogVisible = ref(false);
+const selectedOrder = ref<any>(null);
+
+
 const progressPercentage = computed(() => credits.value % 100);
+
+const MAX_SIZE = 1024 * 1024; // 1MB
+
+function formatTime(isoString: String) {
+  // 1. 检查输入是否为空或无效，如果是则返回提示
+  if (!isoString) {
+    console.log('无')
+    return '无';
+  }
+
+  // 2. 使用 ISO 字符串创建一个 Date 对象。
+  //    JavaScript 的 Date 对象会自动将 UTC 时间转换为运行环境的本地时区。
+  const date = new Date(isoString);
+
+  // 3. 检查转换后的日期是否有效
+  if (isNaN(date.getTime())) {
+    console.log('无效日期')
+    return '无效日期';
+  }
+
+  // 4. 从 Date 对象中获取年、月、日、时、分、秒
+  const year = date.getFullYear();
+
+  // getMonth() 返回的月份是从 0 开始的（0-11），所以需要加 1
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  // 5. 拼接成最终的字符串格式
+  console.log('有效')
+  return `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
+}
 
 const getUserInfo = async () => {
   try {
@@ -184,21 +269,52 @@ const getUserInfo = async () => {
   } catch (error) { console.error('获取用户信息失败:', error); }
 };
 
-const handleAvatarChange = async (file: UploadFile) => {
-  if (file.status === 'ready') {
-    try {
-      const res = await getImage(file.raw!);
-      if(res.data.code == 200) {
-        editForm.avatar = res.data.data;
-        ElMessage.success("新头像已上传，点击“更新”按钮保存");
-      } else { ElMessage.error("头像上传失败"); }
-    } catch(e) { ElMessage.error("头像上传异常"); }
+const handleAvatarChange = async (uploadFile: UploadFile, uploadFiles: UploadFile[]) => {
+  // 确保我们只处理原始文件对象
+  const rawFile = uploadFile.raw;
+  if (!rawFile) return;
+
+  if (rawFile.size > MAX_SIZE) {
+    ElMessage.error('文件超过最大大小限制（1MB）');
+    return;
+  }
+
+  try {
+    // 调用上传API
+    const res = await getImage(rawFile);
+
+    if (res && res.code === '200') {
+      // 1. 【修改点】将返回的URL直接赋值给 editForm.avatar 字符串
+      console.log("上传成功");
+      editForm.avatar = res.data;
+
+      // 2. 【修改点】确保fileList中只保留当前这一个成功上传的文件
+      //    el-upload在limit=1时会自动处理，这里我们显式同步状态
+      fileList.value = uploadFiles.slice(-1);
+
+      ElMessage.success('新头像上传成功，点击“更新个人信息”以保存。');
+    } else {
+      // 上传失败，清空文件列表以移除失败的文件项
+      fileList.value = [];
+      ElMessage.error(res.data.msg || '头像上传失败');
+    }
+  } catch (error) {
+    // 捕获到异常，同样清空文件列表
+    fileList.value = [];
+    console.error("头像上传异常:", error);
+    ElMessage.error('头像上传异常');
   }
 };
 
+/**
+ * 处理头像移除。
+ * el-upload 的 :on-remove 事件会触发此函数。
+ */
 const handleAvatarRemove = () => {
+  // 【修改点】逻辑大幅简化，只需清空对应字段和文件列表即可
   editForm.avatar = '';
   fileList.value = [];
+  ElMessage.info('头像已移除。');
 };
 
 const handlePictureCardPreview = (file: UploadFile) => {
@@ -302,10 +418,35 @@ const checked = async () => {
   }
 };
 
+// 【新功能】获取历史订单数据的函数
+const fetchHistoryOrders = async () => {
+  if (!userId) return;
+  try {
+    const res = await getHistoryOrders(Number(userId));
+    if (res.data.code === '200' && Array.isArray(res.data.data)) {
+      historyOrders.value = res.data.data;
+    } else {
+      ElMessage.error('获取历史订单失败');
+    }
+  } catch (error) {
+    console.error("获取历史订单失败:", error);
+    ElMessage.error('获取历史订单失败');
+  }
+};
+
+// 【新功能】打开订单详情对话框的函数
+const showOrderDetail = (order: any) => {
+  selectedOrder.value = order;
+  orderDetailDialogVisible.value = true;
+};
+
+
 onMounted(async () => {
   await getUserInfo();
   await checked();
   await getLatestCheckIn();
+  // 【新功能】组件加载时获取历史订单
+  await fetchHistoryOrders();
 });
 </script>
 
