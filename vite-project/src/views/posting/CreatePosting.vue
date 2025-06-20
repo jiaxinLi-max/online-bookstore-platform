@@ -1,11 +1,11 @@
 <template>
   <div class="create_posting bgimage">
-    <h1 class="create-posting-title">创建帖子</h1>
+    <h1 class="create-posting-title">创建笔记</h1>
     <el-form ref="form" label-width="120px" class="posting-form">
-      <el-form-item label="帖子标题" prop="postingTitle">
-        <el-input v-model="title" placeholder="请输入帖子标题" style="width: 400px;"></el-input>
+      <el-form-item label="笔记标题" prop="postingTitle">
+        <el-input v-model="title" placeholder="请输入笔记标题" style="width: 400px;"></el-input>
       </el-form-item>
-      <el-form-item label="帖子内容" prop="postingContent">
+      <el-form-item label="笔记内容" prop="postingContent">
         <el-input v-model="content" placeholder="请输入内容" style="width: 400px;"></el-input>
       </el-form-item>
 
@@ -26,7 +26,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="帖子封面" prop="covers">
+      <el-form-item label="笔记封面" prop="covers">
         <el-upload
             action="http://localhost:8080/api/images"
             list-type="picture-card"
@@ -38,7 +38,7 @@
             multiple
         >
           <el-icon><Plus /></el-icon>
-          <div>点击上传帖子封面</div>
+          <div>点击上传笔记封面</div>
         </el-upload>
         <el-dialog v-model="dialogVisible">
           <img class="dialog-image" :src="dialogImageUrl" alt="Logo Preview" />
@@ -46,7 +46,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click.prevent="handleCreatePosting" :disabled="createDisabled" type="primary" plain>
-          创建帖子
+          创建笔记
         </el-button>
       </el-form-item>
     </el-form>
@@ -143,12 +143,12 @@ async function handleCreatePosting() {
   try {
     const res = await createPosting(payload);
     if (res.data.code === '200') {
-      ElMessage.success('创建帖子成功');
+      ElMessage.success('创建笔记成功');
       title.value = ''; content.value = '';
       covers.value = []; fileList.value = [];
       selectedProductIds.value = [];
     } else { ElMessage.error(res.data.message); }
-  } catch (error) { ElMessage.error('创建帖子失败'); }
+  } catch (error) { ElMessage.error('创建笔记失败'); }
 }
 
 onMounted(async () => {

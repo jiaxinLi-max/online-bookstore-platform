@@ -3,7 +3,7 @@
     <div class="posting-detail-container">
       <el-button type="primary" @click="backToAllPosting" class="back-button">
         <el-icon><ArrowLeft /></el-icon>
-        返回帖子列表
+        返回笔记列表
       </el-button>
 
       <el-card class="detail-card" v-if="title">
@@ -23,7 +23,7 @@
               class="delete-btn"
           >
             <el-icon><Delete /></el-icon>
-            删除帖子
+            删除笔记
           </el-button>
         </div>
 
@@ -37,14 +37,14 @@
               class="covers-carousel"
           >
             <el-carousel-item v-for="(img, index) in covers" :key="index">
-              <img :src="img" alt="帖子图片" class="carousel-image"/>
+              <img :src="img" alt="笔记图片" class="carousel-image"/>
             </el-carousel-item>
           </el-carousel>
           <div class="content-text" v-html="content"></div>
         </div>
 
         <div v-if="linkedProducts.length > 0" class="linked-products">
-          <h3>帖子中提到的书籍</h3>
+          <h3>笔记中提到的书籍</h3>
           <div class="products-list">
             <el-card v-for="product in linkedProducts" :key="product.id" class="product-card" @click="goToProductDetail(product.id)" shadow="hover">
               <div class="product-image">
@@ -80,7 +80,7 @@
 
       <div v-else class="loading-container">
         <el-icon class="loading-icon"><Loading /></el-icon>
-        正在加载帖子详情...
+        正在加载笔记详情...
       </div>
     </div>
   </div>
@@ -161,7 +161,7 @@ async function getPost() {
       }
     }
   } catch (error) {
-    ElMessage.error('加载帖子详情失败')
+    ElMessage.error('加载笔记详情失败')
   }
 }
 
@@ -169,7 +169,7 @@ async function handleDelete() {
   try {
     const res = await deletePost(id)
     if (res.data.code === '200') {
-      ElMessage.success('帖子删除成功')
+      ElMessage.success('笔记删除成功')
       await router.push({name: 'AllPostings'})
     } else {
       console.error("Error in deleting post:", res.data.msg);
