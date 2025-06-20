@@ -304,3 +304,23 @@ export const getOrderItems = (order_id: number) => {
         throw error;
     })
 }
+
+export const getCartItem = (cartItemId: number) => {
+    const token = sessionStorage.getItem('token');
+    const url = `${CART_MODULE}/getCart/${cartItemId}`;
+
+    return axios.get(url, {
+        headers: {
+            'token': token
+        },
+        params: {
+            id: cartItemId
+        }
+    }).then(res => {
+        console.log("Got cart item:", res);
+        return res;
+    }).catch(error => {
+        console.log("获取购物车商品失败:", error);
+        throw error;
+    })
+}
