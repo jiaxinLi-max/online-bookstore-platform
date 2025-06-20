@@ -140,6 +140,9 @@ public class CommentServicelmpl implements CommentService {
      * 本方法通过给定的父评论ID，从数据库中查询出所有以该评论为父评论的子评论（即回复），
      * 然后将这些评论实体对象（Comment）转换为用于前端展示的视图对象（CommentVO）列表返回
      *
+     * 变更前的需求：评论是“单层结构”，仅支持商品的评论（顶层评论），无嵌套
+     * 变更后的需求：评论支持“层级结构”，允许用户对某条评论进行回复（即“子评论”或“嵌套评论”）
+     *
      * @param commentId 父评论id
      * @return CommentVO 列表，每个元素代表一条回复的视图信息
      */
