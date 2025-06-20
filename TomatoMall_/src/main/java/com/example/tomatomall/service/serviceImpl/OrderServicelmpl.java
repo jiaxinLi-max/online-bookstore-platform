@@ -94,7 +94,7 @@ public class OrderServicelmpl implements OrderService {
             request.setReturnUrl(returnUrl);
             Order order = orderRepository.findById(order_id).orElseThrow(TomatoMallException::orderNotExist);
             JSONObject bizContent = new JSONObject();
-            bizContent.put("out_trade_no", String.valueOf(order_id));
+            bizContent.put("out_trade_no", String.valueOf(order_id+100));
             bizContent.put("total_amount", String.valueOf(order.getRealAmount()));
 
             bizContent.put("subject", "番茄书城订单 #" + order_id); // 商品标题（必填）
