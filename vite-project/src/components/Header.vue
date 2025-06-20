@@ -152,7 +152,7 @@ const showSubNav = computed(() => {
   const pathsToShow = [
     '/home/all-products',
     '/home/rankings',
-    '/home/categories'
+    '/home/all-columns'
   ];
   return pathsToShow.includes(route.path);
 });
@@ -323,6 +323,7 @@ function logout() {
               <el-dropdown-menu>
                 <el-dropdown-item @click="router.push('/home/create-product')">创建书籍</el-dropdown-item>
                 <el-dropdown-item @click="router.push('/home/create-columns')">创建栏目</el-dropdown-item>
+                <el-dropdown-item @click="router.push('/home/create-question')">创建问题</el-dropdown-item>
                 <el-dropdown-item @click="router.push('/home/all-advertisements')">广告管理</el-dropdown-item>
               </el-dropdown-menu>
             </template>
