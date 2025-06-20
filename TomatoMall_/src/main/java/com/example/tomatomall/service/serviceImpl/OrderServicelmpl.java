@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class OrderServiceLmpl implements OrderService {
+public class OrderServicelmpl implements OrderService {
 
     @Autowired
     OrderRepository orderRepository;
