@@ -34,7 +34,18 @@ declare module 'vue' {
     ElInputNumber: typeof import('element-plus/es')['ElInputNumber']
     ElMain: typeof import('element-plus/es')['ElMain']
     ElOption: typeof import('element-plus/es')['ElOption']
+<<<<<<< HEAD
     ElProgress: typeof import('element-plus/es')['ElProgress']
+=======
+<<<<<<< HEAD
+    ElProgress: typeof import('element-plus/es')['ElProgress']
+=======
+
+    ElRadio: typeof import('element-plus/es')['ElRadio']
+    ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
+
+>>>>>>> 06619e08331ce5979d142b3ab57653b86ccc4137
+>>>>>>> 2a4fd00dc6d78ba9a8d0b62fde90eafbf2e93d0c
     ElRate: typeof import('element-plus/es')['ElRate']
     ElResult: typeof import('element-plus/es')['ElResult']
     ElRow: typeof import('element-plus/es')['ElRow']
