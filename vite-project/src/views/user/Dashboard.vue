@@ -125,7 +125,7 @@
     </el-dialog>
     <el-dialog v-model="dialogVisible"><img class="dialog-image" :src="dialogImageUrl" alt="Preview" /></el-dialog>
 
-    <el-dialog v-model="orderDetailDialogVisible" title="订单详情" width="500px">
+    <el-dialog v-model="orderDetailDialogVisible" title="订单详情" width="600px">
       <div v-if="selectedOrder">
         <el-descriptions :column="1" border>
           <el-descriptions-item label="订单号">{{ selectedOrder.id }}</el-descriptions-item>
@@ -133,6 +133,22 @@
           <el-descriptions-item label="订单金额">￥{{ selectedOrder.totalAmount.toFixed(2) }}</el-descriptions-item>
           <el-descriptions-item label="实付金额">￥{{ selectedOrder.realAmount.toFixed(2) }}</el-descriptions-item>
         </el-descriptions>
+
+        <el-divider>订单商品</el-divider>
+        <el-table :data="historyProducts" stripe max-height="200px">
+          <el-table-column label="商品封面" width="100">
+            <template #default="scope">
+              <el-image style="width: 80px; height: 80px" :src="scope.row.cover[0]" fit="cover" />
+            </template>
+          </el-table-column>
+          <el-table-column prop="title" label="商品标题" />
+          <el-table-column label="单价" width="100">
+            <template #default="scope">
+              ￥{{ scope.row.price.toFixed(2) }}
+            </template>
+          </el-table-column>
+        </el-table>
+
       </div>
       <template #footer>
         <el-button type="primary" @click="orderDetailDialogVisible = false">关闭</el-button>
@@ -144,7 +160,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive } from 'vue';
-// 【新功能】导入 getHistoryOrders
 import { userInfo, userInfoUpdate, addCredit, updateLevel, getHistoryOrders } from '../../api/user.ts';
 import { parseRole } from "../../utils";
 import { router } from '../../router';
@@ -152,6 +167,8 @@ import { ElMessage, ElMessageBox, type UploadFile } from "element-plus";
 import { getImage } from "../../api/tools.ts";
 import { Plus } from "@element-plus/icons-vue";
 import { checkIn, getCheckinHistory, getCheckinStatus } from "../../api/checkin.ts";
+import { getCartItem } from  "../../api/cart.ts"
+import { getProduct } from "../../api/product.ts"
 
 const username = sessionStorage.getItem("username");
 const role = sessionStorage.getItem("role");
@@ -195,7 +212,7 @@ const dialogVisible = ref(false);
 const latestCheck = ref('');
 const isChecked = ref(false);
 
-// 【新功能】历史订单相关状态
+// 历史订单相关状态
 const historyOrders = ref([]);
 const orderDetailDialogVisible = ref(false);
 const selectedOrder = ref<any>(null);
@@ -203,38 +220,24 @@ const selectedOrder = ref<any>(null);
 
 const progressPercentage = computed(() => credits.value % 100);
 
+const historyProducts = ref([]);
+
 const MAX_SIZE = 1024 * 1024; // 1MB
 
-function formatTime(isoString: String) {
-  // 1. 检查输入是否为空或无效，如果是则返回提示
+function formatTime(isoString: string): string {
   if (!isoString) {
-    console.log('无')
     return '无';
   }
-
-  // 2. 使用 ISO 字符串创建一个 Date 对象。
-  //    JavaScript 的 Date 对象会自动将 UTC 时间转换为运行环境的本地时区。
   const date = new Date(isoString);
-
-  // 3. 检查转换后的日期是否有效
   if (isNaN(date.getTime())) {
-    console.log('无效日期')
     return '无效日期';
   }
-
-  // 4. 从 Date 对象中获取年、月、日、时、分、秒
   const year = date.getFullYear();
-
-  // getMonth() 返回的月份是从 0 开始的（0-11），所以需要加 1
   const month = String(date.getMonth() + 1).padStart(2, '0');
-
   const day = String(date.getDate()).padStart(2, '0');
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
   const seconds = String(date.getSeconds()).padStart(2, '0');
-
-  // 5. 拼接成最终的字符串格式
-  console.log('有效')
   return `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
 }
 
@@ -270,7 +273,6 @@ const getUserInfo = async () => {
 };
 
 const handleAvatarChange = async (uploadFile: UploadFile, uploadFiles: UploadFile[]) => {
-  // 确保我们只处理原始文件对象
   const rawFile = uploadFile.raw;
   if (!rawFile) return;
 
@@ -280,38 +282,24 @@ const handleAvatarChange = async (uploadFile: UploadFile, uploadFiles: UploadFil
   }
 
   try {
-    // 调用上传API
     const res = await getImage(rawFile);
 
-    if (res && res.code === '200') {
-      // 1. 【修改点】将返回的URL直接赋值给 editForm.avatar 字符串
-      console.log("上传成功");
-      editForm.avatar = res.data;
-
-      // 2. 【修改点】确保fileList中只保留当前这一个成功上传的文件
-      //    el-upload在limit=1时会自动处理，这里我们显式同步状态
+    if (res && res.data.code === '200') {
+      editForm.avatar = res.data.data;
       fileList.value = uploadFiles.slice(-1);
-
       ElMessage.success('新头像上传成功，点击“更新个人信息”以保存。');
     } else {
-      // 上传失败，清空文件列表以移除失败的文件项
       fileList.value = [];
       ElMessage.error(res.data.msg || '头像上传失败');
     }
   } catch (error) {
-    // 捕获到异常，同样清空文件列表
     fileList.value = [];
     console.error("头像上传异常:", error);
     ElMessage.error('头像上传异常');
   }
 };
 
-/**
- * 处理头像移除。
- * el-upload 的 :on-remove 事件会触发此函数。
- */
 const handleAvatarRemove = () => {
-  // 【修改点】逻辑大幅简化，只需清空对应字段和文件列表即可
   editForm.avatar = '';
   fileList.value = [];
   ElMessage.info('头像已移除。');
@@ -321,6 +309,16 @@ const handlePictureCardPreview = (file: UploadFile) => {
   dialogImageUrl.value = file.url!;
   dialogVisible.value = true;
 };
+
+const getIteminCart = async (cartItemId: number) => {
+  const res = await getCartItem(cartItemId);
+  if (res.data.code == '200') {
+    return res.data.data.productId;
+  }
+  else {
+    console.log("Unable to get cart item:", res.data);
+  }
+}
 
 const submitAllUserInfo = async () => {
   try {
@@ -418,7 +416,6 @@ const checked = async () => {
   }
 };
 
-// 【新功能】获取历史订单数据的函数
 const fetchHistoryOrders = async () => {
   if (!userId) return;
   try {
@@ -434,9 +431,29 @@ const fetchHistoryOrders = async () => {
   }
 };
 
-// 【新功能】打开订单详情对话框的函数
-const showOrderDetail = (order: any) => {
+const getHisProduct = async (productId: number) => {
+  const res = await getProduct(String(productId)); // Ensure productId is a string
+  if (res.data.code === '200') {
+    return res.data.data;
+  }
+  else {console.log("Unable to get product: ", productId);}
+}
+
+const showOrderDetail = async (order: any) => {
+  historyProducts.value = [];
   selectedOrder.value = order;
+  const cartItemIds = selectedOrder.value.cartItemIds;
+  if (cartItemIds && Array.isArray(cartItemIds)) {
+    for (const cartItemId of cartItemIds) {
+      const productId = await getIteminCart(cartItemId);
+      if (productId) {
+        const product = await getHisProduct(Number(productId));
+        if (product) {
+          historyProducts.value.push(product);
+        }
+      }
+    }
+  }
   orderDetailDialogVisible.value = true;
 };
 
@@ -445,7 +462,6 @@ onMounted(async () => {
   await getUserInfo();
   await checked();
   await getLatestCheckIn();
-  // 【新功能】组件加载时获取历史订单
   await fetchHistoryOrders();
 });
 </script>

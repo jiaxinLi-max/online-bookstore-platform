@@ -232,7 +232,7 @@ function logout() {
             <el-icon :size="35" color="white">
               <Document />
             </el-icon>
-            <div class="icon-label">每日一问</div>
+            <div class="icon-label">真相解码</div>
           </router-link>
         </el-col>
 
