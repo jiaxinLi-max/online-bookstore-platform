@@ -92,7 +92,7 @@ const selectedAnswer = ref<string>('')
 const optionLabel = (index: number) => String.fromCharCode(65 + index) // A, B, C, ...
 
 const formatDate = (dateStr: string) => {
-  return dayjs(dateStr).format('YYYY-MM-DD HH:mm:ss')
+  return dayjs(dateStr).format('YYYY年MM月DD日 HH:mm:ss')
 }
 
 const isExpired = computed(() => {

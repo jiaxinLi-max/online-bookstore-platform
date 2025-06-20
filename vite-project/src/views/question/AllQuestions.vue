@@ -5,8 +5,18 @@
     <el-table :data="questions" border style="width: 100%">
       <el-table-column prop="id" label="ID" width="60" />
       <el-table-column prop="content" label="问题内容" />
-      <el-table-column prop="createTime" label="创建时间" width="180" />
-      <el-table-column prop="ddl" label="截止时间" width="180" />
+      <el-table-column
+          prop="createTime"
+          label="创建时间"
+          width="180"
+          :formatter="formatDate"
+      />
+      <el-table-column
+          prop="ddl"
+          label="截止时间"
+          width="180"
+          :formatter="formatDate"
+      />
       <el-table-column label="状态" width="100">
         <template #default="{ row }">
           <el-tag :type="isExpired(row.ddl) ? 'danger' : 'success'">
@@ -53,7 +63,11 @@ const questions = ref<Question[]>([])
 const router = useRouter()
 
 const userId = Number(sessionStorage.getItem('userId'))
+import dayjs from 'dayjs'
 
+const formatDate = (row: Question, column: any, cellValue: string) => {
+  return dayjs(cellValue).format('YYYY年MM月DD日')
+}
 onMounted(async () => {
   if (!userId) {
     ElMessage.error('请先登录')
