@@ -37,7 +37,7 @@
 <script lang="ts">
 import { onMounted, ref } from 'vue';
 import { addCredit, updateLevel } from '../../api/user.ts'
-import {postOrder, getStatus, Cart, getOrderItems } from '../../api/cart.ts';
+import {postOrder, getStatus, Cart, getOrderItems, getCartItems } from '../../api/cart.ts';
 import { ElMessage } from "element-plus";
 import { useRoute, useRouter } from 'vue-router';
 import {parseRole} from "../../utils"; // 引入路由相关
@@ -130,11 +130,20 @@ export default {
         return;
       }
       try {
-        const res = await getOrderItems(Number(orderId));
-        console.log("getItems", res.data.data);
+        const res = await getCartItems(userIdNumber);
+        const res2 = await getOrderItems(Number(orderId));
+        console.log("getCart", res.data.data);
+        console.log("getItems", res2.data.data)
         // 确认响应数据格式
         if (res.data.data && Array.isArray(res.data.data.items)) {
-          products.value = res.data.data.items; // 更新产品列表
+          // products.value = res.data.data.items; // 更新产品列表
+          for (const item of res.data.data.items) {
+            for (const id of res2.data.data.cartItemIds) {
+              if (item.cartItemId === id) {
+                products.value.push(item);
+              }
+            }
+          }
         } else {
           console.error('获取数据失败：响应格式不符合预期');
         }
