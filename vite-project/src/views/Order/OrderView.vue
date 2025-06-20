@@ -10,18 +10,18 @@
       <p><strong>创建时间：</strong>{{ createTime }}</p>
     </div>
 
-    <el-card
-        v-for="product in products"
-        :key="product.cartItemId"
-        class="product-card"
-    >
-      <div class="product-image">
-        <img :src='product.cover' alt="Product Cover" class="product-image-style" />
-      </div>
-      <h3>{{ product.title }}</h3>
-      <span> 数量: {{ product.quantity }} </span>
-      <span> 单价: {{ product.price }} </span>
-    </el-card>
+<!--    <el-card-->
+<!--        v-for="product in products"-->
+<!--        :key="product.cartItemId"-->
+<!--        class="product-card"-->
+<!--    >-->
+<!--      <div class="product-image">-->
+<!--        <img :src='product.cover' alt="Product Cover" class="product-image-style" />-->
+<!--      </div>-->
+<!--      <h3>{{ product.title }}</h3>-->
+<!--      <span> 数量: {{ product.quantity }} </span>-->
+<!--      <span> 单价: {{ product.price }} </span>-->
+<!--    </el-card>-->
 
     <el-button type="primary" @click="confirmOrder" v-if="!orderClosed">确认支付</el-button>
 <!--    <div v-if="payFormHtml" ref="formContainer" v-html="payFormHtml"></div>-->
@@ -124,28 +124,28 @@ export default {
       router.push({name: 'Cart'});
     }
 
-    async function getAllInCart() {
-      if (!userId) {
-        console.error('用户未登录');
-        return;
-      }
-      try {
-        const res = await getCartItems(userIdNumber);
-        console.log("getAllInCart", res.data.data);
-        // 确认响应数据格式
-        if (res.data.data && Array.isArray(res.data.data.items)) {
-          products.value = res.data.data.items; // 更新产品列表
-        } else {
-          console.error('获取数据失败：响应格式不符合预期');
-        }
-      } catch (error) {
-        console.error('获取购物车列表失败:', error);
-      }
-    }
+    // async function getAllInCart() {
+    //   if (!userId) {
+    //     console.error('用户未登录');
+    //     return;
+    //   }
+    //   try {
+    //     const res = await getCartItems(userIdNumber);
+    //     console.log("getAllInCart", res.data.data);
+    //     // 确认响应数据格式
+    //     if (res.data.data && Array.isArray(res.data.data.items)) {
+    //       products.value = res.data.data.items; // 更新产品列表
+    //     } else {
+    //       console.error('获取数据失败：响应格式不符合预期');
+    //     }
+    //   } catch (error) {
+    //     console.error('获取购物车列表失败:', error);
+    //   }
+    // }
 
-    onMounted(()=>{
-      getAllInCart();
-    });
+    // onMounted(()=>{
+    //   getAllInCart();
+    // });
 
     return {
       userIdNumber,
