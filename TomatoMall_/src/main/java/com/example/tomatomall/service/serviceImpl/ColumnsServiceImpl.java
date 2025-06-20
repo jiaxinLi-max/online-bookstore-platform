@@ -83,4 +83,13 @@ public class ColumnsServiceImpl implements ColumnsService {
                 .map(Product::toVO)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public ColumnsVO getColumnInfo(Integer id){
+        Columns columns=columnsRepository.findById(id).orElse(null);
+        if(columns==null){
+            throw TomatoMallException.columnsNotExist();
+        }
+        return columns.toVO();
+    }
 }

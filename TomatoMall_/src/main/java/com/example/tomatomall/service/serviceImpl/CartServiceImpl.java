@@ -42,8 +42,8 @@ public class CartServiceImpl implements CartService {
         if(quantity>stockpile.getAmount()){
             throw TomatoMallException.exceedAmount();
         }
-        Cart cart=cartRepository.findByUserIdAndProductId(userId,productId);
-        if(cart==null||(cart.getValid()!=null&& !cart.getValid())){
+        Cart cart=cartRepository.findByUserIdAndProductIdAndValid(userId,productId,true);
+        if(cart==null){
             //购物车中无记录
             cart=new Cart();
             cart.setQuantity(quantity);
