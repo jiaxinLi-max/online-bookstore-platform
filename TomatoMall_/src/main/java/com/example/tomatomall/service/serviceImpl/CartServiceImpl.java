@@ -1,5 +1,6 @@
 package com.example.tomatomall.service.serviceImpl;
 
+import com.alipay.api.domain.Car;
 import com.example.tomatomall.exception.TomatoMallException;
 import com.example.tomatomall.po.Cart;
 import com.example.tomatomall.po.Product;
@@ -159,5 +160,14 @@ public class CartServiceImpl implements CartService {
     @Override
     public Cart findById(Integer id){
         return cartRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public CartVO findCartById(Integer id){
+        Cart cart=cartRepository.findById(id).orElse(null);
+        if(cart==null){
+            throw TomatoMallException.cartNotExist();
+        }
+        return cart.toVO();
     }
 }

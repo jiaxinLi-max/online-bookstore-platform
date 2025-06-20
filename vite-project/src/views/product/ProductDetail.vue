@@ -262,6 +262,7 @@ export default defineComponent({
     const currentParentComment = ref<(Comment & { username: string; avatar: string; }) | null>(null);
     const subComments = ref<(Comment & { username: string; avatar: string; })[]>([]);
     const replyContent = ref('');
+    const MAX_SIZE = 1024 * 1024;
 
     // --- 计算属性 ---
     const associatedColumns = computed(() => {
@@ -457,6 +458,10 @@ export default defineComponent({
     async function handleChange(file: UploadFile, newFileList: UploadFile[]) {
       const rawFile = file.raw;
       if (!rawFile) return;
+      if (rawFile.size > MAX_SIZE) {
+        ElMessage.error('文件超过最大大小限制（1MB）');
+        return;
+      }
 
       try {
         const res = await getImage(rawFile);

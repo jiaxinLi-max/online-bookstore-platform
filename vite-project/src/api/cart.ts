@@ -284,3 +284,43 @@ export const getStatus = (order_id: number) => {
         throw error;
     })
 }
+
+export const getOrderItems = (order_id: number) => {
+    const token = sessionStorage.getItem('token');
+    const url = `${ORDER_MODULE}/get/${order_id}`;
+
+    return axios.get(url, {
+        headers: {
+            'token': token
+        },
+        params: {
+            orderId: order_id
+        }
+    }).then(res => {
+        console.log("获取订单商品成功:", res);
+        return res;
+    }).catch(error => {
+        console.error("获取订单商品失败:", error);
+        throw error;
+    })
+}
+
+export const getCartItem = (cartItemId: number) => {
+    const token = sessionStorage.getItem('token');
+    const url = `${CART_MODULE}/getCart/${cartItemId}`;
+
+    return axios.get(url, {
+        headers: {
+            'token': token
+        },
+        params: {
+            id: cartItemId
+        }
+    }).then(res => {
+        console.log("Got cart item:", res);
+        return res;
+    }).catch(error => {
+        console.log("获取购物车商品失败:", error);
+        throw error;
+    })
+}

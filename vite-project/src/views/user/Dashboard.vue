@@ -39,6 +39,7 @@
         <el-tab-pane label="修改个人信息" name="info"></el-tab-pane>
         <el-tab-pane label="修改密码" name="password"></el-tab-pane>
         <el-tab-pane label="我的地址簿" name="addressBook"></el-tab-pane>
+        <el-tab-pane label="我的历史订单" name="historyOrders"></el-tab-pane>
       </el-tabs>
 
       <div v-if="activeTab === 'info'">
@@ -82,6 +83,33 @@
         </el-table>
         <el-button type="primary" @click="submitAllUserInfo" style="margin-top: 20px;">保存地址簿改动</el-button>
       </div>
+
+      <div v-if="activeTab === 'historyOrders'">
+        <el-table :data="historyOrders" stripe style="width: 100%" height="350" empty-text="暂无历史订单">
+          <el-table-column prop="id" label="订单号" width="100" sortable />
+          <el-table-column label="下单时间">
+            <template #default="scope">
+              {{ formatTime(scope.row.createTime) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="totalAmount" label="订单金额" width="120">
+            <template #default="scope">
+              ￥{{ scope.row.totalAmount.toFixed(2) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="realAmount" label="实付金额" width="120">
+            <template #default="scope">
+              ￥{{ scope.row.realAmount.toFixed(2) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="120" fixed="right">
+            <template #default="scope">
+              <el-button type="primary" link size="small" @click="showOrderDetail(scope.row)">查看详情</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+
     </el-card>
 
     <el-dialog v-model="addressDialogVisible" :title="isAddressEditing ? '编辑地址' : '新增地址'" width="400px">
@@ -96,18 +124,51 @@
       </template>
     </el-dialog>
     <el-dialog v-model="dialogVisible"><img class="dialog-image" :src="dialogImageUrl" alt="Preview" /></el-dialog>
+
+    <el-dialog v-model="orderDetailDialogVisible" title="订单详情" width="600px">
+      <div v-if="selectedOrder">
+        <el-descriptions :column="1" border>
+          <el-descriptions-item label="订单号">{{ selectedOrder.id }}</el-descriptions-item>
+          <el-descriptions-item label="下单时间">{{ formatTime(selectedOrder.createTime) }}</el-descriptions-item>
+          <el-descriptions-item label="订单金额">￥{{ selectedOrder.totalAmount.toFixed(2) }}</el-descriptions-item>
+          <el-descriptions-item label="实付金额">￥{{ selectedOrder.realAmount.toFixed(2) }}</el-descriptions-item>
+        </el-descriptions>
+
+        <el-divider>订单商品</el-divider>
+        <el-table :data="historyProducts" stripe max-height="200px">
+          <el-table-column label="商品封面" width="100">
+            <template #default="scope">
+              <el-image style="width: 80px; height: 80px" :src="scope.row.cover[0]" fit="cover" />
+            </template>
+          </el-table-column>
+          <el-table-column prop="title" label="商品标题" />
+          <el-table-column label="单价" width="100">
+            <template #default="scope">
+              ￥{{ scope.row.price.toFixed(2) }}
+            </template>
+          </el-table-column>
+        </el-table>
+
+      </div>
+      <template #footer>
+        <el-button type="primary" @click="orderDetailDialogVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
+
   </el-main>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive } from 'vue';
-import { userInfo, userInfoUpdate, addCredit, updateLevel } from '../../api/user.ts';
+import { userInfo, userInfoUpdate, addCredit, updateLevel, getHistoryOrders } from '../../api/user.ts';
 import { parseRole } from "../../utils";
 import { router } from '../../router';
 import { ElMessage, ElMessageBox, type UploadFile } from "element-plus";
 import { getImage } from "../../api/tools.ts";
 import { Plus } from "@element-plus/icons-vue";
 import { checkIn, getCheckinHistory, getCheckinStatus } from "../../api/checkin.ts";
+import { getCartItem } from  "../../api/cart.ts"
+import { getProduct } from "../../api/product.ts"
 
 const username = sessionStorage.getItem("username");
 const role = sessionStorage.getItem("role");
@@ -129,7 +190,7 @@ const editForm = reactive({
   telephone: '',
   location: '',
   email: '',
-  addressBook: [] as { name: string; telephone: string; address: string }[]
+  addressBook: [] as { name: string; phone: string; address: string }[]
 });
 
 const password = ref('');
@@ -151,7 +212,34 @@ const dialogVisible = ref(false);
 const latestCheck = ref('');
 const isChecked = ref(false);
 
+// 历史订单相关状态
+const historyOrders = ref([]);
+const orderDetailDialogVisible = ref(false);
+const selectedOrder = ref<any>(null);
+
+
 const progressPercentage = computed(() => credits.value % 100);
+
+const historyProducts = ref([]);
+
+const MAX_SIZE = 1024 * 1024; // 1MB
+
+function formatTime(isoString: string): string {
+  if (!isoString) {
+    return '无';
+  }
+  const date = new Date(isoString);
+  if (isNaN(date.getTime())) {
+    return '无效日期';
+  }
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
+}
 
 const getUserInfo = async () => {
   try {
@@ -184,27 +272,53 @@ const getUserInfo = async () => {
   } catch (error) { console.error('获取用户信息失败:', error); }
 };
 
-const handleAvatarChange = async (file: UploadFile) => {
-  if (file.status === 'ready') {
-    try {
-      const res = await getImage(file.raw!);
-      if(res.data.code == 200) {
-        editForm.avatar = res.data.data;
-        ElMessage.success("新头像已上传，点击“更新”按钮保存");
-      } else { ElMessage.error("头像上传失败"); }
-    } catch(e) { ElMessage.error("头像上传异常"); }
+const handleAvatarChange = async (uploadFile: UploadFile, uploadFiles: UploadFile[]) => {
+  const rawFile = uploadFile.raw;
+  if (!rawFile) return;
+
+  if (rawFile.size > MAX_SIZE) {
+    ElMessage.error('文件超过最大大小限制（1MB）');
+    return;
+  }
+
+  try {
+    const res = await getImage(rawFile);
+
+    if (res && res.data.code === '200') {
+      editForm.avatar = res.data.data;
+      fileList.value = uploadFiles.slice(-1);
+      ElMessage.success('新头像上传成功，点击“更新个人信息”以保存。');
+    } else {
+      fileList.value = [];
+      ElMessage.error(res.data.msg || '头像上传失败');
+    }
+  } catch (error) {
+    fileList.value = [];
+    console.error("头像上传异常:", error);
+    ElMessage.error('头像上传异常');
   }
 };
 
 const handleAvatarRemove = () => {
   editForm.avatar = '';
   fileList.value = [];
+  ElMessage.info('头像已移除。');
 };
 
 const handlePictureCardPreview = (file: UploadFile) => {
   dialogImageUrl.value = file.url!;
   dialogVisible.value = true;
 };
+
+const getIteminCart = async (cartItemId: number) => {
+  const res = await getCartItem(cartItemId);
+  if (res.data.code == '200') {
+    return res.data.data.productId;
+  }
+  else {
+    console.log("Unable to get cart item:", res.data);
+  }
+}
 
 const submitAllUserInfo = async () => {
   try {
@@ -302,10 +416,53 @@ const checked = async () => {
   }
 };
 
+const fetchHistoryOrders = async () => {
+  if (!userId) return;
+  try {
+    const res = await getHistoryOrders(Number(userId));
+    if (res.data.code === '200' && Array.isArray(res.data.data)) {
+      historyOrders.value = res.data.data;
+    } else {
+      ElMessage.error('获取历史订单失败');
+    }
+  } catch (error) {
+    console.error("获取历史订单失败:", error);
+    ElMessage.error('获取历史订单失败');
+  }
+};
+
+const getHisProduct = async (productId: number) => {
+  const res = await getProduct(String(productId)); // Ensure productId is a string
+  if (res.data.code === '200') {
+    return res.data.data;
+  }
+  else {console.log("Unable to get product: ", productId);}
+}
+
+const showOrderDetail = async (order: any) => {
+  historyProducts.value = [];
+  selectedOrder.value = order;
+  const cartItemIds = selectedOrder.value.cartItemIds;
+  if (cartItemIds && Array.isArray(cartItemIds)) {
+    for (const cartItemId of cartItemIds) {
+      const productId = await getIteminCart(cartItemId);
+      if (productId) {
+        const product = await getHisProduct(Number(productId));
+        if (product) {
+          historyProducts.value.push(product);
+        }
+      }
+    }
+  }
+  orderDetailDialogVisible.value = true;
+};
+
+
 onMounted(async () => {
   await getUserInfo();
   await checked();
   await getLatestCheckIn();
+  await fetchHistoryOrders();
 });
 </script>
 

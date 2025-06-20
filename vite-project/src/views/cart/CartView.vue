@@ -181,6 +181,7 @@ export default {
 
         if (cartRes.data.code == 200 && Array.isArray(cartRes.data.data.items)) {
           products.value = cartRes.data.data.items;
+          console.log(product.value);
         } else { console.error("获取购物车数据失败"); }
 
         if (userRes.data.code == 200 && Array.isArray(userRes.data.data.addressBook)) {

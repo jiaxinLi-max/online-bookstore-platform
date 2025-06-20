@@ -51,7 +51,7 @@
         <el-upload
             action="http://localhost:8080/api/images"
             list-type="picture-card"
-            :auto-upload="true"
+            :auto-upload="false"
             :file-list="fileList"
             :on-change="handleChange"
             :on-remove="handleRemove"
@@ -86,6 +86,7 @@
   </div>
 </template>
 
+
 <script lang="ts" setup>
 import { ref, computed,onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
@@ -96,6 +97,7 @@ import { Plus } from '@element-plus/icons-vue';
 import { getImage } from '../../api/tools';
 import { useRouter } from 'vue-router';
 
+const MAX_SIZE = 1024 * 1024; // 1MB
 const title = ref('');
 const imgUrl = ref('');
 const content = ref('');
@@ -117,6 +119,10 @@ async function handleChange(file: UploadFile, fileListNew: UploadFile[]) {
   const rawFile = file.raw;
   if (!rawFile) {
     ElMessage.error('无法获取文件');
+    return;
+  }
+  if (rawFile.size > MAX_SIZE) {
+    ElMessage.error('文件超过最大大小限制（1MB）');
     return;
   }
 

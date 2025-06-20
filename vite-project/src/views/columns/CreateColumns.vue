@@ -84,6 +84,8 @@ const dialogVisible = ref(false);
 
 const router = useRouter();
 
+const MAX_SIZE = 1024 * 1024; // 1MB
+
 // 计算属性，检查输入状态
 const createDisabled = computed(() => {
   return !theme.value || !description.value || covers.value.length === 0;
@@ -94,6 +96,10 @@ async function handleChange(file: UploadFile, newFileList: UploadFile[]) {
   const rawFile = file.raw;
   if (!rawFile) {
     ElMessage.error('无法获取文件');
+    return;
+  }
+  if (rawFile.size > MAX_SIZE) {
+    ElMessage.error('文件超过最大大小限制（1MB）');
     return;
   }
 

@@ -52,7 +52,9 @@ public class OrderController {
 
     @GetMapping("/get/{orderId}")
     public Response<OrderVO> getOrder(@PathVariable(value="orderId")Integer orderId){
-        return  Response.buildSuccess(orderService.getOrder(orderId));
+        return  Response.buildSuccess(orderService.getOrderById(orderId));
     }
+
+
 
 }

@@ -7,21 +7,21 @@
       <p><strong>订单 ID：</strong>{{ orderId }}</p>
       <p><strong>总金额：</strong>{{ totalAmount }}元</p>
       <p><strong>实际金额：</strong>{{ realAmount }}元</p>
-      <p><strong>创建时间：</strong>{{ createTime }}</p>
+      <p><strong>创建时间：</strong>{{ formatTime(createTime) }}</p>
     </div>
 
-<!--    <el-card-->
-<!--        v-for="product in products"-->
-<!--        :key="product.cartItemId"-->
-<!--        class="product-card"-->
-<!--    >-->
-<!--      <div class="product-image">-->
-<!--        <img :src='product.cover' alt="Product Cover" class="product-image-style" />-->
-<!--      </div>-->
-<!--      <h3>{{ product.title }}</h3>-->
-<!--      <span> 数量: {{ product.quantity }} </span>-->
-<!--      <span> 单价: {{ product.price }} </span>-->
-<!--    </el-card>-->
+    <el-card
+        v-for="product in products"
+        :key="product.cartItemId"
+        class="product-card"
+    >
+      <div class="product-image">
+        <img :src='product.cover' alt="Product Cover" class="product-image-style" />
+      </div>
+      <h3>{{ product.title }}</h3>
+      <span> 数量: {{ product.quantity }} </span>
+      <span> 单价: {{ product.price }} </span>
+    </el-card>
 
     <el-button type="primary" @click="confirmOrder" v-if="!orderClosed">确认支付</el-button>
 <!--    <div v-if="payFormHtml" ref="formContainer" v-html="payFormHtml"></div>-->
@@ -37,7 +37,7 @@
 <script lang="ts">
 import { onMounted, ref } from 'vue';
 import { addCredit, updateLevel } from '../../api/user.ts'
-import {postOrder, getStatus, Cart, getCartItems } from '../../api/cart.ts';
+import {postOrder, getStatus, Cart, getOrderItems, getCartItems } from '../../api/cart.ts';
 import { ElMessage } from "element-plus";
 import { useRoute, useRouter } from 'vue-router';
 import {parseRole} from "../../utils"; // 引入路由相关
@@ -61,6 +61,39 @@ export default {
     const realAmount: number = Number(route.params.realAmount);
 
     // const formContainer = ref<HTMLElement | null>(null);
+
+    function formatTime(isoString: String) {
+      // 1. 检查输入是否为空或无效，如果是则返回提示
+      if (!isoString) {
+        console.log('无')
+        return '无';
+      }
+
+      // 2. 使用 ISO 字符串创建一个 Date 对象。
+      //    JavaScript 的 Date 对象会自动将 UTC 时间转换为运行环境的本地时区。
+      const date = new Date(isoString);
+
+      // 3. 检查转换后的日期是否有效
+      if (isNaN(date.getTime())) {
+        console.log('无效日期')
+        return '无效日期';
+      }
+
+      // 4. 从 Date 对象中获取年、月、日、时、分、秒
+      const year = date.getFullYear();
+
+      // getMonth() 返回的月份是从 0 开始的（0-11），所以需要加 1
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+
+      // 5. 拼接成最终的字符串格式
+      console.log('有效')
+      return `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`;
+    }
 
     const confirmOrder = async () => {
       try {
@@ -124,28 +157,37 @@ export default {
       router.push({name: 'Cart'});
     }
 
-    // async function getAllInCart() {
-    //   if (!userId) {
-    //     console.error('用户未登录');
-    //     return;
-    //   }
-    //   try {
-    //     const res = await getCartItems(userIdNumber);
-    //     console.log("getAllInCart", res.data.data);
-    //     // 确认响应数据格式
-    //     if (res.data.data && Array.isArray(res.data.data.items)) {
-    //       products.value = res.data.data.items; // 更新产品列表
-    //     } else {
-    //       console.error('获取数据失败：响应格式不符合预期');
-    //     }
-    //   } catch (error) {
-    //     console.error('获取购物车列表失败:', error);
-    //   }
-    // }
+    async function getAllInCart() {
+      if (!userId) {
+        console.error('用户未登录');
+        return;
+      }
+      try {
+        const res = await getCartItems(userIdNumber);
+        const res2 = await getOrderItems(Number(orderId));
+        console.log("getCart", res.data.data);
+        console.log("getItems", res2.data.data)
+        // 确认响应数据格式
+        if (res.data.data && Array.isArray(res.data.data.items)) {
+          // products.value = res.data.data.items; // 更新产品列表
+          for (const item of res.data.data.items) {
+            for (const id of res2.data.data.cartItemIds) {
+              if (item.cartItemId === id) {
+                products.value.push(item);
+              }
+            }
+          }
+        } else {
+          console.error('获取数据失败：响应格式不符合预期');
+        }
+      } catch (error) {
+        console.error('获取购物车列表失败:', error);
+      }
+    }
 
-    // onMounted(()=>{
-    //   getAllInCart();
-    // });
+    onMounted(()=>{
+      getAllInCart();
+    });
 
     return {
       userIdNumber,
@@ -159,6 +201,7 @@ export default {
       closeOrder,
       products,
       realAmount,
+      formatTime
     };
   }
 };
