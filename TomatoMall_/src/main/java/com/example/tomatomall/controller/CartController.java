@@ -49,11 +49,6 @@ public class CartController {
         return Response.buildSuccess(cartService.getPInCart(userId));
     }
 
-//    @PostMapping("/checkout")
-//    Response<OrderVO> createOrder(@RequestParam Integer userId,@RequestParam List<String> cartItemIds,@RequestParam Object shipping_address,@RequestParam String payment_method){
-//        return Response.buildSuccess(orderService.createOrder(userId,cartItemIds,shipping_address,payment_method));
-//    }
-
     @PostMapping("/checkout")
     Response<OrderVO> createOrder(@RequestBody OrderVO orderVO){
         return Response.buildSuccess(orderService.createOrder(orderVO));
@@ -63,5 +58,5 @@ public class CartController {
     Response<CartVO>getCart(@PathVariable(value="id")Integer id){
         return Response.buildSuccess(cartService.findCartById(id));
     }
-
+    
 }
