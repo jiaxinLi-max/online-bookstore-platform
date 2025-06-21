@@ -148,7 +148,7 @@ public class CommentServicelmpl implements CommentService {
      */
     @Override
     public List<CommentVO>getReplies(Integer commentId){
-        //根据productId获取该评论的回复
+        //根据commentId获取该评论的回复
         List<Comment> replies = commentRepository.findByParent_Id(commentId);
 
         // 使用 Java Stream 对查询结果进行转换：
