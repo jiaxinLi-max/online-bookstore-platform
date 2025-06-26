@@ -20,6 +20,7 @@ public class CommentVO {
     private Float score;
     private Integer likes;
     private LocalDateTime time;
+    //父评论id
     private Integer parentId;
 
     public Comment toPO(Comment parentComment){
