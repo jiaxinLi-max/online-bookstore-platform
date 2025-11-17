@@ -183,8 +183,12 @@ function logout() {
 }
 .detective-header.shrink { padding: 10px 40px; background: rgba(18,18,18,0.6); backdrop-filter: blur(8px); }
 
-.header-inner { display:flex; align-items:center; justify-content:space-between; }
-
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* 改为靠左 */
+  gap: 100px; /* 左右间距 */
+}
 .logo { font-size:22px; font-weight:600; color:#e7d3a0; letter-spacing:2px; cursor:pointer; user-select:none; transition: all .25s; }
 .detective-header.shrink .logo { font-size:18px; opacity:0.85; }
 
@@ -201,7 +205,7 @@ function logout() {
 .suggestion-item:hover { background: rgba(198,166,103,0.12); color:#fff; }
 
 /* 右侧 */
-.right-area { display:flex; align-items:center; gap:14px; }
+.right-area { display:flex; align-items:center; gap:14px; margin-left: -20px;}
 .role-tag { background:transparent; color:#d7caa8; border-color:transparent; font-weight:600; }
 .icon-group { display:flex; gap:10px; align-items:center; }
 .icon-btn { width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;background: rgba(255,255,255,0.03);color:#efece6;cursor:pointer;transition: all .15s; }
@@ -210,7 +214,17 @@ function logout() {
 .avatar-area .user-avatar { width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.06);cursor:pointer;transition: all .12s; box-shadow:0 2px 8px rgba(0,0,0,0.25);}
 .avatar-area .user-avatar:hover { transform: translateY(-2px) scale(1.06); box-shadow:0 8px 20px rgba(198,166,103,0.14); }
 
-.logout-area { width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#efece6;border-radius:8px; }
+.logout-area {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #efece6;
+  border-radius: 8px;
+  flex-shrink: 0;       /* 防止被挤压 */
+}
 .logout-area:hover { background: rgba(255,255,255,0.03); }
 
 /* 子导航固定在 header 底部 */
@@ -224,4 +238,6 @@ function logout() {
 
 /* 页面内容预留 Header + Sub-nav 高度 */
 .page-content { padding-top: 80px; } /* header 80 + sub-nav 52 */
+
+
 </style>
