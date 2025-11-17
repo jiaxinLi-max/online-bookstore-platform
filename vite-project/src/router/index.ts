@@ -112,10 +112,10 @@ import { createRouter, createWebHashHistory } from "vue-router";
 const router = createRouter({
     history: createWebHashHistory(),
     routes: [
-        // {
-        //     path: '/',
-        //     redirect: '/home/all-products', // 保留这一个重定向规则
-        // },
+        {
+            path: '/',
+            redirect: '/home/all-products', // 保留这一个重定向规则
+        },
         {
             path: '/login',
             component: () => import('../views/user/Login.vue'),
@@ -159,7 +159,7 @@ const router = createRouter({
                     path: 'all-products', // 添加商店列表页面
                     name: 'AllProducts',
                     component: () => import('../views/product/AllProduct.vue'), // 确保路径正确
-                    meta: { title: '商品列表' },
+                    meta: { title: '商品列表',public: true },
                 },
                 {
                     path: 'all-advertisements', // 子路由路径，去掉前导斜杠
@@ -312,34 +312,26 @@ const router = createRouter({
 
 // 路由导航守卫
 router.beforeEach((to, _, next) => {
-    const token: string | null = sessionStorage.getItem('token');
-    const role: string | null = sessionStorage.getItem('role');
+    const token = sessionStorage.getItem('token');
 
-    // 设置页面标题
-    if (to.meta.title) {
-        document.title = to.meta.title;
-    }
+    if (to.meta.title) document.title = to.meta.title;
 
-    // 用户已登录
     if (token) {
-        if (to.meta.permission) {
-            if (to.meta.permission.includes(role!)) {
-                next();
-            } else {
-                next('/404');
-            }
-        } else {
-            next();
-        }
+        next();
     }
     else {
-        //用户未登录
-        if (to.path === '/login' || to.path === '/register' ) {
-            next();
-        } else {
-            next('/login');
+        // 游客访问公开页面
+        if (to.meta.public) {
+            return next();
         }
-        //next();
+
+        // 允许跳登录注册
+        if (to.path === '/login' || to.path === '/register') {
+            return next();
+        }
+
+        // 其他必须登录
+        next('/login');
     }
 });
 
