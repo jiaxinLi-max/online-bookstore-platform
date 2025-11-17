@@ -200,11 +200,70 @@ onMounted(() => {
 .product-title{ font-size: 13px; font-weight: 500; margin-top: 6px; color: #333; line-height: 1.2; }
 .ad-carousel { width: 100%; max-width: 960px; border-radius: 12px; overflow: hidden; }
 .ad-carousel-item { height: 200px; cursor: pointer; padding: 0; display: flex; justify-content: center; align-items: center; }
-.ad-item-container { display: flex; height: 100%; width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
-.ad-image-left { width: 300px; height: 100%; object-fit: cover; flex-shrink: 0; }
-.ad-content-right { flex-grow: 1;  color: black; padding: 20px; display: flex; flex-direction: column; justify-content: center; border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
-.ad-title { font-weight: 700; font-size: 20px; margin-bottom: 12px; }
-.ad-desc { font-size: 14px; line-height: 1.4; opacity: 0.9; white-space: pre-wrap; }
+/* 轮播项容器，左右结构卡片 */
+.ad-item-container {
+  display: flex;
+  border-radius: 12px;
+  background: #fff8dc;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 600px;  /* 调整宽度适应你的需求 */
+  height: 180px; /* 与轮播高度相符 */
+}
+
+/* 左侧图片 */
+.ad-image-left {
+  width: 100px;
+  height: 100%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+/* 右侧文字 */
+.ad-content-right {
+  flex-grow: 1;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  color: #333;
+}
+
+
+/* 标题 */
+.ad-title {
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+/* 描述 */
+.ad-desc {
+  font-size: 14px;
+  line-height: 1.4;
+  opacity: 0.9;
+  white-space: pre-wrap;
+}
+
+/* 当前激活卡片放大并加阴影，提升层级 */
+.el-carousel__item.is-active .ad-item-container {
+  transform: scale(1.15);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  z-index: 10;
+}
+
+/* 非激活卡片缩小且变淡 */
+.el-carousel__item:not(.is-active) .ad-item-container {
+  transform: scale(0.85);
+  filter: brightness(0.85);
+  transition: transform 0.4s ease, filter 0.4s ease;
+  z-index: 1;
+}
+
 .bgimage {
   background: #ffffff;
   min-height: 100vh;
