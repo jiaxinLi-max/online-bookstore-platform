@@ -10,7 +10,23 @@ const keyword = ref(route.params.keyword as string || '');
 const results = ref<any[]>([]);
 const loading = ref(false);
 const error = ref('');
+import { addCart } from '../../api/cart.ts';
+import { ElMessage } from 'element-plus';
 
+async function handleAddCart(productId: number) {
+  const userId = Number(sessionStorage.getItem('userId'));
+  if (!userId) {
+    ElMessage.warning('请先登录');
+    return;
+  }
+  try {
+    const res = await addCart(userId, productId, 1);
+    if (res.data.code === '200') ElMessage.success('已加入购物车');
+    else ElMessage.error(res.data.msg || '添加失败');
+  } catch {
+    ElMessage.error('网络错误');
+  }
+}
 async function fetchResults() {
   if (!keyword.value.trim()) {
     results.value = [];
@@ -44,101 +60,131 @@ function goToProduct(id: number) {
 </script>
 
 <template>
-  <div class="bgimage"> <!-- 全屏背景容器 -->
-    <el-main class="search-results-page">
+  <el-main class="search-results-page">
+    <!-- 加载/空态保持原样 -->
+    <div v-if="loading">加载中...</div>
+    <div v-if="error" class="error">{{ error }}</div>
+    <div v-if="!loading && results.length === 0">没有找到相关商品</div>
 
+    <!-- 当当式横向列表 -->
+    <div class="results-list">
+      <div
+          v-for="item in results"
+          :key="item.id"
+          class="result-row"
+          @click="goToProduct(item.id)"
+      >
+        <!-- 左侧图书封面 -->
+        <img
+            :src="item.cover || 'https://via.placeholder.com/90x120?text=无图'"
+            alt="书籍图片"
+            class="book-img"
+        />
 
-      <div v-if="loading">加载中...</div>
-      <div v-if="error" class="error">{{ error }}</div>
-      <div v-if="!loading && results.length === 0">没有找到相关商品</div>
-
-      <div class="results-list">
-        <div v-for="item in results" :key="item.id" class="result-item" @click="goToProduct(item.id)">
-          <img :src="item.cover || 'https://via.placeholder.com/120x160?text=无图'" alt="书籍图片" class="book-img" />
-          <div class="info">
+        <!-- 右侧信息区 -->
+        <div class="info-wrap">
+          <!-- 第一行：书名 + 价格 -->
+          <div class="line1">
             <h3 class="title">{{ item.title }}</h3>
-            <p class="author">{{ item.author || '未知作者' }}</p>
-            <p class="price">价格: ￥{{ item.price?.toFixed(2) || '暂无' }}</p>
+            <span class="price">￥{{ item.price?.toFixed(2) }}</span>
+          </div>
+
+          <!-- 第二行：简介 -->
+          <p class="intro">{{ item.description || '暂无简介' }}</p>
+
+          <!-- 第三行：评分 + 加入购物车 -->
+          <div class="line3">
+            <el-rate
+                :model-value="item.rate || 0"
+                disabled
+                size="small"
+                show-score
+                text-color="#999"
+            />
+            <el-button
+                type="warning"
+                size="small"
+                class="add-cart-btn"
+                @click.stop="handleAddCart(item.id)"
+            >
+              加入购物车
+            </el-button>
           </div>
         </div>
       </div>
-    </el-main>
-  </div>
+    </div>
+  </el-main>
 </template>
 
 
-
 <style scoped>
+/* 整区白底 */
+.search-results-page {
+  background: #fff;
+  min-height: 100vh;
+  padding: 20px 0;
+}
 
-
+/* 单条横向卡片 */
 .results-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
 }
-
-.result-item {
+.result-row {
+  display: flex;
+  align-items: flex-start;
+  padding: 15px 20px;
+  border-bottom: 1px solid #ebebeb;
   cursor: pointer;
-  display: flex;
-  width: 100%;
-  max-width: 250px;
-  border-radius: 8px;
-  padding: 12px;
-  background-color: rgba(255, 248, 220, 0.8); /* 半透明白色 */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  transition: box-shadow 0.3s;
-  border: none; /* 去掉灰色边框 */
+  transition: background 0.2s;
 }
-
-
-.result-item:hover {
-  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+.result-row:hover {
+  background: #fafafa;
 }
 
 .book-img {
-  width: 120px;
-  height: 160px;
+  width: 90px;
+  height: 120px;
   object-fit: cover;
-  border-radius: 4px;
-  margin-right: 15px;
+  flex-shrink: 0;
+  margin-right: 18px;
 }
 
-.info {
+/* 右侧信息 */
+.info-wrap {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
-
+.line1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 .title {
-  font-size: 18px;
-  margin: 0 0 6px 0;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
 }
-
-.author,
 .price {
-  margin: 0 0 4px 0;
+  font-size: 18px;
+  color: #e4393c;
+  font-weight: bold;
+}
+.intro {
+  font-size: 13px;
   color: #666;
+  margin: 8px 0 12px 0;
+  line-height: 1.5;
 }
-.error {
-  color: red;
+.line3 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-/* 让背景图铺满整个页面 */
-.bgimage {
-  background-image: url("../../assets/780.jpg");
-  background-position: center top;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-color: #7b6b4d;
-  min-height: 100vh;
-  width: 100%;
+.add-cart-btn {
+  margin-left: auto;
 }
-
-/* 内容宽度限制和居中 */
-.search-results-page {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 30px 20px;
-}
-
-
 </style>
