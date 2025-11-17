@@ -63,4 +63,6 @@ public class TomatoMallException extends RuntimeException {
 
   public static TomatoMallException cartNotExist(){return new TomatoMallException("购物车项不存在","000");}
 
+  public static TomatoMallException cannotSort(){return new TomatoMallException("该类型不支持排序","400");}
+
 }

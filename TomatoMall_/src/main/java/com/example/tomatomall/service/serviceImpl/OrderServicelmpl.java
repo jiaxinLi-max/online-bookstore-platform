@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class OrderServiceLmpl implements OrderService {
+public class OrderServicelmpl implements OrderService {
 
     @Autowired
     OrderRepository orderRepository;
@@ -94,7 +94,7 @@ public class OrderServiceLmpl implements OrderService {
             request.setReturnUrl(returnUrl);
             Order order = orderRepository.findById(order_id).orElseThrow(TomatoMallException::orderNotExist);
             JSONObject bizContent = new JSONObject();
-            bizContent.put("out_trade_no", String.valueOf(order_id));
+            bizContent.put("out_trade_no", String.valueOf(order_id+100));
             bizContent.put("total_amount", String.valueOf(order.getRealAmount()));
 
             bizContent.put("subject", "番茄书城订单 #" + order_id); // 商品标题（必填）
@@ -147,8 +147,8 @@ public class OrderServiceLmpl implements OrderService {
 
                 String tradeStatus = params.get("trade_status");
                 String orderId = params.get("out_trade_no");
-                Integer id = Integer.valueOf(orderId);
-                Order order = orderRepository.findById(Integer.parseInt(orderId))
+                Integer id = Integer.valueOf(orderId)-100;
+                Order order = orderRepository.findById(id)
                         .orElseThrow(TomatoMallException::orderNotExist);
                 if ("TRADE_SUCCESS".equals(tradeStatus)) {
                     // TODO: 处理支付成功逻辑

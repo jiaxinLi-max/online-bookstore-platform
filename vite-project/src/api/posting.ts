@@ -1,4 +1,4 @@
-import {axios} from '../utils/request'
+viteimport {axios} from '../utils/request'
 import {POSTING_MODULE} from './_prefix';
 
 // 修正1: cover 改为 covers: string[]

@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/columns")
-public class ColumnController {
+public class ColumnsController {
 
     @Autowired
     ColumnsService columnService;
