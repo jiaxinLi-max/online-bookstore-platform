@@ -74,8 +74,12 @@ public class CommentServicelmpl implements CommentService {
             throw TomatoMallException.productNotExist();
         }
         float sum_score=0;
-        int sum=comments.size();
+        int sum=0;
         for(Comment comment:comments){
+            if(comment.getParent()!=null){
+                continue;
+            }
+            sum++;
             sum_score+=comment.getScore();
         }
         sum_score=sum_score*2;
@@ -109,10 +113,11 @@ public class CommentServicelmpl implements CommentService {
             throw TomatoMallException.commentNotExist();
         }
 
-
+        update_new_score(comment.getProductId());
         commentRepository.deleteById(id);
         return "删除成功";
     }
+
 
     @Override
     public String likeComment(Integer id,Integer userId){
