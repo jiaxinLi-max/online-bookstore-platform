@@ -64,10 +64,10 @@ type UpdateInfo = {
 }
 
 type StockPile = {
-    id: string,
+    id?: string,
     productId: string,
     amount: number,
-    frozen: number
+    frozen?: number
 }
 
 export const createProduct = (productInfo: productInfo) => {
