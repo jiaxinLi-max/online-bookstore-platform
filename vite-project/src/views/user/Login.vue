@@ -1,221 +1,147 @@
-<!--<script setup lang="ts">-->
-<!--import {ElForm, ElFormItem} from "element-plus"-->
-<!--import {ref, computed} from 'vue'-->
-<!--import {router} from '../../router'-->
-<!--import {userInfo, userLogin} from "../../api/user.ts"-->
-
-<!--// 输入框值（需要在前端拦截不合法输入：是否为空+额外规则）-->
-<!--const tel = ref('')-->
-<!--const password = ref('')-->
-
-<!--// 电话号码是否为空-->
-<!--const hasTelInput = computed(() => tel.value != '')-->
-<!--// 密码是否为空-->
-<!--const hasPasswordInput = computed(() => password.value != '')-->
-<!--// 电话号码的规则-->
-<!--const chinaMobileRegex = /^1(3[0-9]|4[579]|5[0-35-9]|6[2567]|7[0-8]|8[0-9]|9[189])\d{8}$/-->
-<!--const telLegal = computed(() => chinaMobileRegex.test(tel.value))-->
-<!--// 密码不设置特殊规则-->
-<!--// 登录按钮可用性-->
-<!--const loginDisabled = computed(() => {-->
-<!--  return !(hasTelInput.value && telLegal.value && hasPasswordInput.value)-->
-<!--})-->
-
-<!--// 登录按钮触发-->
-<!--function handleLogin() {-->
-<!--  userLogin({-->
-<!--    phone: tel.value,-->
-<!--    password: password.value-->
-<!--  }).then(res => {-->
-<!--    if (res.data.code === '000') {-->
-<!--      ElMessage({-->
-<!--        message: "登录成功！",-->
-<!--        type: 'success',-->
-<!--        center: true,-->
-<!--      })-->
-<!--      const token = res.data.result-->
-<!--      sessionStorage.setItem('token', token)-->
-
-<!--      userInfo().then(res => {-->
-<!--        sessionStorage.setItem('name', res.data.result.name)-->
-<!--        sessionStorage.setItem('role', res.data.result.role)-->
-<!--        //router.push({path: "/dashboard"})-->
-<!--        router.push({ path: "/home/all-stores" }); // 确保这条路由存在-->
-<!--      })-->
-<!--    } else if (res.data.code === '400') {-->
-<!--      ElMessage({-->
-<!--        message: res.data.msg,-->
-<!--        type: 'error',-->
-<!--        center: true,-->
-<!--      })-->
-<!--      password.value = ''-->
-<!--    }-->
-<!--  })-->
-<!--}-->
-<!--</script>-->
-
-
-<!--<template>-->
-<!--  <el-main class="main-frame bgimage">-->
-<!--    <el-card class="login-card">-->
-<!--      <div>-->
-<!--        <h1>登入您的账户</h1>-->
-<!--        <el-form>-->
-<!--          <el-form-item>-->
-<!--            <label v-if="!hasTelInput" for="tel">注册手机号</label>-->
-<!--            <label v-else-if="!telLegal" for="tel" class="error-warn">手机号不合法</label>-->
-<!--            <label v-else for="tel">注册手机号</label>-->
-<!--            <el-input id="tel" type="text" v-model="tel"-->
-<!--                      required :class="{'error-warn-input' :(hasTelInput && !telLegal)}"-->
-<!--                      placeholder="请输入手机号"/>-->
-<!--          </el-form-item>-->
-
-<!--          <el-form-item>-->
-<!--            <label for="password">账户密码</label>-->
-<!--            <el-input id="password" type="password" v-model="password"-->
-<!--                      required-->
-<!--                      placeholder="••••••••"/>-->
-<!--          </el-form-item>-->
-
-<!--          <span class="button-group">-->
-<!--              <el-button @click.prevent="handleLogin" :disabled="loginDisabled"-->
-<!--                         type="primary">登入</el-button>-->
-<!--              <router-link to="/register" v-slot="{navigate}">-->
-<!--                <el-button @click="navigate">去注册</el-button>-->
-<!--              </router-link>-->
-<!--          </span>-->
-<!--        </el-form>-->
-<!--      </div>-->
-<!--    </el-card>-->
-<!--  </el-main>-->
-<!--</template>-->
-
-
-<!--<style scoped>-->
-<!--.main-frame {-->
-<!--  width: 100%;-->
-<!--  height: 100%;-->
-
-<!--  display: flex;-->
-<!--  align-items: center;-->
-<!--  justify-content: center;-->
-<!--}-->
-
-<!--.bgimage {-->
-<!--  background-image: url("../../assets/shopping-1s-1084px.svg");-->
-<!--}-->
-
-<!--.login-card {-->
-<!--  width: 60%;-->
-<!--  padding: 10px;-->
-<!--}-->
-
-<!--.error-warn {-->
-<!--  color: red;-->
-<!--}-->
-
-<!--.error-warn-input {-->
-<!--  &#45;&#45;el-input-focus-border-color: red;-->
-<!--}-->
-
-<!--.button-group {-->
-<!--  padding-top: 10px;-->
-<!--  display: flex;-->
-<!--  flex-direction: row;-->
-<!--  gap: 30px;-->
-<!--  align-items: center;-->
-<!--  justify-content: right;-->
-<!--}-->
-<!--</style>-->
 <template>
-  <div class="main-frame bgimage">
-    <div class="login-form">
-      <h2>真相书局 登录</h2>
+  <div class="login-wrapper">
+
+    <!-- 左上角品牌 Logo + 英文副标题 -->
+    <div class="brand">
+      <div class="brand-cn">真相书局</div>
+      <div class="brand-en">TRUTH BOOKSTORE</div>
+    </div>
+
+    <!-- 登录卡片 -->
+    <div class="login-card">
+      <h2 class="title">登录账户</h2>
+
       <el-form>
         <el-form-item>
-<!--          <label v-if="!hasTelInput" for="tel">注册手机号</label>-->
-<!--          <label v-else-if="!telLegal" for="tel" class="error-warn">手机号不合法</label>-->
-<!--          <label v-else for="tel">注册手机号</label>-->
-<!--          <el-input id="tel" type="text" v-model="tel"-->
-<!--                    required :class="{'error-warn-input' :(hasTelInput && !telLegal)}"-->
-<!--                    placeholder="请输入手机号"/>-->
-          <label v-if="!hasUsernameInput" for="username">注册用户名</label>
-<!--          <label v-else-if="!telLegal" for="tel" class="error-warn">用户名不合法</label>-->
-          <label v-else for="username">注册用户名</label>
-          <el-input id="username" type="text" v-model="username"
-                    required :class="{'error-warn-input' :(hasUsernameInput)}"
-                    placeholder="请输入用户名"/>
+          <el-input
+              v-model="username"
+              placeholder="用户名"
+              clearable
+              size="large"
+          />
         </el-form-item>
 
         <el-form-item>
-          <label for="password">账户密码</label>
-          <el-input id="password" type="password" v-model="password"
-                    required
-                    placeholder="••••••••"/>
+          <el-input
+              v-model="password"
+              placeholder="密码"
+              type="password"
+              clearable
+              size="large"
+          />
         </el-form-item>
 
-        <span class="button-group">
-          <el-button @click.prevent="handleLogin" :disabled="loginDisabled"
-                     type="primary">登入</el-button>
-          <router-link to="/register" v-slot="{navigate}">
-            <el-button @click="navigate">去注册</el-button>
-          </router-link>
-        </span>
+        <el-button
+            type="primary"
+            class="login-btn"
+            size="large"
+            :disabled="loginDisabled"
+            @click.prevent="handleLogin"
+        >
+          登录
+        </el-button>
+
+        <div class="extra-links">
+          <router-link to="/register">没有账号？去注册</router-link>
+        </div>
       </el-form>
     </div>
   </div>
 </template>
 
+
+
+
 <style scoped>
-.main-frame {
+.login-wrapper {
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  position: relative;
 
+  /* 侦探感渐变背景（深墨绿 → 黑） */
+  background: linear-gradient(145deg, #1e2a27 0%, #0e0f0f 100%);
   display: flex;
-  align-items: center;
   justify-content: center;
-}
-
-.bgimage {
-  background-image: url("../../assets/login.png");
-  background-position: center top;
-  background-size: 1500px auto; /* 或根据需求调整为 cover 或百分比 */
-  background-repeat: no-repeat;
-  background-attachment: fixed; /* 关键属性：背景固定 */
-  background-color: #7b6b4d; /* 深羊驼色兜底 */
-  min-height: 100vh;
-}
-
-.login-form {
-  background: rgba(255, 215, 0, 0.5);
-  padding: 40px 40px;
-  border-radius: 10px;
-  width: 400px;
-}
-
-h2 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 30px;
-}
-
-.error-warn {
-  color: red;
-}
-
-.error-warn-input {
-  --el-input-focus-border-color: red;
-}
-
-.button-group {
-  padding-top: 10px;
-  display: flex;
-  flex-direction: row;
-  gap: 30px;
   align-items: center;
-  justify-content: right;
+}
+
+/*********** Logo 区域 ***********/
+.brand {
+  position: absolute;
+  top: 40px;
+  left: 60px;
+
+  color: #e6d5a3; /* 暗金色 */
+  font-family: "Cinzel", "Times New Roman", serif;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+
+  user-select: none;
+}
+
+.brand-cn {
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: 4px;
+}
+
+.brand-en {
+  margin-top: 4px;
+  font-size: 14px;
+  opacity: 0.8;
+  letter-spacing: 3px;
+}
+
+/*********** 登录卡片 ***********/
+.login-card {
+  width: 380px;
+  padding: 40px 45px;
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+
+  animation: fadeIn 0.7s ease-out;
+}
+
+.title {
+  text-align: center;
+  color: #f0eee9;
+  font-size: 22px;
+  margin-bottom: 30px;
+  font-weight: 600;
+}
+
+.login-btn {
+  width: 100%;
+  margin-top: 5px;
+  border-radius: 8px;
+  background-color: #c6a667;  /* 暗金色主按钮 */
+  border-color: #c6a667;
+}
+
+.extra-links {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.extra-links a {
+  color: #d7caa8;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+/* 淡入效果 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 </style>
+
+
+
 <script setup lang="ts">
 import { ElForm, ElFormItem, ElInput, ElButton, ElMessage } from 'element-plus'
 import { ref, computed } from 'vue'
