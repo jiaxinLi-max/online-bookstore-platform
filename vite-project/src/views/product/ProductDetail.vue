@@ -1,25 +1,33 @@
 <template>
   <div class="product-detail">
-    <div class="product-info">
-      <div class="product-image">
-        <el-carousel
-            v-if="Array.isArray(product.cover) && product.cover.length > 0"
-            height="400px"
-            indicator-position="outside"
-            arrow="always"
-            class="cover-carousel"
-        >
-          <el-carousel-item v-for="(img, idx) in product.cover" :key="idx">
-            <img :src="img" class="carousel-image" alt="书籍图片" />
-          </el-carousel-item>
-        </el-carousel>
-        <div v-else class="no-image-placeholder">暂无图片</div>
+    <!-- 左侧：图片 + 详情 可滑动 -->
+    <div class="left-scroll">
+      <!-- 1. 图片轮播 -->
+      <!-- 1. 左侧小图 + 右侧大图 -->
+      <div class="pic-and-info">
+        <!-- 小图列表 -->
+        <div class="thumb-list">
+          <img
+              v-for="(img, idx) in product.cover"
+              :key="idx"
+              :src="img"
+              class="thumb-item"
+              :class="{ active: idx === currentIndex }"
+              @click="currentIndex = idx"
+          />
+        </div>
+
+        <!-- 大图 -->
+        <div class="big-img">
+          <img :src="product.cover[currentIndex]" alt="书籍大图" />
+        </div>
       </div>
 
-      <div class="product-details">
+      <!-- 2. 商品信息 -->
+      <div class="product-meta">
         <h1>{{ product.title }}</h1>
-        <div class="price">价格: ¥{{ product.price }}</div>
-        <div class="rating">评分: {{ product.rate }}</div>
+
+
         <p class="description">描述: {{ product.description }}</p>
         <p class="detail">详情: {{ product.detail }}</p>
 
@@ -44,169 +52,104 @@
         </ul>
         <p v-if="specifications.length === 0">没有书籍信息可显示。</p>
       </div>
-    </div>
 
-    <div class="action-area">
-      <div v-if="role === 'CUSTOMER'" class="customer-actions-group">
-        <div class="stock-display" v-if="stockAmount <= 10">库存紧张</div>
-        <div class="action-row">
-          <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>
-          <el-button class="btn-camel" @click="addToCart">加入购物车</el-button>
-        </div>
-        <div class="comment-area">
-          <el-button class="btn-camel" @click="showCommentForm = !showCommentForm">
-            {{ showCommentForm ? '收起评论框' : '发表评价' }}
-          </el-button>
-        </div>
-        <div v-if="showCommentForm" class="create-comment-box">
-          <el-form label-width="120px" class="comment-form">
-            <el-form-item label="评价内容">
-              <el-input v-model="commentContent" placeholder="请输入评价内容" />
-            </el-form-item>
-            <el-form-item label="评分">
-              <el-rate
-                  v-model="commentScore"
-                  :allow-half="true"
-                  show-text
-                  :texts="['极差', '失望', '一般', '满意', '惊喜']"
-              />
-            </el-form-item>
-            <el-form-item>
-              <el-button
-                  @click.prevent="handleCreateComment(null)"
-                  :disabled="!commentContent || !commentScore"
-                  type="primary"
-                  plain
-                  class="custom-black-button"
-              >
-                提交评价
-              </el-button>
-            </el-form-item>
-          </el-form>
-        </div>
+      <!-- 3. 评论区 -->
+      <!-- 评价输入框：左侧上方 -->
+      <div v-if="showCommentForm" class="create-comment-box">
+        <el-form label-width="120px" class="comment-form">
+          <el-form-item label="评价内容">
+            <el-input v-model="commentContent" placeholder="请输入评价内容" />
+          </el-form-item>
+          <el-form-item label="评分">
+            <el-rate
+                v-model="commentScore"
+                :allow-half="true"
+                show-text
+                :texts="['极差', '失望', '一般', '满意', '惊喜']"
+            />
+          </el-form-item>
+          <el-form-item>
+            <el-button
+                @click.prevent="handleCreateComment(null)"
+                :disabled="!commentContent || !commentScore"
+                type="primary"
+                plain
+                class="custom-black-button"
+            >
+              提交评价
+            </el-button>
+          </el-form-item>
+        </el-form>
       </div>
 
-      <div v-if="role === 'MANAGER'" class="manager-actions-group">
-        <div class="stock-display">库存: {{ stockAmount }}</div>
-        <div class="action-row stock-control">
-          <el-input-number v-model="newStock" :min="0" label="新库存"></el-input-number>
-          <el-button type="warning" @click="updateStock">更新库存</el-button>
-        </div>
-        <div class="action-row management-buttons">
-          <el-button type="primary" @click="openEditDialog">更新信息</el-button>
-          <el-button type="danger" @click="deleteProduct">删除商品</el-button>
-        </div>
-      </div>
-    </div>
-
-    <el-card class="comments-section-card">
-      <template #header>
-        <div class="comments-header">
-          <h2>用户评价</h2>
-          <div class="sort-select-wrapper">
-            <el-select v-model="sortOption" placeholder="排序方式" @change="fetchCommentsBySort" class="sort-select">
-              <el-option label="按时间排序" value="time" />
-              <el-option label="按点赞排序" value="like" />
-            </el-select>
+      <el-card class="comments-section-card">
+        <template #header>
+          <div class="comments-header">
+            <h2>用户评价</h2>
+            <div class="rating">评分: {{ product.rate }}</div>
+            <el-button
+                class="btn-camel"
+                @click="showCommentForm = !showCommentForm"
+            >
+              {{ showCommentForm ? '收起评价' : '发表评价' }}
+            </el-button>
           </div>
-        </div>
-      </template>
+        </template>
 
-      <div v-if="comments.length > 0" class="comment-list">
-        <el-card v-for="comment in comments" :key="comment.id" class="comment-card" shadow="never">
-          <div class="comment-main">
-            <el-avatar :src="comment.avatar" class="comment-avatar" size="large" />
-            <div class="comment-content">
-              <h3 class="username">{{ comment.username }}</h3>
-              <p class="comment-time">🕒 {{ formatTime(comment.time) }}</p>
-              <div class="score-like-row">
-                <span>评分：<el-rate v-model="comment.score" disabled size="small" /></span>
-                <span class="like-count">👍 点赞数：{{ comment.likes }}</span>
+        <div v-if="comments.length > 0" class="comment-list">
+          <el-card v-for="comment in comments" :key="comment.id" class="comment-card" shadow="never">
+            <div class="comment-main">
+              <el-avatar :src="comment.avatar" class="comment-avatar" size="large" />
+              <div class="comment-content">
+                <h3 class="username">{{ comment.username }}</h3>
+                <p class="comment-time">🕒 {{ formatTime(comment.time) }}</p>
+                <div class="score-like-row">
+                  <span>评分：<el-rate v-model="comment.score" disabled size="small" /></span>
+                  <span class="like-count">👍 点赞数：{{ comment.likes }}</span>
+                </div>
+                <p class="comment-text-body">{{ comment.content }}</p>
               </div>
-              <p class="comment-text-body">{{ comment.content }}</p>
             </div>
-          </div>
-          <div class="comment-actions">
-            <!-- 【新增】点赞和删除按钮 -->
-            <el-button type="warning" link @click.stop="handleLikeComment(comment.id)" v-if="role === 'CUSTOMER'">点赞</el-button>
-            <el-button type="primary" link @click="openReplyDialog(comment)">查看/回复</el-button>
-            <el-button type="danger" link @click.stop="handleDeleteComment(comment.id)" v-if="role === 'MANAGER' || comment.userId === currentUserId">删除</el-button>
-          </div>
-        </el-card>
-      </div>
-      <el-empty v-else description="暂无评价，快来抢沙发吧！"></el-empty>
-    </el-card>
-
-    <el-dialog v-model="isColumnDialogVisible" :title="selectedColumn.theme + ' 栏目下的所有书籍'" width="60%">
-      <div v-loading="isColumnLoading">
-        <div v-if="columnProducts.length > 0" class="dialog-book-list">
-          <el-card v-for="p in columnProducts" :key="p.id" class="product-card-small" @click="goToProductDetail(p.id)" shadow="hover">
-            <div class="product-image-small">
-              <img :src="Array.isArray(p.cover) && p.cover.length > 0 ? p.cover[0] : ''" alt="Product Cover" />
+            <div class="comment-actions">
+              <el-button type="warning" link @click.stop="handleLikeComment(comment.id)" v-if="role === 'CUSTOMER'">点赞</el-button>
+              <el-button type="danger" link @click.stop="handleDeleteComment(comment.id)" v-if="role === 'MANAGER' || comment.userId === currentUserId">删除</el-button>
             </div>
-            <h4 class="product-title-small">{{ p.title }}</h4>
           </el-card>
         </div>
-        <el-empty v-else description="该栏目下没有其他书籍"></el-empty>
-      </div>
-    </el-dialog>
+        <el-empty v-else description="暂无评价，快来抢沙发吧！"></el-empty>
+      </el-card>
+    </div>
 
-    <el-dialog v-model="showEditDialog" title="修改商品信息" width="40%">
-      <el-form ref="form" label-width="120px" class="product-form">
-        <el-form-item label="商品名称" prop="productName"><el-input v-model="editForm.title"></el-input></el-form-item>
-        <el-form-item label="商品价格" prop="productPrice"><el-input v-model="editForm.price" type="number"></el-input></el-form-item>
-        <el-form-item label="商品评分" prop="productRate"><el-input v-model="editForm.rate" type="number"></el-input></el-form-item>
-        <el-form-item label="商品描述" prop="productDescription"><el-input v-model="editForm.description"></el-input></el-form-item>
-        <el-form-item label="商品详细说明" prop="productDetail"><el-input v-model="editForm.detail"></el-input></el-form-item>
-        <el-form-item label="所属栏目" prop="columnIds">
-          <el-select v-model="editForm.columnIds" multiple placeholder="请选择栏目" style="width: 100%;"><el-option v-for="column in allColumns" :key="column.id" :label="column.theme" :value="column.id" /></el-select>
-        </el-form-item>
-        <el-form-item label="规格说明" prop="specifications">
-          <div v-for="(spec, index) in newSpecifications" :key="index" class="specification-item">
-            <el-input v-model="spec.item" placeholder="规格名称" style="width: 200px; margin-right: 10px;"></el-input>
-            <el-input v-model="spec.value" placeholder="规格值" style="width: 200px; margin-right: 10px;"></el-input>
-            <el-button type="danger" @click="removeSpecification(index)">删除</el-button>
+    <!-- 右侧：固定购物车操作区 -->
+    <div class="right-sticky">
+      <div class="action-area">
+        <!-- 顾客版 -->
+        <div v-if="role === 'CUSTOMER'" class="customer-actions-group">
+          <div class="price-big">¥{{ product.price }}</div>
+          <div class="stock-display" v-if="stockAmount <= 10">库存紧张</div>
+          <div class="action-row">
+            <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>
+            <el-button class="btn-camel" @click="addToCart">加入购物车</el-button>
           </div>
-        </el-form-item>
-        <el-form-item><el-button type="primary" @click="addSpecification">添加规格</el-button></el-form-item>
-        <el-form-item label="商品封面" prop="cover">
-          <el-upload action="#" list-type="picture-card" :auto-upload="false" :file-list="fileList" :on-change="handleChange" :on-remove="handleRemove" :on-preview="handlePictureCardPreview" multiple>
-            <el-icon><Plus /></el-icon>
-            <div>点击上传或修改封面</div>
-          </el-upload>
-        </el-form-item>
-        <el-form-item><el-button @click.prevent="handleUpdateProduct" type="primary" plain>更新商品</el-button></el-form-item>
-      </el-form>
-    </el-dialog>
-    <el-dialog v-model="dialogVisible"><img class="dialog-image" :src="dialogImageUrl" alt="Logo Preview" /></el-dialog>
+          <!-- 发表评价按钮及表单已移除 -->
+        </div>
 
-    <el-dialog v-model="replyDialogVisible" :title="`回复“${currentParentComment?.username}”的评论`" width="60%" top="5vh">
-      <div class="parent-comment-in-dialog">
-        <el-card><p>{{ currentParentComment?.content }}</p></el-card>
-      </div>
-      <el-divider>回复列表</el-divider>
-      <div v-loading="subCommentsLoading" class="sub-comments-container">
-        <div v-if="subComments.length > 0">
-          <div v-for="reply in subComments" :key="reply.id" class="sub-comment-item">
-            <el-avatar :src="reply.avatar" size="default" />
-            <div class="sub-comment-content">
-              <span class="sub-comment-username">{{ reply.username }}</span>
-              <p class="sub-comment-text">{{ reply.content }}</p>
-              <span class="sub-comment-time">{{ formatTime(reply.time) }}</span>
-            </div>
+        <!-- 管理员版 -->
+        <div v-if="role === 'MANAGER'" class="manager-actions-group">
+          <div class="stock-display">库存: {{ stockAmount }}</div>
+          <div class="action-row stock-control">
+            <el-input-number v-model="newStock" :min="0" label="新库存"></el-input-number>
+            <el-button type="warning" @click="updateStock">更新库存</el-button>
+          </div>
+          <div class="action-row management-buttons">
+            <el-button type="primary" @click="openEditDialog">更新信息</el-button>
+            <el-button type="danger" @click="deleteProduct">删除商品</el-button>
           </div>
         </div>
-        <el-empty v-else description="暂无回复"></el-empty>
       </div>
-      <el-divider>发表你的回复</el-divider>
-      <div class="reply-form">
-        <el-input v-model="replyContent" type="textarea" :rows="3" placeholder="请输入回复内容..."/>
-        <el-button type="primary" @click="handlePostReply" :disabled="!replyContent" style="margin-top: 10px;">提交回复</el-button>
-      </div>
-    </el-dialog>
+    </div>
   </div>
 </template>
-
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
@@ -566,9 +509,9 @@ export default defineComponent({
         if(response.data.code == 200) stockAmount.value = response.data.data.amount;
       } catch(e) { console.error(e) }
     };
-    function addSpecification() { newSpecifications.value.push({item: '', value: ''}); }
+    function addSpecification() { newSpecifications.value.push({item: " ", value: " "}); }
     function removeSpecification(index: number) { newSpecifications.value.splice(index, 1); }
-
+    const currentIndex = ref(0)   // 默认显示第一张
     onMounted(async () => {
       if (productId) {
         await loadProductDetails(productId);
@@ -589,7 +532,8 @@ export default defineComponent({
       showCommentForm, commentContent, commentScore, handleCreateComment, allColumns, associatedColumns, isColumnDialogVisible, isColumnLoading, selectedColumn, columnProducts, showColumnProducts, goToProductDetail,
       comments, sortOption, formatTime, fetchComments, fetchCommentsBySort,
       replyDialogVisible, subCommentsLoading, currentParentComment, subComments, replyContent, openReplyDialog, handlePostReply,
-      handleLikeComment, handleDeleteComment, currentUserId
+      handleLikeComment, handleDeleteComment, currentUserId,
+      currentIndex
     };
   },
 });
@@ -597,7 +541,90 @@ export default defineComponent({
 
 <style scoped>
 html, body { height: 100%; }
-.product-detail { padding: 20px; display: flex; justify-content: center; align-items: center; flex-direction: column; background-image: url("../../assets/780.jpg"); background-size: cover; background-position: center top; min-height: 100vh; color: black; }
+.product-detail{
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: none;          /* 背景图仍在最外层 */
+  box-shadow: none;
+  border-radius: 0;
+}
+.left-scroll{
+  flex: 0 0 58%;        /* 原来 1 → 现在 52% */
+  max-width: 58%;
+  max-height: 100vh;
+  overflow-y: auto;
+  background-color: rgba(255,255,255,.6);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,.2);
+}
+.right-sticky{
+  flex: 0 0 40%;        /* 原来 360px → 现在 46% */
+  max-width: 40%;
+  position: sticky;
+  top: 20px;
+  width: 360px;              /* 固定宽度，可自己调 */
+}
+.right-sticky .action-area{
+  width: 100%;
+  background-color: rgba(255,255,255,.6);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,.2);
+}
+
+/* 微调小屏响应式 */
+@media (max-width: 1024px){
+  .product-detail{ flex-direction: column; }
+  .right-sticky{ width: 100%; position: static; }
+}
+.pic-and-info{
+  display: flex;
+  gap: 12px;
+}
+.thumb-list{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 80px;
+}
+.thumb-item{
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border: 2px solid transparent;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.thumb-item.active{
+  border-color: #ff6700;
+}
+.big-img{
+  flex: 1;
+  max-width: 420px;
+}
+.big-img img{
+  width: 100%;
+  height: 420px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+.price-big{
+  font-size: 32px;
+  color: #e60023;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.rating-bottom{
+  margin: 20px 0;
+  text-align: center;
+  font-size: 16px;
+}
+.rating-text{ margin-left: 8px; }
 .product-info { display: flex; justify-content: center; align-items: flex-start; width: 100%; max-width: 1200px; margin: 0 auto 20px auto; background-color: rgba(255, 255, 255, 0.6); padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
 .product-image { flex: 1; margin-right: 20px; }
 .product-details { flex: 2; margin-left: 20px; }

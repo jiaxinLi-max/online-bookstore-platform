@@ -1,14 +1,43 @@
 <template>
   <el-main class="main-container">
+    <!-- 左侧：个人信息 -->
     <el-card class="aside-card">
       <div class="avatar-area">
-        <el-avatar :src="avatar" :size="80"></el-avatar>
-        <span class="avatar-text"> 欢迎您，{{ username }}</span>
+        <el-avatar :src="avatar" :size="90" class="user-avatar"></el-avatar>
+        <div class="user-info">
+          <div class="username-row">
+            <div class="username-large">{{ username }}</div>
+            <el-progress
+                :percentage="progressPercentage"
+                :stroke-width="8"
+                :show-text="false"
+                class="level-progress-inline"
+            />
+            <span class="level-tag">L{{ level }}</span>
+          </div>
+
+          <div class="checkin-section" v-if="role === 'CUSTOMER'">
+            <div class="checkin-info">
+              <p>最近签到：{{ latestCheck || '暂无记录' }}</p>
+            </div>
+            <button class="checkin-button" v-if="!isChecked" @click="handleCheckIn">
+              ✨ 今日签到
+            </button>
+            <button class="checkin-button checked" v-else disabled>
+              ✅ 已签到
+            </button>
+          </div>
+        </div>
+
       </div>
       <el-divider></el-divider>
+
       <el-descriptions :column="1" border title="个人信息">
         <template #extra>
-          <el-button type="primary" @click="activeTab = 'info'">修改个人信息</el-button>
+          <div style="display: flex; gap: 10px;">
+            <el-button type="primary" @click="editDialogVisible = true">修改个人信息</el-button>
+            <el-button type="success" @click="addressDialogVisible = true">管理地址簿</el-button>
+          </div>
         </template>
         <el-descriptions-item label="身份"><el-tag>{{ parseRole(role) }}</el-tag></el-descriptions-item>
         <el-descriptions-item label="用户名"><el-tag>{{ username }}</el-tag></el-descriptions-item>
@@ -17,114 +46,61 @@
         <el-descriptions-item label="主地址">{{ location }}</el-descriptions-item>
         <el-descriptions-item label="电子邮箱">{{ email }}</el-descriptions-item>
       </el-descriptions>
-      <div class="progress-container" v-if="role === 'CUSTOMER'">
-        <el-progress :percentage="progressPercentage" :text-inside="true" :stroke-width="24" style="flex: 1;" />
-        <div class="level-display">等级 {{ level }}</div>
-      </div>
-      <div class="level-rules" v-if="role === 'CUSTOMER'">
-        <p>• 最高可升至10级，每级享受额外0.5折优惠</p>
-        <p>• 每消费10元获取1积分，累计100积分可升1级</p>
-        <p>• 每日可签到一次，获取1积分</p>
-      </div>
-      <div class="latestCheck-container" v-if="role === 'CUSTOMER'">
-        <p>最近签到日期：{{ latestCheck }}</p>
-      </div>
-      <div class="checkInButton" v-if="(role === 'CUSTOMER') && !isChecked" >
-        <el-button @click="handleCheckIn">签到</el-button>
-      </div>
-    </el-card>
-
-    <el-card class="change-card">
-      <el-tabs v-model="activeTab">
-        <el-tab-pane label="修改个人信息" name="info"></el-tab-pane>
-        <el-tab-pane label="修改密码" name="password"></el-tab-pane>
-        <el-tab-pane label="我的地址簿" name="addressBook"></el-tab-pane>
-        <el-tab-pane label="我的历史订单" name="historyOrders"></el-tab-pane>
-      </el-tabs>
-
-      <div v-if="activeTab === 'info'">
-        <el-form>
-          <el-form-item label="真实姓名"><el-input v-model="editForm.name" /></el-form-item>
-          <el-form-item label="联系电话"><el-input v-model="editForm.telephone" /></el-form-item>
-          <el-form-item label="主地址"><el-input v-model="editForm.location" type="textarea" rows="2" /></el-form-item>
-          <el-form-item label="电子邮箱"><el-input v-model="editForm.email" /></el-form-item>
-          <el-form-item label="头像">
-            <el-upload action="#" list-type="picture-card" :auto-upload="false" :file-list="fileList" :on-change="handleAvatarChange" :on-remove="handleAvatarRemove" :on-preview="handlePictureCardPreview" :limit="1">
-              <el-icon><Plus /></el-icon>
-            </el-upload>
-          </el-form-item>
-          <el-form-item><el-button type="primary" @click="submitAllUserInfo">更新个人信息</el-button></el-form-item>
-        </el-form>
-      </div>
-
-      <div v-if="activeTab === 'password'">
-        <el-form>
-          <el-form-item label="新密码"><el-input type="password" v-model="password" show-password /></el-form-item>
-          <el-form-item label="确认新密码">
-            <el-input type="password" v-model="confirmPassword" show-password />
-            <p v-if="password !== confirmPassword && confirmPassword" class="error-warn">两次密码输入不一致</p>
-          </el-form-item>
-          <el-form-item><el-button type="primary" @click="updatePassword" :disabled="!password || password !== confirmPassword">确认修改密码</el-button></el-form-item>
-        </el-form>
-      </div>
-
-      <div v-if="activeTab === 'addressBook'">
-        <el-button type="success" @click="openAddressDialog()" style="margin-bottom: 20px;">添加新地址</el-button>
-        <el-table :data="editForm.addressBook" stripe style="width: 100%" height="250">
-          <el-table-column prop="name" label="姓名" width="100" />
-          <el-table-column prop="phone" label="电话" width="120" />
-          <el-table-column prop="address" label="地址" show-overflow-tooltip />
-          <el-table-column label="操作" width="120" fixed="right">
-            <template #default="scope">
-              <el-button type="primary" link size="small" @click="openAddressDialog(scope.row, scope.$index)">编辑</el-button>
-              <el-button type="danger" link size="small" @click="deleteAddress(scope.$index)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-button type="primary" @click="submitAllUserInfo" style="margin-top: 20px;">保存地址簿改动</el-button>
-      </div>
-
-      <div v-if="activeTab === 'historyOrders'">
-        <el-table :data="historyOrders" stripe style="width: 100%" height="350" empty-text="暂无历史订单">
-          <el-table-column prop="id" label="订单号" width="100" sortable />
-          <el-table-column label="下单时间">
-            <template #default="scope">
-              {{ formatTime(scope.row.createTime) }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="totalAmount" label="订单金额" width="120">
-            <template #default="scope">
-              ￥{{ scope.row.totalAmount.toFixed(2) }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="realAmount" label="实付金额" width="120">
-            <template #default="scope">
-              ￥{{ scope.row.realAmount.toFixed(2) }}
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" width="120" fixed="right">
-            <template #default="scope">
-              <el-button type="primary" link size="small" @click="showOrderDetail(scope.row)">查看详情</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
 
     </el-card>
 
-    <el-dialog v-model="addressDialogVisible" :title="isAddressEditing ? '编辑地址' : '新增地址'" width="400px">
-      <el-form :model="addressForm" label-position="top">
-        <el-form-item label="收货人姓名"><el-input v-model="addressForm.name" /></el-form-item>
-        <el-form-item label="手机号码"><el-input v-model="addressForm.phone" /></el-form-item>
-        <el-form-item label="详细地址"><el-input v-model="addressForm.address" type="textarea" /></el-form-item>
+    <!-- 右侧：历史订单 -->
+    <el-card class="orders-card">
+      <h3>我的历史订单</h3>
+      <el-table :data="historyOrders" stripe style="width: 100%" height="500" empty-text="暂无历史订单">
+        <el-table-column prop="id" label="订单号" width="100" sortable />
+        <el-table-column label="下单时间">
+          <template #default="scope">{{ formatTime(scope.row.createTime) }}</template>
+        </el-table-column>
+        <el-table-column prop="totalAmount" label="订单金额" width="120">
+          <template #default="scope">￥{{ scope.row.totalAmount.toFixed(2) }}</template>
+        </el-table-column>
+        <el-table-column prop="realAmount" label="实付金额" width="120">
+          <template #default="scope">￥{{ scope.row.realAmount.toFixed(2) }}</template>
+        </el-table-column>
+        <el-table-column label="操作" width="120" fixed="right">
+          <template #default="scope">
+            <el-button type="primary" link size="small" @click="showOrderDetail(scope.row)">查看详情</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
+
+    <!-- 修改个人信息弹窗 -->
+    <el-dialog v-model="editDialogVisible" title="修改个人信息" width="500px">
+      <el-form>
+        <el-form-item label="真实姓名"><el-input v-model="editForm.name" /></el-form-item>
+        <el-form-item label="联系电话"><el-input v-model="editForm.telephone" /></el-form-item>
+        <el-form-item label="主地址"><el-input v-model="editForm.location" type="textarea" rows="2" /></el-form-item>
+        <el-form-item label="电子邮箱"><el-input v-model="editForm.email" /></el-form-item>
+        <el-form-item label="头像">
+          <el-upload
+              action="#"
+              list-type="picture-card"
+              :auto-upload="false"
+              :file-list="fileList"
+              :on-change="handleAvatarChange"
+              :on-remove="handleAvatarRemove"
+              :on-preview="handlePictureCardPreview"
+              :limit="1"
+          >
+            <el-icon><Plus /></el-icon>
+          </el-upload>
+        </el-form-item>
       </el-form>
+
       <template #footer>
-        <el-button @click="addressDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="saveAddress">保存</el-button>
+        <el-button @click="editDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitAllUserInfo">保存修改</el-button>
       </template>
     </el-dialog>
-    <el-dialog v-model="dialogVisible"><img class="dialog-image" :src="dialogImageUrl" alt="Preview" /></el-dialog>
 
+    <!-- 订单详情弹窗 -->
     <el-dialog v-model="orderDetailDialogVisible" title="订单详情" width="600px">
       <div v-if="selectedOrder">
         <el-descriptions :column="1" border>
@@ -143,20 +119,50 @@
           </el-table-column>
           <el-table-column prop="title" label="商品标题" />
           <el-table-column label="单价" width="100">
-            <template #default="scope">
-              ￥{{ scope.row.price.toFixed(2) }}
-            </template>
+            <template #default="scope">￥{{ scope.row.price.toFixed(2) }}</template>
           </el-table-column>
         </el-table>
-
       </div>
       <template #footer>
         <el-button type="primary" @click="orderDetailDialogVisible = false">关闭</el-button>
       </template>
     </el-dialog>
 
+    <!-- 地址簿管理弹窗 -->
+    <el-dialog v-model="addressDialogVisible" title="地址簿管理" width="600px">
+      <el-table :data="editForm.addressBook" stripe border style="width: 100%">
+        <el-table-column label="收件人" prop="name" width="120" />
+        <el-table-column label="电话" prop="phone" width="150" />
+        <el-table-column label="地址" prop="address" />
+        <el-table-column label="操作" width="150">
+          <template #default="scope">
+            <el-button link type="primary" @click="openAddressDialog(scope.row, scope.$index)">编辑</el-button>
+            <el-button link type="danger" @click="deleteAddress(scope.$index)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <div style="text-align: right; margin-top: 15px;">
+        <el-button type="success" @click="openAddressDialog()">新增地址</el-button>
+        <el-button type="primary" @click="submitAllUserInfo">保存地址簿改动</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 新增/编辑地址弹窗 -->
+    <el-dialog v-model="isAddressEditing" title="编辑地址" width="400px" append-to-body>
+      <el-form :model="addressForm" label-width="80px">
+        <el-form-item label="收件人"><el-input v-model="addressForm.name" /></el-form-item>
+        <el-form-item label="电话"><el-input v-model="addressForm.phone" /></el-form-item>
+        <el-form-item label="地址"><el-input type="textarea" rows="2" v-model="addressForm.address" /></el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="isAddressEditing = false">取消</el-button>
+        <el-button type="primary" @click="saveAddress">保存</el-button>
+      </template>
+    </el-dialog>
   </el-main>
 </template>
+
 
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive } from 'vue';
@@ -169,7 +175,7 @@ import { Plus } from "@element-plus/icons-vue";
 import { checkIn, getCheckinHistory, getCheckinStatus } from "../../api/checkin.ts";
 import { getCartItem } from  "../../api/cart.ts"
 import { getProduct } from "../../api/product.ts"
-
+const editDialogVisible = ref(false); // ✨ 新增控制修改信息弹窗
 const username = sessionStorage.getItem("username");
 const role = sessionStorage.getItem("role");
 const userId = sessionStorage.getItem("userId");
@@ -467,21 +473,142 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.main-container { display: flex; flex-direction: row; padding: 15px; gap: 15px; justify-content: center; background-image: url("../../assets/login.png"); }
-.aside-card, .change-card { background: rgba(255, 255, 255, 0.9); border-radius: 8px; }
-.aside-card { width: 33%; max-width: 400px; }
-.change-card { width: 66%; max-width: 800px; }
-.avatar-area { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 10px; }
-.avatar-text { font-size: large; font-weight: bold; }
-.progress-container { display: flex; align-items: center; gap: 20px; margin-top: 20px; }
-.level-display { font-size: 24px; font-weight: bold; color: #409eff; min-width: 80px; text-align: center; }
-.level-rules { font-size: 13px; color: #909399; line-height: 1.6; padding: 8px; margin-top: 10px; background-color: #f7f7f7; border-radius: 4px;}
-.level-rules p { margin: 4px 0; }
-.latestCheck-container { margin-top: 10px; text-align: center; color: #666; }
-.checkInButton { text-align: center; margin-top: 15px; }
-.error-warn { color: red; }
-.dialog-image { max-width: 100%; }
-.address-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ebeef5; }
-.address-item:last-child { border-bottom: none; }
-.address-info p { margin: 2px 0; }
+.main-container {
+  display: flex;
+  flex-direction: row;
+  padding: 40px; /* ✅ 增加内边距 */
+  gap: 30px;
+  background-image: url("../../assets/login.png");
+  background-size: cover;
+}
+
+.aside-card {
+  width: 32%;
+  max-width: 380px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+}
+
+.orders-card {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+}
+
+
+.avatar-area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar-text {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.level-display {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #409eff;
+  text-align: center;
+}
+
+.user-top {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* ✅ 用户名与等级之间的间距 */
+}
+
+.username {
+  font-weight: bold; /* ✅ 用户名加粗 */
+  font-size: 18px;
+  color: #333;
+}
+
+.user-level {
+  font-size: 14px;
+  color: #999;
+}
+
+/* ✅ 修改进度条样式 */
+.level-progress {
+  margin-top: 6px;
+}
+
+/* 进度条底色为黑色，自己的等级条为红色 */
+.level-progress ::v-deep(.el-progress-bar__outer) {
+  background-color: black !important; /* 底色黑 */
+}
+
+.level-progress ::v-deep(.el-progress-bar__inner) {
+  background-color: red !important; /* 自己的等级条红色 */
+}
+.username-large {
+  font-size: 26px;
+  font-weight: 700;
+  color: #333;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.level-tag {
+  background: linear-gradient(135deg, #ffd700, #ff8c00);
+  color: white;
+  font-weight: bold;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(255, 140, 0, 0.3);
+}
+
+.fancy-checkin {
+  margin-top: 12px;
+  background: linear-gradient(90deg, #ffb347, #ffcc33);
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(255, 204, 51, 0.4);
+}
+
+.fancy-checkin:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 14px rgba(255, 204, 51, 0.6);
+}
+
+.user-avatar {
+  border: 3px solid #ffcc33;
+  box-shadow: 0 0 10px rgba(255, 204, 51, 0.5);
+}
+
+.username-row {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* 用户名、进度条、等级之间的距离 */
+}
+
+.level-progress-inline {
+  width: 120px; /* 控制进度条宽度 */
+}
+
+.level-tag {
+  font-size: 14px;
+  font-weight: 600;
+  color: #409eff;
+}
+
+
 </style>
