@@ -8,6 +8,8 @@ export function parseRole(role: string | null) {
         return "商家"
     } else if (role === 'CEO') {
         return "CEO"
+    } else if(role==='tourist') {
+        return "游客"
     }
 }
 
