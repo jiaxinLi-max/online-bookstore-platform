@@ -125,12 +125,16 @@
       <div class="action-area">
         <!-- 顾客版 -->
         <div v-if="role === 'CUSTOMER'" class="customer-actions-group">
+          <h2 class="right-title">{{ product.title }}</h2>
           <div class="price-big">¥{{ product.price }}</div>
-          <div class="stock-display" v-if="stockAmount <= 10">库存紧张</div>
+
+          <el-card class="buy-card" shadow="never">
           <div class="action-row">
             <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>
+            <span v-if="stockAmount <= 10" class="stock-tips">库存紧张</span>
             <el-button class="btn-camel" @click="addToCart">加入购物车</el-button>
           </div>
+          </el-card>
           <!-- 发表评价按钮及表单已移除 -->
         </div>
 
@@ -569,14 +573,33 @@ html, body { height: 100%; }
   top: 20px;
   width: 360px;              /* 固定宽度，可自己调 */
 }
-.right-sticky .action-area{
-  width: 100%;
-  background-color: rgba(255,255,255,.6);
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,.2);
-}
 
+.right-sticky .action-area {
+  background: none;              /* 不要背景 */
+  box-shadow: none;              /* 不要阴影 */
+  border: none !important;       /* 所有边框清零 */
+  padding: 0;                    /* 把原内边距也清掉，后面单独给按钮卡片补 */
+}
+.stock-tips {
+  font-size: 12px;
+  color: #999;          /* 淘宝同款灰 */
+  margin-left: 8px;     /* 和数量器隔一点 */
+  white-space: nowrap;  /* 禁止换行 */
+}
+.buy-card {
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  background-color: rgba(255,255,255,.75);
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+}
+/* 让内部一行两端对齐，更淘宝 */
+.buy-card .action-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
 /* 微调小屏响应式 */
 @media (max-width: 1024px){
   .product-detail{ flex-direction: column; }
