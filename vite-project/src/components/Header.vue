@@ -76,7 +76,6 @@ onMounted(() => {
 // 购物车
 const cart = ref<Cart[]>([]);
 const cartItemCount = computed(() => cart.value.reduce((total, item) => total + item.quantity, 0));
-function goToCart() { router.push({ path: '/cart' }); }
 
 // 子导航显示
 const showSubNav = computed(() => ['/home/all-products','/home/rankings','/home/all-columns'].includes(route.path));
@@ -134,7 +133,7 @@ function logout() {
             <div class="icon-btn" @click="router.push('/home/all-questions')"><el-icon><Document /></el-icon></div>
           </el-tooltip>
           <el-tooltip content="购物车">
-            <div class="icon-btn" @click="goToCart">
+            <div class="icon-btn" @click="router.push('/home/cart')">
               <el-badge :value="cartItemCount"><el-icon><ShoppingCart /></el-icon></el-badge>
             </div>
           </el-tooltip>
