@@ -1,130 +1,83 @@
 <template>
-  <el-main class="cart-container bgimage">
-    <div class="product-list">
-      <div
-          v-for="product in products"
-          :key="product.cartItemId"
-          class="product-item"
-      >
-        <div class="left-section">
+  <el-main class="cart-page">
+
+    <!-- 顶部全选栏 -->
+    <div class="cart-header">
+      <el-checkbox v-model="checkAll" @change="toggleCheckAll">全选</el-checkbox>
+      <div class="cart-header-right">
+        已选 {{ selectedProducts.length }} 件
+      </div>
+    </div>
+
+    <!-- 主体两栏布局 -->
+    <div class="cart-layout">
+
+      <!-- 左侧商品列表 -->
+      <div class="cart-left">
+        <div
+            class="cart-item-card"
+            v-for="product in products"
+            :key="product.cartItemId"
+        >
           <el-checkbox
               v-model="selectedProducts"
               :label="product.cartItemId"
-              class="item-checkbox"
-          >
-          </el-checkbox>
+              class="checkbox"
+          />
 
-          <div class="item-image">
-            <img :src="product.cover" alt="商品封面" />
-          </div>
+          <img class="item-img" :src="product.cover" />
 
           <div class="item-info">
             <div class="item-title">{{ product.title }}</div>
             <div class="item-price">￥{{ product.price }}</div>
           </div>
-        </div>
 
-        <div class="right-section">
-          <div class="item-quantity">
-            <el-button
-                @click="updateQuantity(product.cartItemId, product.quantity - 1)"
-                :disabled="product.quantity <= 1"
-                size="small"
-                icon="el-icon-minus"
-            >-</el-button>
-            <span class="quantity-text">{{ product.quantity }}</span>
-            <el-button
-                @click="updateQuantity(product.cartItemId, product.quantity + 1)"
-                size="small"
-                icon="el-icon-plus"
-            >+</el-button>
+          <!-- 数量选择器 -->
+          <div class="quantity-box">
+            <div class="qty-btn" @click="updateQuantity(product.cartItemId, product.quantity - 1)">−</div>
+            <div class="qty-number">{{ product.quantity }}</div>
+            <div class="qty-btn" @click="updateQuantity(product.cartItemId, product.quantity + 1)">＋</div>
+          </div>
+
+          <div class="delete-btn" @click="removeFromCart(userIdNumber, product.cartItemId)">删除</div>
+        </div>
+      </div>
+
+      <!-- 右侧结算栏 -->
+      <div class="cart-right">
+        <div class="checkout-panel">
+          <div class="checkout-title">订单摘要</div>
+
+          <div class="checkout-row">
+            <span>已选商品：</span>
+            <span>{{ selectedProducts.length }} 件</span>
+          </div>
+
+          <div class="checkout-row total">
+            <span>总金额：</span>
+            <span class="price">￥{{ totalPrice.toFixed(2) }}</span>
           </div>
 
           <el-button
-              type="danger"
-              size="small"
-              @click="removeFromCart(userIdNumber, product.cartItemId)"
-              class="delete-btn"
+              type="primary"
+              class="checkout-btn"
+              :disabled="selectedProducts.length === 0"
+              @click="handleCheckout"
           >
-            删除
+            结算
           </el-button>
         </div>
       </div>
+
     </div>
 
-    <div class="checkout-bar">
-      <div class="total-info">
-        已选 {{ selectedProducts.length }} 件商品，
-        合计：￥<span class="total-price">{{ totalPrice.toFixed(2) }}</span>
-      </div>
-      <el-button
-          type="primary"
-          :disabled="selectedProducts.length === 0"
-          @click="handleCheckout"
-          class="checkout-button"
-      >结算所选</el-button>
-    </div>
-
-    <el-dialog
-        title="填写订单信息"
-        class="order-form"
-        v-model="dialogVisible"
-        width="500px"
-        :before-close="handleCancel"
-    >
-      <el-form>
-        <el-form-item v-if="addressBook.length > 0">
-          <label>从地址簿选择</label>
-          <el-select
-              v-model="selectedAddressIndex"
-              placeholder="请选择一个收货地址"
-              @change="onAddressSelect"
-              style="width: 100%;"
-              clearable
-          >
-            <el-option
-                v-for="(addr, index) in addressBook"
-                :key="index"
-                :label="`${addr.name} - ${addr.phone} - ${addr.address}`"
-                :value="index"
-            />
-          </el-select>
-        </el-form-item>
-
-        <el-row>
-          <el-form-item>
-            <label for="username">收货姓名</label>
-            <el-input id="username" v-model="name" placeholder="请输入姓名" />
-          </el-form-item>
-        </el-row>
-
-        <el-row>
-          <el-form-item>
-            <label v-if="!hasTelInput" for="tel">收货手机号</label>
-            <label v-else-if="!telLegal" for="tel" class="error-warn">手机号不合法</label>
-            <label v-else for="tel">收货手机号</label>
-            <el-input id="tel" v-model="telephone" :class="{'error-warn-input': (hasTelInput && !telLegal)}" placeholder="请输入手机号"/>
-          </el-form-item>
-        </el-row>
-
-        <el-row>
-          <el-form-item>
-            <label for="address">收货地址</label>
-            <el-input id="address" v-model="address" placeholder="请输入地址"/>
-          </el-form-item>
-        </el-row>
-      </el-form>
-
-      <template #footer>
-        <el-button @click="handleCancel">取消</el-button>
-        <el-button type="primary" @click="generateOrder" :disabled="!ableToOrder">支付</el-button>
-      </template>
-    </el-dialog>
   </el-main>
 </template>
 
+
+
 <script lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref,watch } from "vue";
 import { getUserInfo, type Address } from "../../api/user.ts";
 import {
   Cart,
@@ -143,6 +96,10 @@ export default {
     const userIdNumber = Number(userId);
     const router = useRouter();
     const dialogVisible = ref(false);
+
+    // 全选状态
+    const checkAll = ref(false);
+    const indeterminate = ref(false);
 
     const name = ref<string>("");
     const telephone = ref<string>("");
@@ -266,6 +223,25 @@ export default {
       }
     };
 
+
+    // 切换全选/取消全选
+    const toggleCheckAll = (value: boolean) => {
+      if (value) {
+        selectedProducts.value = products.value.map(p => p.cartItemId);
+      } else {
+        selectedProducts.value = [];
+      }
+    };
+
+    // 监听单个勾选，更新全选状态
+    watch(selectedProducts, (val) => {
+      const total = products.value.length;
+      const checked = val.length;
+      checkAll.value = checked === total && total > 0;
+      indeterminate.value = checked > 0 && checked < total;
+    });
+
+
     onMounted(fetchInitialData);
 
     return {
@@ -290,29 +266,247 @@ export default {
       addressBook,
       selectedAddressIndex,
       onAddressSelect,
+      toggleCheckAll,
+      checkAll,
     };
   },
 };
 </script>
 
 <style>
-.cart-container { padding: 20px; position: relative; min-height: 80vh; }
-.product-list { display: flex; flex-direction: column; gap: 12px; padding-bottom: 100px; align-items: center; }
-.product-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.85); padding: 20px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); backdrop-filter: blur(4px); max-width: 900px; width: 100%; }
-.left-section { display: flex; align-items: center; gap: 12px; }
-.item-image img { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; }
-.item-info { display: flex; flex-direction: column; justify-content: center; }
-.item-title { font-size: 16px; font-weight: bold; color: #333; }
-.item-price { font-size: 16px; color: #444; }
-.right-section { display: flex; align-items: center; gap: 16px; }
-.item-quantity { display: flex; align-items: center; gap: 8px; }
-.quantity-text { min-width: 24px; text-align: center; font-size: 16px; }
-.checkout-bar { position: fixed; bottom: 0; left: 0; right: 0; background-color: #fff; box-shadow: 0 -1px 10px rgb(0 0 0 / 0.1); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; z-index: 100; border-top: 1px solid #eee; }
-.total-info { font-size: 16px; color: #333; }
-.total-price { color: #d9534f; font-weight: 700; font-size: 18px; }
-.checkout-button { min-width: 120px; font-size: 16px; }
-.bgimage { background-image: url("../../assets/780.jpg"); background-position: center top; background-size: 1500px auto; background-repeat: no-repeat; background-attachment: fixed; background-color: #7b6b4d; min-height: 100vh; }
-.order-form label { display: block; margin-bottom: 5px; }
-.error-warn { color: red; }
-.error-warn-input { --el-input-focus-border-color: red; }
+
+
+/* --- 图片 --- */
+.item-image img {
+  width: 88px;
+  height: 88px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+/* --- 文本信息 --- */
+.item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.item-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #2b2b2b;
+}
+
+.item-price {
+  font-size: 15px;
+  color: #d9534f;
+  font-weight: 700;
+}
+
+
+
+/* --- 弹窗表单 --- */
+.order-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #444;
+}
+
+
+/* 整体页面 */
+.cart-page {
+  padding: 24px;
+  min-height: 100vh;
+  background: #f5f5f7;
+}
+
+/* 左右布局 */
+.cart-layout {
+  display: flex;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 左边 70% */
+.cart-left {
+  flex: 1;
+}
+
+/* 右边固定栏 30% */
+.cart-right {
+  width: 320px;
+  position: sticky;
+  top: 80px; /* 跟随滚动 不遮挡导航 */
+  align-self: flex-start;
+}
+
+/* --- 右侧结算框 --- */
+
+
+.checkout-row {
+  font-size: 15px;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+/* 按钮 */
+.checkout-btn {
+  width: 100%;
+  height: 40px;
+  font-size: 16px;
+  border-radius: 6px;
+}
+
+.cart-page {
+  background: #fafafa;
+  padding: 30px 0;
+}
+
+/* 顶部 全选 */
+.cart-header {
+  width: 85%;
+  margin: 0 auto 20px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+}
+
+/* 主体布局 */
+.cart-layout {
+  width: 85%;
+  margin: 0 auto;
+  display: flex;
+  gap: 30px; /* 左右留白！！ */
+}
+
+/* 左侧列表 */
+.cart-left {
+  flex: 1;
+}
+
+/* 商品卡片 */
+.cart-item-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: white;
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+}
+
+.item-img {
+  width: 90px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.item-price {
+  margin-top: 8px;
+  font-size: 16px;
+  color: #ff6b6b;
+  font-weight: bold;
+}
+
+/* 数量输入器（仿淘宝） */
+.quantity-box {
+  display: flex;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  overflow: hidden;
+  width: 110px;
+  height: 36px;
+}
+
+.qty-btn {
+  width: 36px;
+  text-align: center;
+  line-height: 36px;
+  cursor: pointer;
+  user-select: none;
+  background: #f6f6f6;
+}
+
+.qty-btn:hover {
+  background: #e8e8e8;
+}
+
+.qty-number {
+  flex: 1;
+  text-align: center;
+  line-height: 36px;
+  background: white;
+}
+
+/* 删除按钮 */
+.delete-btn {
+  color: #888;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  color: #ff4d4f;
+}
+
+/* 右侧结算栏 */
+.cart-right {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+.checkout-panel {
+  background: white;
+  padding: 24px;
+  border-radius: 18px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+  position: sticky;
+  top: 40px;
+}
+
+.checkout-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.checkout-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+  margin: 12px 0;
+}
+
+.checkout-row.total {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.checkout-row .price {
+  color: #ff6b6b;
+}
+
+.checkout-btn {
+  width: 100%;
+  margin-top: 18px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+
+
 </style>
