@@ -58,7 +58,10 @@ const role = ref('');
 const avatar = ref('');
 
 async function getUserInfo() {
-  if (!username) return;
+  if (!username) {
+    role.value = 'tourist';
+    avatar.value = 'https://bpic.588ku.com/back_origin_min_pic/19/10/22/7d5760a4e3926576c237d950d5964db1.jpg';
+  }
   try {
     const res = await userInfo(username);
     avatar.value = res.data.data.avatar || 'https://bpic.588ku.com/back_origin_min_pic/19/10/22/7d5760a4e3926576c237d950d5964db1.jpg';
@@ -76,7 +79,6 @@ onMounted(() => {
 // 购物车
 const cart = ref<Cart[]>([]);
 const cartItemCount = computed(() => cart.value.reduce((total, item) => total + item.quantity, 0));
-function goToCart() { router.push({ path: '/cart' }); }
 
 // 子导航显示
 const showSubNav = computed(() => ['/home/all-products','/home/rankings','/home/all-columns'].includes(route.path));
@@ -134,7 +136,7 @@ function logout() {
             <div class="icon-btn" @click="router.push('/home/all-questions')"><el-icon><Document /></el-icon></div>
           </el-tooltip>
           <el-tooltip content="购物车">
-            <div class="icon-btn" @click="goToCart">
+            <div class="icon-btn" @click="router.push('/home/cart')">
               <el-badge :value="cartItemCount"><el-icon><ShoppingCart /></el-icon></el-badge>
             </div>
           </el-tooltip>
@@ -154,7 +156,24 @@ function logout() {
           </el-dropdown>
         </div>
 
-        <div class="avatar-area"><img :src="avatar" class="user-avatar" @click="router.push('/home/dashboard')" /></div>
+        <!-- 游客模式 -->
+        <div v-if="role==='tourist'" class="icon-group">
+          <el-tooltip content="登录以获得更多功能">
+            <div class="icon-btn" @click="router.push('/login')">
+              <el-icon><User /></el-icon>
+            </div>
+          </el-tooltip>
+        </div>
+
+
+        <div class="avatar-area">
+          <img
+              :src="avatar"
+              class="user-avatar"
+              @click="role==='tourist' ? router.push('/login') : router.push('/home/dashboard')"
+          />
+        </div>
+
         <div class="logout-area" @click="logout"><el-icon><SwitchButton /></el-icon></div>
       </div>
     </div>
