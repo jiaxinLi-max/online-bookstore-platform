@@ -181,12 +181,15 @@
         <div v-if="role === 'CUSTOMER'" class="customer-actions-group">
           <h2 class="right-title">{{ product.title }}</h2>
           <div class="price-big">¥{{ product.price }}</div>
+          <div class="quantity-row">
+            <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>
+            <span v-if="stockAmount <= 10" class="stock-tips">库存紧张</span>
+          </div>
 
           <el-card class="buy-card" shadow="never">
             <div class="action-row">
-              <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>
-              <span v-if="stockAmount <= 10" class="stock-tips">库存紧张</span>
-              <el-button class="btn-camel" @click="addToCart">加入购物车</el-button>
+
+              <el-button class="add-to-cart-btn" @click="addToCart">加入购物车</el-button>
             </div>
           </el-card>
           <!-- 发表评价按钮及表单已移除 -->
@@ -854,4 +857,285 @@ html, body { height: 100%; }
 }
 
 
+ html, body { height: 100%; margin: 0; padding: 0; }
+
+.product-detail{
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1400px;
+  margin: 30px auto 50px; /* 增加上下边距 */
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  min-height: calc(100vh - 100px); /* 保证最小高度 */
+}
+
+/* 左侧区域 */
+.left-scroll{
+  flex: 0 0 58%;
+  max-width: 58%;
+  max-height: calc(100vh - 100px); /* 调整最大高度 */
+  overflow-y: auto;
+  background-color: rgba(255,255,255,.6);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  margin-top: 20px; /* 与右侧对齐 */
+}
+
+/* 右侧固定区域 - 改为淘宝样式 */
+.right-sticky{
+  flex: 0 0 40%;
+  max-width: 40%;
+  position: sticky;
+  top: 30px; /* 调整粘性位置 */
+  width: 360px;
+  margin-top: 20px;
+}
+
+.right-sticky .action-area {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
+
+/* 右侧标题 */
+.right-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 15px 0;
+  line-height: 1.4;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+/* 价格区域 - 淘宝样式 */
+.price-big {
+  font-size: 28px;
+  color: #fff !important; /* 白色文字 */
+  font-weight: bold;
+  margin-bottom: 20px;
+  background-color: #333; /* 深灰色背景 */
+  padding: 12px 16px;
+  border-radius: 6px;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+/* 购买卡片样式调整 */
+.buy-card {
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+
+  width: 600px;       /* 卡片变长 */
+  max-width: 100%;    /* 自适应屏幕 */
+  margin-left: 0;     /* 靠左对齐 */
+}
+
+/* 按钮容器 */
+.buy-card .action-row {
+  display: flex;
+  flex-direction: column; /* 垂直排列 */
+  gap: 16px;
+  width: 100%;
+}
+
+/* 数量选择器行 */
+.quantity-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+/* 库存提示 */
+.stock-tips {
+  font-size: 12px;
+  color: #ff5500; /* 橙色醒目 */
+  margin-left: 8px;
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+/* 加入购物车按钮样式 */
+.add-to-cart-btn {
+  width: 100%;           /* 长条效果 */
+  background-color: #121212; /* 黑色背景 */
+  color: #fff;           /* 白色文字 */
+  border: none;
+  border-radius: 6px;
+  padding: 12px 0;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.add-to-cart-btn:hover {
+  background-color:  #ffcc00 !important;
+  border-color:  #ffcc00 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255,103,0,.2);
+}
+
+
+/* 管理员样式调整 */
+.manager-actions-group {
+  background: #fff;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #e5e5e5;
+}
+
+.stock-display {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.stock-control {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.management-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 响应式调整 */
+@media (max-width: 1024px){
+  .product-detail{
+    flex-direction: column;
+    margin: 20px auto;
+  }
+  .left-scroll, .right-sticky{
+    max-width: 100%;
+    width: 100%;
+  }
+  .right-sticky{
+    position: static;
+    margin-top: 30px;
+  }
+}
+
+/* 图片部分保持原样 */
+.pic-and-info{
+  display: flex;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.thumb-list{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 80px;
+}
+
+.thumb-item{
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border: 2px solid transparent;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.thumb-item.active{
+  border-color: #ff6700;
+}
+
+.big-img{
+  flex: 1;
+  max-width: 420px;
+}
+
+.big-img img{
+  width: 100%;
+  height: 420px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+/* 商品信息区域 */
+.product-meta {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  border: 1px solid #e5e5e5;
+}
+
+.product-meta h1 {
+  font-size: 24px;
+  color: #333;
+  margin: 0 0 15px 0;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+.product-meta .description,
+.product-meta .detail {
+  color: #666;
+  line-height: 1.6;
+  margin: 10px 0;
+  padding: 8px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+/* 评论区样式调整 */
+.comments-section-card {
+  width: 100%;
+  margin-top: 25px;
+  background-color: #fff;
+  border: 1px solid #e5e5e5;
+}
+
+.comments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+/* 保持原有其他样式不变 */
+.like-heart {
+  cursor: pointer;
+  font-size: 20px;
+  transition: 0.15s;
+}
+
+.like-heart:hover {
+  transform: scale(1.15);
+}
+
+.rating-bottom{
+  margin: 20px 0;
+  text-align: center;
+  font-size: 16px;
+}
+.rating-text{ margin-left: 8px; }
+
+/* ... 其他已有样式保持不变 ... */
+
 </style>
+
+
