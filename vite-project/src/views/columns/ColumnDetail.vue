@@ -251,7 +251,16 @@ const handleRemoveProduct = async (productId: number) => {
 .product-card:hover { transform: scale(1.05); }
 .product-image img { width: 100%; height: 150px; object-fit: cover; }
 .product-title { font-size: 13px; padding: 8px 4px 0; text-align: center; }
-.bgimage { background-image: url("../../assets/780.jpg"); background-attachment: fixed; background-size: cover; min-height: 100vh; }
+.bgimage {
+  min-height: 100vh;
+  background: linear-gradient(
+      135deg,
+      #1b1b1b 0%,
+      #2a2e33 50%,
+      #1f1f1f 100%
+  );
+  background-attachment: fixed;
+}
 .dialog-image { max-width: 100%; }
 .card-clickable-content { cursor: pointer; }
 .remove-product-btn {

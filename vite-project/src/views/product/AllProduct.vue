@@ -61,7 +61,7 @@
           </div>
         </div>
 
-        <div class="side-more" @click.stop="goToRankings">查看更多 &gt;</div>
+<!--        <div class="side-more" @click.stop="goToRankings">查看更多 &gt;</div>-->
       </div>
 
 
@@ -192,164 +192,223 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.product-list { display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 20px; min-height: 800px; }
-.all-books { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; max-width: 750px; }
-.product-card {width: 140px;height: auto;min-height: 200px;cursor: pointer; padding: 8px;  border-radius: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; transition: transform 0.2s ease; }
-.product-card:hover:hover { transform: scale(1.05); }
-.product-image img { width: 100%; height: 150px; object-fit: cover; border-radius: 6px; }
-.product-title{ font-size: 13px; font-weight: 500; margin-top: 6px; color: #333; line-height: 1.2; }
-.ad-carousel { width: 100%; max-width: 960px; border-radius: 12px; overflow: hidden; }
-.ad-carousel-item { height: 200px; cursor: pointer; padding: 0; display: flex; justify-content: center; align-items: center; }
-/* 轮播项容器，左右结构卡片 */
-.ad-item-container {
-  display: flex;
-  border-radius: 12px;
-  background: #fff8dc;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  cursor: pointer;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  width: 600px;  /* 调整宽度适应你的需求 */
-  height: 180px; /* 与轮播高度相符 */
-}
-
-/* 左侧图片 */
-.ad-image-left {
-  width: 100px;
-  height: 100%;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-/* 右侧文字 */
-.ad-content-right {
-  flex-grow: 1;
-  padding: 20px 24px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border-top-right-radius: 12px;
-  border-bottom-right-radius: 12px;
-  color: #333;
-}
-
-
-/* 标题 */
-.ad-title {
-  font-weight: 700;
-  font-size: 20px;
-  margin-bottom: 12px;
-}
-
-/* 描述 */
-.ad-desc {
-  font-size: 14px;
-  line-height: 1.4;
-  opacity: 0.9;
-  white-space: pre-wrap;
-}
-
-/* 当前激活卡片放大并加阴影，提升层级 */
-.el-carousel__item.is-active .ad-item-container {
-  transform: scale(1.15);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-  z-index: 10;
-}
-
-/* 非激活卡片缩小且变淡 */
-.el-carousel__item:not(.is-active) .ad-item-container {
-  transform: scale(0.85);
-  filter: brightness(0.85);
-  transition: transform 0.4s ease, filter 0.4s ease;
-  z-index: 1;
-}
-
+/* ======== 页面整体 ======== */
 .bgimage {
-  background: #ffffff;
+  background: #f7f8fa;
   min-height: 100vh;
 }
-.product-price {
-  margin-top: 4px;
-  font-size: 14px;
-  font-weight: bold;
-  color: #d9534f; /* 温和一点的红色 */
-}
-.top-section {
-  width: 100%;
-  max-width: 1100px;
-  display: grid;
-  grid-template-columns: 160px 1fr 160px;
-  gap: 20px;
-  align-items: stretch;
-}
 
-.side-card {
-  height: 200px;
-  border-radius: 12px;
-  padding: 20px;
-  cursor: pointer;
+.product-list {
+  font-size: 16px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  box-shadow: 0 0 8px rgba(0,0,0,0.15);
-  transition: transform 0.2s;
+  align-items: center;
+  gap: 32px;
+  padding: 20px;
+}
+
+
+/* =================== 顶部三栏布局 =================== */
+.top-section {
+  width: 100%;
+  max-width: 1300px;
+  display: grid;
+  grid-template-columns: 240px 1fr 240px;
+  gap: 32px;
+  align-items: stretch;
+  margin-top: 12px;
+}
+
+
+/* =================== 左右侧卡片（分类 & 排行） =================== */
+.side-card {
+  height: 420px;
+  border-radius: 18px;
+  padding: 26px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .side-card:hover {
-  transform: scale(1.05);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
 }
 
 .side-title {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 14px;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 18px;
 }
 
-.side-more {
-  font-size: 14px;
-  color: #323d4a;
+/* 通用列表样式 */
+.side-columns-list,
+.side-rank-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
-/*column*/
-.side-columns-list {
-  margin: 8px 0;
-  max-height: 300px; /* 限制最大高度，可选 */
-  overflow-y: auto;  /* 超出可滚动 */
+.side-column-item,
+.side-rank-item {
+  font-size: 16px;
+  padding: 10px 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  margin-bottom: 6px;
 }
 
 .side-column-item {
-  font-size: 14px;
-  padding: 6px 8px;
-  cursor: pointer;
   color: #409eff;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
 }
 
 .side-column-item:hover {
   background-color: rgba(64, 158, 255, 0.1);
 }
 
-
-/*rank*/
-.side-rank-list {
-  margin: 8px 0;
-  max-height: 300px;
-  overflow-y: auto;
-}
-
 .side-rank-item {
-  font-size: 14px;
-  padding: 6px 8px;
-  cursor: pointer;
-  color: #f56c6c; /* 红色调，突显排行 */
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
+  color: #f56c6c;
 }
 
 .side-rank-item:hover {
   background-color: rgba(245, 108, 108, 0.1);
 }
 
+.side-more {
+  font-size: 16px;
+  margin-top: 12px;
+  color: #666;
+  text-align: right;
+}
+
+
+/* =================== 中间轮播图 =================== */
+.ad-carousel {
+  width: 100%;
+  max-width: 1000px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+}
+
+.ad-carousel-item {
+  height: 260px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+}
+
+
+/* =================== 轮播内卡片（左右结构） =================== */
+.ad-item-container {
+  display: flex;
+  width: 760px;
+  height: 240px;
+  border-radius: 14px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.10);
+  transition: transform 0.35s ease, box-shadow 0.35s ease, filter 0.4s ease;
+}
+
+/* 图片区 */
+.ad-image-left {
+  width: 160px;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 文本区 */
+.ad-content-right {
+  flex: 1;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #333;
+}
+
+.ad-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.ad-desc {
+  font-size: 16px;
+  line-height: 1.45;
+  opacity: 0.9;
+}
+
+.el-carousel__item {
+  height: 400px !important; /* 和你的 carousel 高度一致 */
+}
+
+
+/* 轮播激活状态 */
+.el-carousel__item.is-active .ad-item-container {
+  transform: scale(1.12);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  z-index: 10;
+}
+
+/* 非激活状态变淡 */
+.el-carousel__item:not(.is-active) .ad-item-container {
+  transform: scale(0.85);
+  filter: brightness(0.85);
+}
+
+/* =================== 商品列表 =================== */
+.all-books {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  justify-content: center;
+  max-width: 1150px;
+}
+
+.product-card {
+  width: 190px;
+  min-height: 260px;
+  padding: 14px;
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.15);
+}
+
+.product-image img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.product-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-top: 10px;
+  line-height: 1.3;
+}
+
+.product-price {
+  margin-top: 6px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #e14d4d;
+}
 
 </style>

@@ -79,85 +79,104 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-  padding: 20px;
+  gap: 32px;
+  padding: 40px 20px;
+  backdrop-filter: blur(3px);
 }
-.page-header {
-  text-align: center;
-  color: white;
+
+/* 背景：更柔和、不抢眼 */
+.bgimage {
+  background: linear-gradient(
+      135deg,
+      #1b1b1b 0%,
+      #2a2e33 50%,
+      #1f1f1f 100%
+  );
+  min-height: 100vh;
 }
-.page-title {
-  font-size: 2.5em;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-}
+
+
+/* 列表布局保持一致 */
 .columns-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 26px;
   justify-content: center;
   width: 100%;
   max-width: 1200px;
 }
+
+/* 🔥 卡片改成 “悬疑风磨砂玻璃” 风格 */
 .column-card {
   width: 280px;
-  height: 320px;
+  height: 330px;
   cursor: pointer;
-  background-color: rgba(255, 255, 255, 0.85);
-  border-radius: 10px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  display: flex;
-  flex-direction: column;
+  border-radius: 14px;
   padding: 0;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.25s ease;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
+
+/* hover 发光，突出神秘感 */
 .column-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  transform: translateY(-6px);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.55);
+  border-color: rgba(255, 255, 255, 0.25);
 }
+
+/* 封面轮播区 */
 .column-image {
   width: 100%;
   height: 180px;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
   overflow: hidden;
+  border-radius: 0;
 }
+
 .carousel-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.no-image-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f5f7fa;
-  color: #c0c4cc;
-}
+
+/* 栏目信息区域 */
 .column-info {
-  padding: 14px;
-  text-align: center;
+  flex: 1;
+  padding: 16px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
+
+/* 标题：强化白色，类似书籍页风格 */
 .column-theme {
-  font-size: 1.2em;
-  font-weight: bold;
-  margin: 0 0 8px 0;
+  font-size: 1.22em;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  color: #fff;
+  letter-spacing: 0.5px;
 }
+
+/* 描述：微透明，沉稳 */
 .column-description {
-  font-size: 0.9em;
-  color: #666;
-  line-height: 1.4;
+  font-size: 0.95em;
+  line-height: 1.45;
+  color: rgba(230, 230, 230, 0.75);
   overflow: hidden;
   text-overflow: ellipsis;
-  display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  display: -webkit-box;
 }
-.bgimage {
-  background-image: url("../../assets/780.jpg");
-  background-position: center top;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-color: #7b6b4d;
-  min-height: 100vh;
+
+/* 没有封面时 */
+.no-image-placeholder {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(230, 230, 230, 0.7);
 }
+
 </style>
