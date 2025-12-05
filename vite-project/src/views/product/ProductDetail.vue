@@ -8,7 +8,7 @@
         <!-- 小图列表 -->
         <div class="thumb-list">
           <img
-              v-for="(img, idx) in product.cover"
+              v-for="(img, idx) in (product.cover || [])"
               :key="idx"
               :src="img"
               class="thumb-item"
@@ -19,14 +19,13 @@
 
         <!-- 大图 -->
         <div class="big-img">
-          <img :src="product.cover[currentIndex]" alt="书籍大图" />
+          <img :src="(product.cover && product.cover.length) ? product.cover[currentIndex] : ''" alt="书籍大图" />
         </div>
       </div>
 
       <!-- 2. 商品信息 -->
       <div class="product-meta">
         <h1>{{ product.title }}</h1>
-
 
         <p class="description">描述: {{ product.description }}</p>
         <p class="detail">详情: {{ product.detail }}</p>
@@ -84,9 +83,28 @@
 
       <el-card class="comments-section-card">
         <template #header>
+          <!-- 评论区头部 -->
           <div class="comments-header">
             <h2>用户评价</h2>
-            <div class="rating">评分: {{ product.rate }}</div>
+            <el-rate
+                :model-value="Number(product.rate)"
+                disabled
+                show-score
+                text-color="#ff6700"
+                score-template="{value} 分"
+            />
+            <!-- 排序下拉 -->
+            <el-dropdown trigger="click" @command="handleSort">
+              <el-button size="small" class="btn-sort">
+                默认排序<el-icon class="el-icon--right"><arrow-down /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="time">时间排序</el-dropdown-item>
+                  <el-dropdown-item command="like">点赞排序</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
             <el-button
                 class="btn-camel"
                 @click="showCommentForm = !showCommentForm"
@@ -104,15 +122,51 @@
                 <h3 class="username">{{ comment.username }}</h3>
                 <p class="comment-time">🕒 {{ formatTime(comment.time) }}</p>
                 <div class="score-like-row">
-                  <span>评分：<el-rate v-model="comment.score" disabled size="small" /></span>
-                  <span class="like-count">👍 点赞数：{{ comment.likes }}</span>
+                  <el-rate
+                      :model-value="comment.score"
+                      disabled
+                      show-score
+                      text-color="#ff6700"
+                      score-template="{value} 分"
+                      size="small"
+                  />
                 </div>
                 <p class="comment-text-body">{{ comment.content }}</p>
               </div>
             </div>
             <div class="comment-actions">
-              <el-button type="warning" link @click.stop="handleLikeComment(comment.id)" v-if="role === 'CUSTOMER'">点赞</el-button>
-              <el-button type="danger" link @click.stop="handleDeleteComment(comment.id)" v-if="role === 'MANAGER' || comment.userId === currentUserId">删除</el-button>
+              <!-- 图标点赞 + 数字（UI 不改你的属性/函数） -->
+              <span class="like-box" v-if="role === 'CUSTOMER'" @click.stop="handleLikeComment(comment.id)">
+  <span class="like-icon" :class="{ active: comment.likes }">
+    <!-- 空心 -->
+    <svg v-if="!comment.likes" viewBox="0 0 24 24" width="20" height="20">
+      <path d="M12.1 8.64l-.1.1-.11-.11C10.14 6.78 7.1 6.86 5.36 8.6c-1.73 1.73-1.82 4.74-.09 6.47l6.36 6.36c.2.2.51.2.71 0l6.36-6.36c1.73-1.73 1.63-4.74-.1-6.47-1.73-1.73-4.77-1.82-6.5-.09z"
+            fill="none" stroke="#bbb" stroke-width="2"/>
+    </svg>
+
+    <!-- 实心 -->
+    <svg v-else viewBox="0 0 24 24" width="20" height="20">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+               2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
+               C13.09 3.81 14.76 3 16.5 3
+               19.58 3 22 5.42 22 8.5
+               c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+            fill="#e63946"/>
+    </svg>
+  </span>
+
+  <span class="like-num">{{ comment.likes }}</span>
+</span>
+
+
+
+              <!-- 删除按钮完全不变 -->
+              <el-button
+                  type="danger"
+                  link
+                  @click.stop="handleDeleteComment(comment.id)"
+                  v-if="role === 'MANAGER' || comment.userId === currentUserId"
+              >删除</el-button>
             </div>
           </el-card>
         </div>
@@ -127,13 +181,16 @@
         <div v-if="role === 'CUSTOMER'" class="customer-actions-group">
           <h2 class="right-title">{{ product.title }}</h2>
           <div class="price-big">¥{{ product.price }}</div>
-
-          <el-card class="buy-card" shadow="never">
-          <div class="action-row">
+          <div class="quantity-row">
             <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>
             <span v-if="stockAmount <= 10" class="stock-tips">库存紧张</span>
-            <el-button class="btn-camel" @click="addToCart">加入购物车</el-button>
           </div>
+
+          <el-card class="buy-card" shadow="never">
+            <div class="action-row">
+
+              <el-button class="add-to-cart-btn" @click="addToCart">加入购物车</el-button>
+            </div>
           </el-card>
           <!-- 发表评价按钮及表单已移除 -->
         </div>
@@ -154,6 +211,7 @@
     </div>
   </div>
 </template>
+
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
@@ -169,9 +227,12 @@ import { Plus } from "@element-plus/icons-vue";
 import { getImage } from "../../api/tools.ts";
 import type { Product } from '../../api/product';
 
+import { ArrowDown } from '@element-plus/icons-vue';
+
 export default defineComponent({
   name: 'ProductDetail',
-  components: { Plus },
+  //components: { Plus, ThumbFilled }, // <-- 注册 StarFilled，修复图标不显示问题
+  components: { ArrowDown },
   setup() {
     const route = useRoute();
     const router = useRouter();
@@ -211,6 +272,10 @@ export default defineComponent({
     const replyContent = ref('');
     const MAX_SIZE = 1024 * 1024;
 
+    const handleSort = (cmd: 'time' | 'like') => {
+      sortOption.value = cmd;
+      fetchCommentsBySort();
+    };
     // --- 计算属性 ---
     const associatedColumns = computed(() => {
       if (!product.value.columnIds || !allColumns.value.length) return [];
@@ -401,7 +466,6 @@ export default defineComponent({
     };
 
     // --- 原有其他方法 ---
-    // 【修改点2】: 更新handleChange以支持多图
     async function handleChange(file: UploadFile, newFileList: UploadFile[]) {
       const rawFile = file.raw;
       if (!rawFile) return;
@@ -430,15 +494,11 @@ export default defineComponent({
       }
     }
 
-// 【修改点3】: 更新handleRemove以支持多图
     const handleRemove = (file: UploadFile) => {
       const urlToRemove = file.url;
-      // 从两个数组中都移除
       fileList.value = fileList.value.filter(item => item.uid !== file.uid);
       if (urlToRemove) {
         editForm.value.cover = editForm.value.cover.filter(url => url !== urlToRemove);
-        console.log(urlToRemove);
-        console.log(editForm.value.cover);
       }
     };
     const handlePictureCardPreview = (file: UploadFile) => {
@@ -537,7 +597,8 @@ export default defineComponent({
       comments, sortOption, formatTime, fetchComments, fetchCommentsBySort,
       replyDialogVisible, subCommentsLoading, currentParentComment, subComments, replyContent, openReplyDialog, handlePostReply,
       handleLikeComment, handleDeleteComment, currentUserId,
-      currentIndex
+      currentIndex,
+      handleSort,
     };
   },
 });
@@ -642,6 +703,16 @@ html, body { height: 100%; }
   font-weight: bold;
   margin-bottom: 10px;
 }
+.like-heart {
+  cursor: pointer;
+  font-size: 20px;
+  transition: 0.15s;
+}
+
+.like-heart:hover {
+  transform: scale(1.15);
+}
+
 .rating-bottom{
   margin: 20px 0;
   text-align: center;
@@ -687,6 +758,21 @@ html, body { height: 100%; }
 .product-title-small { font-size: 13px; margin: 6px 0 0 0; text-align: center; }
 
 /* 新增的评论区样式 */
+.like-icon {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.like-icon:hover {
+  transform: scale(1.15);
+}
+
+.like-icon.active svg {
+  transform: scale(1.1);
+}
+
 .comments-section-card { width: 100%; max-width: 1200px; margin-top: 20px; background-color: rgba(255, 255, 255, 0.8); }
 .comments-header { display: flex; justify-content: space-between; align-items: center; }
 .sort-select-wrapper { margin-left: auto; }
@@ -711,4 +797,345 @@ html, body { height: 100%; }
 .sub-comment-text { margin: 4px 0; }
 .sub-comment-time { font-size: 0.8em; color: #909399; text-align: right; }
 .reply-form { margin-top: 20px; }
+/* -------------- 下拉按钮 -------------- */
+.btn-sort {
+  background-color: #ffffff !important;   /* 纯白底 */
+  color: #606266 !important;            /* 字用 Element 默认灰 */
+  border: none !important;              /* 彻底去掉边框 */
+  padding: 6px 12px;                    /* 让文字和箭头更紧凑 */
+  font-size: 14px;
+  line-height: 1;
+  box-shadow: none !important;
+}
+
+/* 评论区头部整体布局：评分居中偏左 */
+.comments-header{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;   /* 先靠左排列 */
+  gap: 16px;
+}
+/* 让评分星星独占一块弹性宽度，实现“居中偏左” */
+.comments-header h2 + .el-rate{
+  flex: 1;                      /* 把剩余空间占满 */
+  display: flex;
+  justify-content: center;      /* 在其独占行里居中 */
+  margin-left: -4%;             /* 再往左偏移一点，视觉效果“偏左” */
+}
+/* 在 scoped 下使用深度选择器，覆盖 Element Plus 下拉项的 hover/active/focus */
+::v-deep(.el-dropdown-menu__item),
+::v-deep(.el-dropdown-item) {
+  background-color: #ffffff !important; /* 纯白底 */
+  color: #606266 !important;            /* 默认灰字 */
+}
+
+/* 悬停 / 聚焦 / 激活 状态：浅羊驼底 + 深羊驼字 */
+::v-deep(.el-dropdown-menu__item:hover),
+::v-deep(.el-dropdown-item:hover),
+::v-deep(.el-dropdown-menu__item:focus),
+::v-deep(.el-dropdown-item:focus),
+::v-deep(.el-dropdown-menu__item.is-active),
+::v-deep(.el-dropdown-item.is-active),
+::v-deep(.el-dropdown-menu__item.el-dropdown-menu__item--hover),
+::v-deep(.el-dropdown-item.el-dropdown-item--hover) {
+  background-color: #f5f1eb !important; /* 浅羊驼 */
+  color: #7b6b4d !important;            /* 深羊驼 */
+}
+
+/* 禁用默认蓝色文字阴影/边框（如果有的话） */
+::v-deep(.el-dropdown-menu__item),
+::v-deep(.el-dropdown-item) {
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+/* 如果菜单项内含 Icon，让 Icon 跟随文字颜色 */
+::v-deep(.el-dropdown-menu__item .el-icon),
+::v-deep(.el-dropdown-item .el-icon) {
+  color: currentColor !important;
+  fill: currentColor !important;
+}
+
+
+ html, body { height: 100%; margin: 0; padding: 0; }
+
+.product-detail{
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1400px;
+  margin: 30px auto 50px; /* 增加上下边距 */
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  min-height: calc(100vh - 100px); /* 保证最小高度 */
+}
+
+/* 左侧区域 */
+.left-scroll{
+  flex: 0 0 58%;
+  max-width: 58%;
+  max-height: calc(100vh - 100px); /* 调整最大高度 */
+  overflow-y: auto;
+  background-color: rgba(255,255,255,.6);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  margin-top: 20px; /* 与右侧对齐 */
+}
+
+/* 右侧固定区域 - 改为淘宝样式 */
+.right-sticky{
+  flex: 0 0 40%;
+  max-width: 40%;
+  position: sticky;
+  top: 30px; /* 调整粘性位置 */
+  width: 360px;
+  margin-top: 20px;
+}
+
+.right-sticky .action-area {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
+
+/* 右侧标题 */
+.right-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 15px 0;
+  line-height: 1.4;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+/* 价格区域 - 淘宝样式 */
+.price-big {
+  font-size: 28px;
+  color: #fff !important; /* 白色文字 */
+  font-weight: bold;
+  margin-bottom: 20px;
+  background-color: #333; /* 深灰色背景 */
+  padding: 12px 16px;
+  border-radius: 6px;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+/* 购买卡片样式调整 */
+.buy-card {
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+
+  width: 600px;       /* 卡片变长 */
+  max-width: 100%;    /* 自适应屏幕 */
+  margin-left: 0;     /* 靠左对齐 */
+}
+
+/* 按钮容器 */
+.buy-card .action-row {
+  display: flex;
+  flex-direction: column; /* 垂直排列 */
+  gap: 16px;
+  width: 100%;
+}
+
+/* 数量选择器行 */
+.quantity-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+/* 库存提示 */
+.stock-tips {
+  font-size: 12px;
+  color: #ff5500; /* 橙色醒目 */
+  margin-left: 8px;
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+/* 加入购物车按钮样式 */
+.add-to-cart-btn {
+  width: 100%;           /* 长条效果 */
+  background-color: #121212; /* 黑色背景 */
+  color: #fff;           /* 白色文字 */
+  border: none;
+  border-radius: 6px;
+  padding: 12px 0;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.add-to-cart-btn:hover {
+  background-color:  #ffcc00 !important;
+  border-color:  #ffcc00 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255,103,0,.2);
+}
+
+
+/* 管理员样式调整 */
+.manager-actions-group {
+  background: #fff;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #e5e5e5;
+}
+
+.stock-display {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.stock-control {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.management-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 响应式调整 */
+@media (max-width: 1024px){
+  .product-detail{
+    flex-direction: column;
+    margin: 20px auto;
+  }
+  .left-scroll, .right-sticky{
+    max-width: 100%;
+    width: 100%;
+  }
+  .right-sticky{
+    position: static;
+    margin-top: 30px;
+  }
+}
+
+/* 图片部分保持原样 */
+.pic-and-info{
+  display: flex;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.thumb-list{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 80px;
+}
+
+.thumb-item{
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border: 2px solid transparent;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.thumb-item.active{
+  border-color: #ff6700;
+}
+
+.big-img{
+  flex: 1;
+  max-width: 420px;
+}
+
+.big-img img{
+  width: 100%;
+  height: 420px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+/* 商品信息区域 */
+.product-meta {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  border: 1px solid #e5e5e5;
+}
+
+.product-meta h1 {
+  font-size: 24px;
+  color: #333;
+  margin: 0 0 15px 0;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+.product-meta .description,
+.product-meta .detail {
+  color: #666;
+  line-height: 1.6;
+  margin: 10px 0;
+  padding: 8px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+/* 评论区样式调整 */
+.comments-section-card {
+  width: 100%;
+  margin-top: 25px;
+  background-color: #fff;
+  border: 1px solid #e5e5e5;
+}
+
+.comments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+/* 保持原有其他样式不变 */
+.like-heart {
+  cursor: pointer;
+  font-size: 20px;
+  transition: 0.15s;
+}
+
+.like-heart:hover {
+  transform: scale(1.15);
+}
+
+.rating-bottom{
+  margin: 20px 0;
+  text-align: center;
+  font-size: 16px;
+}
+.rating-text{ margin-left: 8px; }
+
+/* ... 其他已有样式保持不变 ... */
+
 </style>
+
+
