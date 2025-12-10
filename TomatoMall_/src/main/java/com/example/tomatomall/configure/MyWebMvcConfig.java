@@ -19,8 +19,11 @@ public class MyWebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/api/images", "/api/images/**")  // 确保排除图片上传相关的路径
                 .excludePathPatterns("/oss/**")  // 排除 OSS 相关路径（根据实际情况修改）
                 .excludePathPatterns("/api/orders/notify")
-                .excludePathPatterns("/api/products")
+                .excludePathPatterns("/api/products","/api/products/**")
                 .excludePathPatterns("/api/advertisements")
+                .excludePathPatterns("/api/columns","/api/columns/**")
+                .excludePathPatterns("/api/posts")
+                .excludePathPatterns("/api/rank")
                 .order(1);
     }
 }

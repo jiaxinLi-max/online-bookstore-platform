@@ -165,13 +165,13 @@ const router = createRouter({
                     path: 'all-advertisements', // 子路由路径，去掉前导斜杠
                     name: 'AllAdvertisements',
                     component: () => import('../views/advertisement/AllAdvertisement.vue'),
-                    meta: { title: '广告列表' },
+                    meta: { title: '广告列表' ,public: true},
                 },
                 {
                     path: 'all-postings', // 子路由路径，去掉前导斜杠
                     name: 'AllPostings',
                     component: () => import('../views/posting/AllPosting.vue'),
-                    meta: { title: '帖子列表' },
+                    meta: { title: '帖子列表' ,public: true},
                 },
                 {
                     path: 'all-questions', // 子路由路径，去掉前导斜杠
@@ -183,12 +183,14 @@ const router = createRouter({
                     path: '/home/search/:keyword',
                     name: 'SearchResults',
                     component: () => import('../views/search/SearchResult.vue'),
+                    meta:{public:true},
                     props: true
                 },
                 {
                     path: 'rankings',
                     name: 'Rankings',
-                    component: () => import('../views/ranking/AllRankings.vue')  // 示例
+                    component: () => import('../views/ranking/AllRankings.vue') , // 示例
+                    meta:{public:true},
                 },
                 {
                     path: 'create-product',
@@ -256,7 +258,7 @@ const router = createRouter({
                     path: 'postings/:id',
                     name: 'PostingDetail',
                     component: () => import('../views/posting/PostingDetail.vue'),
-                    meta: { title: '帖子详情' },
+                    meta: { title: '帖子详情' ,public: true },
                 },
                 {
                     path: 'questions/:id',
@@ -287,13 +289,13 @@ const router = createRouter({
                     path: 'all-columns',
                     name: "AllColumns",
                     component: () => import('../views/columns/AllColumns.vue'),
-                    meta: { title: '所有栏目' }
+                    meta: { title: '所有栏目', public: true },
                 },
                 {
                     path: 'columns/:id',
                     name: 'ColumnDetail',
                     component: () => import('../views/columns/ColumnDetail.vue'),
-                    meta: { title: '栏目详情' }
+                    meta: { title: '栏目详情', public: true },
                 },
             ],
         },
