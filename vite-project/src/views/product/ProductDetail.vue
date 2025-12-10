@@ -210,6 +210,76 @@
       </div>
     </div>
   </div>
+  <el-dialog
+      v-model="showEditDialog"
+      title="更新商品信息"
+      width="60%"
+      :close-on-click-modal="false"
+  >
+    <el-form :model="editForm" label-width="100px">
+      <el-form-item label="书籍标题">
+        <el-input v-model="editForm.title"></el-input>
+      </el-form-item>
+      <el-form-item label="描述">
+        <el-input type="textarea" v-model="editForm.description"></el-input>
+      </el-form-item>
+      <el-form-item label="详情">
+        <el-input type="textarea" v-model="editForm.detail"></el-input>
+      </el-form-item>
+      <el-form-item label="价格">
+        <el-input-number v-model="editForm.price" :precision="2" :step="1" :min="0"></el-input-number>
+      </el-form-item>
+      <el-form-item label="所属栏目">
+        <el-select v-model="editForm.columnIds" multiple placeholder="请选择所属栏目">
+          <el-option
+              v-for="column in allColumns"
+              :key="column.id"
+              :label="column.theme"
+              :value="column.id"
+          ></el-option>
+        </el-select>
+      </el-form-item>
+
+      <!-- 书籍信息/规格 -->
+      <el-form-item label="书籍信息">
+        <div v-for="(spec, index) in newSpecifications" :key="index" class="specification-row" style="display: flex; margin-bottom: 10px; gap: 10px;">
+          <el-input v-model="spec.item" placeholder="项目名 (如: 作者)"></el-input>
+          <el-input v-model="spec.value" placeholder="项目值 (如: 张三)"></el-input>
+          <el-button type="danger" @click="removeSpecification(index)" plain>删除</el-button>
+        </div>
+        <el-button @click="addSpecification" type="primary" plain>添加规格</el-button>
+      </el-form-item>
+
+      <!-- 封面上传 -->
+      <el-form-item label="书籍封面">
+        <el-upload
+            v-model:file-list="fileList"
+            action="#"
+            list-type="picture-card"
+            :http-request="() => {}"
+            :on-preview="handlePictureCardPreview"
+            :on-remove="handleRemove"
+            :on-change="handleChange"
+        >
+          <el-icon><Plus /></el-icon>
+        </el-upload>
+      </el-form-item>
+
+    </el-form>
+
+    <!-- 对话框底部按钮 -->
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="showEditDialog = false">取消</el-button>
+        <el-button type="primary" @click="handleUpdateProduct">
+          确认更新
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
+  <el-dialog v-model="dialogVisible">
+    <img w-full :src="dialogImageUrl" alt="Preview Image" style="width: 100%;" />
+  </el-dialog>
 </template>
 
 <script lang="ts">
@@ -310,6 +380,7 @@ export default defineComponent({
     };
 
     const openEditDialog = () => {
+      console.log('点击更新商品');
       editForm.value = JSON.parse(JSON.stringify(product.value));
       if (!Array.isArray(editForm.value.cover)) editForm.value.cover = [];
       fileList.value = editForm.value.cover!.map((url, index) => ({
