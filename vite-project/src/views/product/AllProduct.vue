@@ -2,11 +2,12 @@
   <el-main class="product-list bgimage">
     <div class="top-section">
 
-      <!-- 左边：分类入口 -->
-      <div class="side-card">
-        <div class="side-title">📚 分类</div>
+      <div class="side-card category-card">
+        <div class="side-header">
+          <span class="header-icon">📚</span>
+          <span class="header-text">图书分类</span>
+        </div>
 
-        <!-- 栏目列表，最多显示10个 -->
         <div class="side-columns-list">
           <div
               v-for="(column, index) in columns.slice(0, 10)"
@@ -14,41 +15,50 @@
               class="side-column-item"
               @click.stop="goToColumnDetail(column.id)"
           >
+            <span class="col-dot"></span>
             {{ column.theme }}
           </div>
         </div>
 
-        <div class="side-more" @click.stop="goToColumns">查看更多 &gt;</div>
+        <div class="side-footer" @click.stop="goToColumns">
+          <span>全部分类</span>
+          <el-icon><ArrowRight /></el-icon>
+        </div>
       </div>
 
-      <!-- 中间：广告轮播（不变） -->
-      <el-carousel
-          height="200px"
-          :interval="2000"
-          trigger="click"
-          type="card"
-          arrow="never"
-          class="ad-carousel"
-      >
-        <el-carousel-item
-            v-for="ad in advertisements"
-            :key="ad.id"
-            @click="goToProductDetail(ad.productId)"
-            class="ad-carousel-item"
+      <div class="carousel-container">
+        <el-carousel
+            height="380px"
+            :interval="4000"
+            trigger="click"
+            type="card"
+            arrow="hover"
+            class="ad-carousel"
         >
-          <div class="ad-item-container">
-            <img :src="ad.imgUrl" :alt="ad.title" class="ad-image-left" />
-            <div class="ad-content-right">
-              <div class="ad-title">{{ ad.title }}</div>
-              <div class="ad-desc">{{ ad.content || '' }}</div>
+          <el-carousel-item
+              v-for="ad in advertisements"
+              :key="ad.id"
+              class="ad-carousel-item"
+          >
+            <div class="ad-card-inner" @click="goToProductDetail(ad.productId)">
+              <div class="ad-info">
+                <h2 class="ad-title">{{ ad.title }}</h2>
+                <p class="ad-desc">{{ ad.content || '探索更多精彩内容，尽在书海...' }}</p>
+                <el-button type="primary" round class="ad-btn">立即查看</el-button>
+              </div>
+              <div class="ad-image-wrapper">
+                <img :src="ad.imgUrl" :alt="ad.title" class="ad-img" />
+              </div>
             </div>
-          </div>
-        </el-carousel-item>
-      </el-carousel>
+          </el-carousel-item>
+        </el-carousel>
+      </div>
 
-      <!-- 右边：排行榜入口 -->
-      <div class="side-card">
-        <div class="side-title">🏆 排行榜</div>
+      <div class="side-card rank-card">
+        <div class="side-header rank-header">
+          <span class="header-icon">🏆</span>
+          <span class="header-text">热销榜单</span>
+        </div>
 
         <div class="side-rank-list">
           <div
@@ -57,33 +67,47 @@
               class="side-rank-item"
               @click.stop="goToProductDetail(product.id)"
           >
-            {{ index + 1 }}. {{ product.title }}
+            <span class="rank-num" :class="'rank-' + (index + 1)">{{ index + 1 }}</span>
+            <span class="rank-name">{{ product.title }}</span>
           </div>
         </div>
-
-<!--        <div class="side-more" @click.stop="goToRankings">查看更多 &gt;</div>-->
       </div>
-
-
     </div>
 
-    <div class="all-books">
-      <el-card
+    <div class="section-title-bar">
+      <h2>全部书籍</h2>
+      <span class="subtitle">海量好书任你挑选</span>
+    </div>
+
+    <div class="all-books-grid">
+      <div
           v-for="product in products"
           :key="product.id"
           class="product-card"
           @click="goToProductDetail(product.id)"
-          shadow="hover"
       >
-        <div class="product-image">
-          <img :src="Array.isArray(product.cover) && product.cover.length > 0 ? product.cover[0] : ''" alt="Product Cover" />
+        <div class="card-image-box">
+          <img
+              :src="Array.isArray(product.cover) && product.cover.length > 0 ? product.cover[0] : 'https://via.placeholder.com/150'"
+              loading="lazy"
+              alt="Product Cover"
+          />
+          <div class="hover-overlay">
+            <span>点击详情</span>
+          </div>
         </div>
-        <h3 class="product-title">{{ product.title }}</h3>
-        <!-- ✨ 新增：显示价格 -->
-        <div class="product-price">
-          ￥{{ product.price }}
+
+        <div class="card-info">
+          <h3 class="product-title" :title="product.title">{{ product.title }}</h3>
+          <div class="product-meta">
+            <div class="product-price">
+              <span class="currency">￥</span>
+              <span class="amount">{{ product.price }}</span>
+            </div>
+            <div class="cart-icon-btn">GO</div>
+          </div>
         </div>
-      </el-card>
+      </div>
     </div>
   </el-main>
 </template>
@@ -192,223 +216,346 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* ======== 页面整体 ======== */
+/* ======== 基础设置 ======== */
 .bgimage {
-  background: #f7f8fa;
+  background: #f0f2f5; /*稍微深一点的灰白，突出白色卡片*/
   min-height: 100vh;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+  padding: 0; /* 让 main 撑满 */
+  padding-bottom: 60px;
 }
 
-.product-list {
-  font-size: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 32px;
-  padding: 20px;
-}
-
-
-/* =================== 顶部三栏布局 =================== */
+/* 顶部布局容器 */
 .top-section {
   width: 100%;
-  max-width: 1300px;
+  max-width: 1440px; /* 增加宽度 */
+  margin: 20px auto;
+  padding: 0 20px;
   display: grid;
-  grid-template-columns: 240px 1fr 240px;
-  gap: 32px;
+  /* 左侧栏 | 中间轮播 | 右侧栏 - 比例调整 */
+  grid-template-columns: 260px 1fr 260px;
+  gap: 24px;
   align-items: stretch;
-  margin-top: 12px;
 }
 
-
-/* =================== 左右侧卡片（分类 & 排行） =================== */
+/* ======== 侧边栏通用卡片 ======== */
 .side-card {
-  height: 420px;
-  border-radius: 18px;
-  padding: 26px;
-  background: #ffffff;
+  background: #fff;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  height: 420px; /* 和轮播高度区配（轮播380+上下边距/阴影） */
+  border: 1px solid #fff;
 }
 
-.side-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+.side-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #f2f2f2;
 }
 
-.side-title {
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 18px;
+/* 分类特定的头部颜色 */
+.category-card .side-header {
+  background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%);
 }
+.category-card .header-text { color: #1976d2; font-weight: 700; font-size: 18px; }
 
-/* 通用列表样式 */
-.side-columns-list,
-.side-rank-list {
+/* 排行榜特定的头部颜色 */
+.rank-card .side-header {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffffff 100%);
+}
+.rank-card .header-text { color: #ed6c02; font-weight: 700; font-size: 18px; }
+
+.header-icon { font-size: 20px; }
+
+/* 列表区域 */
+.side-columns-list, .side-rank-list {
   flex: 1;
   overflow-y: auto;
-  padding-right: 4px;
+  padding: 10px 0;
 }
 
-.side-column-item,
-.side-rank-item {
-  font-size: 16px;
-  padding: 10px 12px;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
-  margin-bottom: 6px;
+/* 滚动条美化 */
+.side-columns-list::-webkit-scrollbar, .side-rank-list::-webkit-scrollbar {
+  width: 4px;
 }
+.side-columns-list::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 4px;}
 
+/* ---- 分类列表项 ---- */
 .side-column-item {
-  color: #409eff;
+  padding: 10px 20px;
+  font-size: 15px;
+  color: #555;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
 }
-
 .side-column-item:hover {
-  background-color: rgba(64, 158, 255, 0.1);
+  background-color: #f0f9ff;
+  color: #1976d2;
+  padding-left: 24px; /* 悬停右移效果 */
 }
+.col-dot {
+  width: 6px;
+  height: 6px;
+  background: #ccc;
+  border-radius: 50%;
+  margin-right: 10px;
+  transition: background 0.2s;
+}
+.side-column-item:hover .col-dot { background: #1976d2; }
 
+/* ---- 排行榜列表项 ---- */
 .side-rank-item {
-  color: #f56c6c;
-}
-
-.side-rank-item:hover {
-  background-color: rgba(245, 108, 108, 0.1);
-}
-
-.side-more {
-  font-size: 16px;
-  margin-top: 12px;
-  color: #666;
-  text-align: right;
-}
-
-
-/* =================== 中间轮播图 =================== */
-.ad-carousel {
-  width: 100%;
-  max-width: 1000px;
-  border-radius: 16px;
+  padding: 9px 20px;
+  font-size: 14px;
+  color: #444;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
   overflow: hidden;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  text-overflow: ellipsis;
+}
+.side-rank-item:hover { background-color: #fff8f0; }
+
+.rank-num {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #999;
+  background: #f5f5f5;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+/* 前三名高亮 */
+.rank-1 { background: #ffc107; color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,0.2); } /* 金 */
+.rank-2 { background: #cfd8dc; color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,0.2); } /* 银 */
+.rank-3 { background: #d7ccc8; color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,0.2); } /* 铜 */
+
+.rank-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.side-footer {
+  padding: 12px;
+  text-align: center;
+  font-size: 13px;
+  color: #888;
+  cursor: pointer;
+  border-top: 1px solid #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+.side-footer:hover { color: #1976d2; }
+
+
+/* ======== 广告轮播 ======== */
+.carousel-container {
+  overflow: visible; /* 允许阴影溢出 */
+}
+
+/* 覆盖 Element Plus 样式 */
+:deep(.el-carousel__mask) {
+  background-color: #fff;
+  opacity: 0.4;
 }
 
 .ad-carousel-item {
-  height: 260px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: transparent;
-}
-
-
-/* =================== 轮播内卡片（左右结构） =================== */
-.ad-item-container {
-  display: flex;
-  width: 760px;
-  height: 240px;
-  border-radius: 14px;
-  background: #fff;
+  border-radius: 12px;
+  /* 解决 transform 导致的圆角失效 */
   overflow: hidden;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.10);
-  transition: transform 0.35s ease, box-shadow 0.35s ease, filter 0.4s ease;
 }
 
-/* 图片区 */
-.ad-image-left {
-  width: 160px;
+.ad-card-inner {
+  width: 100%;
   height: 100%;
-  object-fit: cover;
+  display: flex;
+  background: #fff;
+  /* 增加一个微妙的渐变背景 */
+  background: linear-gradient(120deg, #ffffff 30%, #f0f7ff 100%);
+  cursor: pointer;
+  position: relative;
 }
 
-/* 文本区 */
-.ad-content-right {
+.ad-info {
   flex: 1;
-  padding: 28px;
+  padding: 40px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  color: #333;
+  align-items: flex-start;
+  z-index: 2;
 }
 
 .ad-title {
-  font-size: 26px;
-  font-weight: 700;
-  margin-bottom: 14px;
+  font-size: 28px;
+  font-weight: 800;
+  color: #333;
+  margin-bottom: 16px;
+  line-height: 1.2;
 }
 
 .ad-desc {
   font-size: 16px;
-  line-height: 1.45;
-  opacity: 0.9;
+  color: #666;
+  margin-bottom: 24px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.el-carousel__item {
-  height: 400px !important; /* 和你的 carousel 高度一致 */
+.ad-btn {
+  padding: 10px 28px;
+  font-weight: 600;
+  background: linear-gradient(90deg, #409eff, #337ecc);
+  border: none;
+  box-shadow: 0 4px 12px rgba(64,158,255,0.4);
+}
+
+.ad-image-wrapper {
+  flex: 0 0 55%; /* 图片占宽度的 55% */
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.ad-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* 斜切效果 */
+  mask-image: linear-gradient(to right, transparent 0%, black 20%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%);
 }
 
 
-/* 轮播激活状态 */
-.el-carousel__item.is-active .ad-item-container {
-  transform: scale(1.12);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-  z-index: 10;
-}
-
-/* 非激活状态变淡 */
-.el-carousel__item:not(.is-active) .ad-item-container {
-  transform: scale(0.85);
-  filter: brightness(0.85);
-}
-
-/* =================== 商品列表 =================== */
-.all-books {
+/* ======== 下方书籍网格 (重点修改) ======== */
+.section-title-bar {
+  max-width: 1440px;
+  margin: 40px auto 20px;
+  padding: 0 20px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 28px;
-  justify-content: center;
-  max-width: 1150px;
+  align-items: baseline;
+  gap: 12px;
+}
+.section-title-bar h2 {
+  font-size: 24px;
+  color: #333;
+  margin: 0;
+}
+.section-title-bar .subtitle {
+  font-size: 14px;
+  color: #999;
+}
+
+.all-books-grid {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: grid;
+  /* 关键：使用 Grid 布局，最小宽度 180px，自动填满 */
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 32px;
 }
 
 .product-card {
-  width: 190px;
-  min-height: 260px;
-  padding: 14px;
-  border-radius: 14px;
   background: #fff;
+  border-radius: 12px;
+  transition: all 0.3s ease;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
   display: flex;
   flex-direction: column;
-  transition: transform 0.25s ease, box-shadow 0.2s ease;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 
 .product-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 4px 18px rgba(0,0,0,0.15);
+  transform: translateY(-8px); /* 上浮 */
+  box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+  border-color: #e0e0e0;
 }
 
-.product-image img {
+.card-image-box {
   width: 100%;
-  height: 200px;
+  aspect-ratio: 3 / 4; /* 固定图片比例 */
+  background: #f9f9f9;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-image-box img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border-radius: 10px;
+  transition: transform 0.5s ease;
+}
+
+/* 图片悬停放大 */
+.product-card:hover .card-image-box img {
+  transform: scale(1.08);
+}
+
+.card-info {
+  padding: 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .product-title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: #333;
-  margin-top: 10px;
-  line-height: 1.3;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+  /* 限制两行，多出显示省略号 */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto; /* 推到底部 */
 }
 
 .product-price {
-  margin-top: 6px;
-  font-size: 17px;
+  color: #f56c6c;
   font-weight: 700;
-  color: #e14d4d;
 }
+.currency { font-size: 12px; }
+.amount { font-size: 18px; }
 
+.cart-icon-btn {
+  font-size: 12px;
+  background: #f2f3f5;
+  color: #666;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.product-card:hover .cart-icon-btn {
+  background: #ecf5ff;
+  color: #409eff;
+}
 </style>

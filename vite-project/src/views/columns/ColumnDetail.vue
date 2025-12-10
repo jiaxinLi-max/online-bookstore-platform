@@ -1,46 +1,58 @@
 <template>
   <el-main class="column-detail-container bgimage">
+
     <div class="column-header">
       <h1 class="column-title">{{ columnInfo.theme }}</h1>
-      <p class="column-description">{{ columnInfo.description }}</p>
+      <p class="column-description">{{ columnInfo.description || '暂无描述' }}</p>
       <div v-if="isAdmin" class="admin-actions">
-        <el-button type="primary" @click="openEditDialog">更新栏目信息</el-button>
-        <el-button type="danger" @click="handleDeleteColumn">删除该栏目</el-button>
+        <el-button type="primary" @click="openEditDialog" size="small">更新信息</el-button>
+        <el-button type="danger" @click="handleDeleteColumn" size="small">删除栏目</el-button>
       </div>
     </div>
 
-    <h2 class="product-list-title">本栏目包含的书籍</h2>
-    <div v-if="products.length > 0" class="products-list">
-      <el-card
-          v-for="product in products"
-          :key="product.id"
-          class="product-card"
-          shadow="hover"
-      >
-        <el-button
-            v-if="isAdmin"
-            class="remove-product-btn"
-            type="danger"
-            icon="el-icon-delete"
-            circle
-            size="small"
-            @click.stop="handleRemoveProduct(product.id)"
-        ></el-button>
-        <div @click="goToProductDetail(product.id)" class="card-clickable-content">
-          <div class="product-image">
-            <img :src="Array.isArray(product.cover) && product.cover.length > 0 ? product.cover[0] : ''" alt="Product Cover" />
-          </div>
-          <h3 class="product-title">{{ product.title }}</h3>
-        </div>
-      </el-card>
-    </div>
-    <el-empty v-else description="该栏目下还没有书籍"></el-empty>
+    <div class="content-section">
+      <h2 class="product-list-title">
+        <span>栏目藏书</span>
+        <span class="book-count" v-if="products.length">({{ products.length }}本)</span>
+      </h2>
 
-    <el-dialog
-        v-model="showEditDialog"
-        title="更新栏目信息"
-        width="50%"
-    >
+      <div v-if="products.length > 0" class="books-grid">
+        <div
+            v-for="product in products"
+            :key="product.id"
+            class="book-card"
+            @click="goToProductDetail(product.id)"
+        >
+          <el-button
+              v-if="isAdmin"
+              class="remove-product-btn"
+              type="danger"
+              icon="Delete"
+              circle
+              size="small"
+              @click.stop="handleRemoveProduct(product.id)"
+          ></el-button>
+
+          <div class="book-image-box">
+            <img
+                :src="Array.isArray(product.cover) && product.cover.length > 0 ? product.cover[0] : 'https://via.placeholder.com/150'"
+                alt="Product Cover"
+                loading="lazy"
+            />
+          </div>
+
+          <div class="book-info">
+            <h3 class="book-title" :title="product.title">{{ product.title }}</h3>
+            <div class="book-price">
+              ￥{{ product.price || '未知' }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <el-empty v-else description="该栏目暂无书籍" :image-size="150"></el-empty>
+    </div>
+
+    <el-dialog v-model="showEditDialog" title="更新栏目信息" width="50%">
       <el-form :model="editForm" label-width="120px">
         <el-form-item label="栏目主题">
           <el-input v-model="editForm.theme"></el-input>
@@ -49,18 +61,8 @@
           <el-input v-model="editForm.description" type="textarea" :rows="3"></el-input>
         </el-form-item>
         <el-form-item label="栏目封面">
-          <el-upload
-              action="http://localhost:8080/api/images"
-              list-type="picture-card"
-              :auto-upload="false"
-              :file-list="fileList"
-              :on-change="handleChange"
-              :on-remove="handleRemove"
-              :on-preview="handlePictureCardPreview"
-              multiple
-          >
+          <el-upload action="#" list-type="picture-card" :auto-upload="false" :file-list="fileList" :on-change="handleChange" :on-remove="handleRemove" :on-preview="handlePictureCardPreview" multiple>
             <el-icon><Plus /></el-icon>
-            <div>上传新封面</div>
           </el-upload>
         </el-form-item>
       </el-form>
@@ -240,17 +242,7 @@ const handleRemoveProduct = async (productId: number) => {
 </script>
 
 <style scoped>
-.column-detail-container { display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 20px; }
-.column-header { text-align: center; color: white; background-color: rgba(0, 0, 0, 0.4); padding: 20px 40px; border-radius: 12px; width: 100%; max-width: 900px; }
-.column-title { font-size: 2.5em; margin: 0 0 10px 0; }
-.column-description { font-size: 1.1em; color: #f0f0f0; }
-.admin-actions { margin-top: 20px; }
-.product-list-title { color: white; font-size: 1.8em; }
-.products-list { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; width: 100%; max-width: 960px; }
-.product-card { width: 140px; height: 200px; cursor: pointer; background-color: rgba(255, 248, 220, 0.9); border-radius: 10px; transition: transform 0.2s ease; }
-.product-card:hover { transform: scale(1.05); }
-.product-image img { width: 100%; height: 150px; object-fit: cover; }
-.product-title { font-size: 13px; padding: 8px 4px 0; text-align: center; }
+/* ======== 核心背景 (保持不变) ======== */
 .bgimage {
   min-height: 100vh;
   background: linear-gradient(
@@ -260,13 +252,151 @@ const handleRemoveProduct = async (productId: number) => {
       #1f1f1f 100%
   );
   background-attachment: fixed;
+  padding: 0; /* Reset padding */
 }
-.dialog-image { max-width: 100%; }
-.card-clickable-content { cursor: pointer; }
+
+.column-detail-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ======== 头部区域优化 ======== */
+.column-header {
+  text-align: center;
+  color: white;
+  /* 稍微增加透明度，让深色背景透出来一点，更有质感 */
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px); /* 可选：增加毛玻璃效果 */
+  padding: 30px 20px;
+  width: 100%;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 30px;
+}
+.column-title { font-size: 2.2em; margin: 0 0 10px 0; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+.column-description { font-size: 1.1em; color: #ccc; max-width: 800px; margin: 0 auto; line-height: 1.6; }
+.admin-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: center;}
+
+/* ======== 内容区容器 ======== */
+.content-section {
+  width: 100%;
+  max-width: 1200px; /* 限制最大宽度，防止在大屏上太散 */
+  padding: 0 20px 40px;
+}
+
+.product-list-title {
+  color: white;
+  font-size: 1.6em;
+  margin-bottom: 24px;
+  padding-left: 10px;
+  border-left: 4px solid #409eff; /* 左侧增加一个强调色条 */
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.book-count { font-size: 0.6em; color: #999; }
+
+
+/* ======== 书籍列表 (核心修改：Grid布局) ======== */
+.books-grid {
+  display: grid;
+  /* 关键：自动填充，最小宽 180px，与主页一致 */
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 24px;
+  width: 100%;
+}
+
+/* ======== 书籍卡片 (核心修改：高对比度样式) ======== */
+.book-card {
+  background-color: #fff; /* 纯白背景，与深色底形成强烈对比 */
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* 在深色背景下，阴影需要更重一点才更有层次感 */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.book-card:hover {
+  transform: translateY(-8px); /* 悬浮上移 */
+  box-shadow: 0 12px 28px rgba(0,0,0,0.5); /* 悬浮加重阴影 */
+}
+
+/* 图片容器：固定比例 */
+.book-image-box {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  height: 240px; /* 你可以根据需要调整 220–260px */
+  background: #f5f7fa;
+  overflow: hidden;
+}
+
+.book-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.book-card:hover .book-image-box img {
+  transform: scale(1.08); /* 图片微放大 */
+}
+
+/* 信息区域 */
+.book-info {
+  padding: 12px;
+  flex: 1; /* 撑满剩余空间 */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: left; /* 左对齐 */
+}
+
+.book-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333; /* 深色文字显示在白色卡片上 */
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+  /* 限制两行省略 */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.book-price {
+  color: #f56c6c; /* 价格高亮色 */
+  font-weight: 700;
+  font-size: 16px;
+  margin-top: auto;
+}
+
+/* ======== 管理员删除按钮 (悬浮显示) ======== */
 .remove-product-btn {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 8px;
+  right: 8px;
   z-index: 10;
+  opacity: 0; /* 默认隐藏 */
+  transition: all 0.2s ease;
+  transform: scale(0.8);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
+
+/* 只有当鼠标悬停在卡片上时才显示 */
+.book-card:hover .remove-product-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* 调整 empty 状态在深色背景下的显示 */
+:deep(.el-empty__description) {
+  color: #ccc;
+}
+
+.dialog-image { max-width: 100%; }
 </style>
