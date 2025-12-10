@@ -115,7 +115,7 @@ function logout() {
             @input="onInputChange"
             @keydown="onKeydown"
             class="search-bar"
-            placeholder="输入书名、作者或线索搜索..."
+            placeholder="输入书名搜索..."
         />
         <ul v-if="showSuggestions && suggestions.length" class="suggestions-list">
           <li v-for="(item, idx) in suggestions" :key="idx" class="suggestion-item" @click="onSelectSuggestion(item)">
@@ -132,12 +132,10 @@ function logout() {
           <el-tooltip content="真相笔记">
             <div class="icon-btn" @click="router.push('/home/all-postings')"><el-icon><ChatSquare /></el-icon></div>
           </el-tooltip>
-          <el-tooltip content="真相解码">
-            <div class="icon-btn" @click="router.push('/home/all-questions')"><el-icon><Document /></el-icon></div>
-          </el-tooltip>
+
           <el-tooltip content="购物车">
             <div class="icon-btn" @click="router.push('/home/cart')">
-              <el-badge :value="cartItemCount"><el-icon><ShoppingCart /></el-icon></el-badge>
+              <el-icon><ShoppingCart /></el-icon>
             </div>
           </el-tooltip>
         </div>

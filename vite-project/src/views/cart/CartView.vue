@@ -70,6 +70,30 @@
       </div>
 
     </div>
+    <el-dialog
+        v-model="dialogVisible"
+        title="填写收货信息"
+        width="480px"
+    >
+      <!-- 表单区 -->
+      <div class="order-form">
+        <label>收货人</label>
+        <el-input v-model="name" />
+
+        <label>手机号</label>
+        <el-input v-model="telephone" />
+
+        <label>地址</label>
+        <el-input v-model="address" type="textarea" />
+      </div>
+
+      <template #footer>
+        <el-button @click="handleCancel">取消</el-button>
+        <el-button type="primary" class="red-btn" :disabled="!ableToOrder" @click="generateOrder">
+          提交订单
+        </el-button>
+      </template>
+    </el-dialog>
 
   </el-main>
 </template>
@@ -505,8 +529,106 @@ export default {
   margin-top: 18px;
   height: 40px;
   border-radius: 10px;
+  background-color: #ff6b6b !important;
+  border-color: #ff6b6b !important;
+  color: white !important;
 }
 
+/* 优雅弹窗整体 */
+.el-dialog {
+  border-radius: 18px !important;
+  padding-bottom: 10px;
+  background: #ffffff;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.15);
+  animation: popup-fade 0.25s ease-out;
+}
+
+/* 弹出动画 */
+@keyframes popup-fade {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 标题样式 */
+.el-dialog__header {
+  margin: 0;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.el-dialog__title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 内容区域 */
+.el-dialog__body {
+  padding: 20px 26px 10px 26px;
+}
+
+/* 表单整体 */
+.order-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.order-form label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+/* input 统一美化 */
+.order-form .el-input,
+.order-form .el-textarea {
+  width: 100%;
+}
+
+.el-input__wrapper,
+.el-textarea__inner {
+  border-radius: 10px !important;
+}
+
+/* 底部按钮区 */
+.el-dialog__footer {
+  padding: 14px 24px 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.el-dialog__footer .el-button {
+  border-radius: 8px;
+  padding: 8px 20px;
+}
+
+/* 提交按钮优雅颜色 */
+.order-confirmation .el-button--primary {
+  background-color: #ff6b6b !important;
+  border-color: #ff6b6b !important;
+}
+
+.order-confirmation .el-button--primary:hover {
+  background-color: #ff5252 !important;
+}
+
+.red-btn {
+  background-color: #ff6b6b !important;
+  border-color: #ff6b6b !important;
+  color: white !important;
+}
+
+.red-btn:hover {
+  background-color: #ff5252 !important;
+  border-color: #ff5252 !important;
+}
 
 
 </style>

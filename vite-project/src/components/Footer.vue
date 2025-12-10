@@ -22,7 +22,6 @@
           <li @click="router.push('/home/rankings')">热销榜</li>
           <li @click="router.push('/home/all-columns')">栏目精选</li>
           <li @click="router.push('/home/all-postings')">真相笔记</li>
-          <li @click="router.push('/home/all-questions')">真相解码</li>
         </ul>
       </div>
 
@@ -32,9 +31,9 @@
         <ul class="footer-list">
           <li>Email：support@truthbookstore.com</li>
           <li>服务热线：400-123-9876</li>
-          <li @click="router.push('/home/about')">关于我们</li>
-          <li @click="router.push('/home/terms')">用户协议</li>
-          <li @click="router.push('/home/privacy')">隐私政策</li>
+          <li >关于我们</li>
+          <li >用户协议</li>
+          <li >隐私政策</li>
         </ul>
       </div>
 

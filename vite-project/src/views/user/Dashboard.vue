@@ -29,10 +29,11 @@
         <div class="info-item"><span>邮箱：</span>{{ email }}</div>
       </div>
 
-      <div class="aside-btns">
+      <div class="btn-row">
         <el-button class="user-btn" type="primary" @click="editDialogVisible = true">修改信息</el-button>
         <el-button class="user-btn" type="primary" @click="addressDialogVisible = true">管理地址簿</el-button>
       </div>
+
     </div>
 
     <!-- 右侧：历史订单 -->
@@ -376,64 +377,94 @@ onMounted(async ()=>{
 
 
 <style scoped>
+/* ===================== 用户中心整体布局 ===================== */
 .user-wrapper {
   display: flex;
-  flex-wrap: wrap;
+  gap: 30px;
+  padding: 40px;
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(145deg, #1e2a27 0%, #0e0f0f 100%);
-  color: #f0eee9;
-  padding: 40px;
-  gap: 30px;
-  font-family: "Cinzel", serif;
+  background: #f0f2f5;
+  font-family: "Helvetica Neue", Arial, sans-serif;
   box-sizing: border-box;
+  color: #333;
+  align-items: flex-start;
 }
 
-/* 左侧信息栏 */
+/* ===================== 左侧个人信息卡片 ===================== */
 .user-aside {
-  flex: 0 0 300px;
+  flex: 0 0 280px;
   max-width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
+  background: #fff;
+  border-radius: 20px;
   padding: 25px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  backdrop-filter: blur(12px);
+  gap: 25px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
   overflow-y: auto;
   max-height: calc(100vh - 80px);
 }
 
+/* 头像和用户名布局 */
 .avatar-section {
   display: flex;
   align-items: center;
   gap: 15px;
 }
 
-.username {
+.user-name-level .username {
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 700;
+  color: #333;
 }
 
-.level {
+.user-name-level .level {
   font-size: 14px;
-  color: #c6a667;
+  font-weight: 600;
+  color: #ff6b6b;
+  margin-top: 4px;
+}
+
+/* 信息列表美化 */
+.info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 14px;
+  background-color: #fff7f6;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px #ffe3e3;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  color: #555;
   font-weight: 500;
 }
 
-.checkin-section p {
-  margin: 0 0 8px 0;
+.info-item span {
+  font-weight: 600;
+  color: #333;
 }
 
-/* 按钮统一风格 */
+/* 左侧按钮统一风格 */
 .user-btn {
-  height: 40px;
-  border-radius: 8px;
+  flex: 1;
+  height: 42px;
+  border-radius: 10px;
   font-weight: 600;
-  background-color: #c6a667;
-  border-color: #c6a667;
-  color: #fff;
+  background-color: #ff6b6b !important;
+  border-color: #ff6b6b !important;
+  color: #fff !important;
   transition: 0.3s;
+}
+
+.user-btn:hover {
+  background-color: #ff5252 !important;
+  border-color: #ff5252 !important;
 }
 
 .user-btn:disabled {
@@ -441,143 +472,144 @@ onMounted(async ()=>{
   cursor: default;
 }
 
-.user-btn:hover {
-  background-color: #b3944e;
-}
-
-/* 信息列表 */
-.info-section {
+/* 按钮容器：左右两个按钮在同一行 */
+.btn-row {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 14px;
+  gap: 15px;
 }
 
-.info-item span {
-  color: #c6a667;
-  font-weight: 500;
-}
-
-/* 修改按钮排列 */
-.aside-btns {
-  display: flex;
-  gap: 10px;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-/* 右侧历史订单 */
+/* ===================== 右侧历史订单 ===================== */
 .user-main {
   flex: 1 1 600px;
   max-width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
+  background: #ffffff;
+  border-radius: 20px;
   padding: 25px;
-  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  min-height: calc(100vh - 80px); /* 保持和左侧一致 */
 }
 
 .main-title {
-  font-size: 20px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #333;
   margin-bottom: 20px;
-  color: #c6a667;
 }
 
-/* ===================== 弹窗统一风格 ===================== */
-/* 全部弹窗背景与圆角 */
+/* 表格字体颜色 */
+.user-main .el-table th,
+.user-main .el-table td {
+  color: #333;
+  background-color: #fafafa;
+}
+
+.user-main .el-table th {
+  font-weight: 600;
+}
+
+.user-main .el-button[type="primary"] {
+  border-radius: 8px !important;
+}
+
+/* ===================== 弹窗整体美化 ===================== */
 .el-dialog {
-  background: rgba(30, 42, 39, 0.95) !important; /* 玻璃感 */
-  border-radius: 16px !important;
-  color: #f0eee9 !important;
+  border-radius: 24px !important;        /* 大圆角 */
+  background: #ffffff !important;        /* 白色背景 */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important; /* 浮动阴影 */
+  color: #333 !important;
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-.el-dialog__header,
-.el-dialog__footer {
-  border-color: rgba(255,255,255,0.1) !important;
-  color: #f0eee9 !important;
+/* 弹窗头部 */
+.el-dialog__header {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  border-bottom: none !important;       /* 去掉默认边框 */
+  background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
+  color: #fff !important;
+  padding: 20px 25px;
+  border-radius: 24px 24px 0 0 !important;
 }
 
+/* 弹窗主体 */
 .el-dialog__body {
-  color: #f0eee9 !important;
+  padding: 25px 30px;
+  background-color: #fffaf7;            /* 柔和背景色 */
+  border-radius: 0 0 24px 24px;
 }
 
-/* 表单元素统一风格 */
-.el-dialog .el-form-item {
-  margin-bottom: 15px;
+/* 弹窗底部 */
+.el-dialog__footer {
+  border-top: none !important;          /* 去掉默认分割线 */
+  padding: 20px 25px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background-color: #fffaf7;
 }
 
+/* 表单输入元素圆角和阴影 */
 .el-dialog input,
 .el-dialog textarea,
 .el-dialog .el-input,
 .el-dialog .el-textarea {
-  background-color: rgba(255,255,255,0.05) !important;
-  border-radius: 8px !important;
-  border: 1px solid rgba(255,255,255,0.2) !important;
-  color: #f0eee9 !important;
+  background-color: #fff !important;
+  border-radius: 12px !important;
+  border: 1px solid #ddd !important;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+  padding: 8px 12px;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .el-dialog input:hover,
 .el-dialog textarea:hover,
 .el-dialog .el-input:hover,
 .el-dialog .el-textarea:hover {
-  border-color: #c6a667 !important;
+  border-color: #ff6b6b !important;
+  box-shadow: inset 0 2px 6px rgba(255,107,107,0.2);
 }
 
-/* 上传组件 */
+/* 上传组件美化 */
 .el-dialog .el-upload .el-upload-dragger,
 .el-dialog .el-upload-list__item {
-  background-color: rgba(255,255,255,0.05) !important;
-  border-radius: 8px !important;
+  background-color: #fff !important;
+  border-radius: 12px !important;
+  border: 1px dashed #ddd !important;
+  transition: border-color 0.3s;
 }
 
-/* 弹窗按钮统一 */
-.el-dialog .el-button {
-  border-radius: 8px !important;
-  font-weight: 600 !important;
+.el-dialog .el-upload:hover {
+  border-color: #ff6b6b !important;
 }
 
+/* 弹窗按钮渐变色风格 */
 .el-dialog .el-button[type="primary"] {
-  background-color: #c6a667 !important;
-  border-color: #c6a667 !important;
+  border-radius: 12px !important;
+  font-weight: 600;
+  background: linear-gradient(90deg, #ff6b6b, #ff5252) !important;
+  border: none !important;
   color: #fff !important;
+  transition: all 0.3s;
 }
 
 .el-dialog .el-button[type="primary"]:hover {
-  background-color: #b3944e !important;
+  background: linear-gradient(90deg, #ff5252, #ff3b3b) !important;
 }
 
 .el-dialog .el-button[type="success"] {
-  background-color: #4caf50 !important;
-  border-color: #4caf50 !important;
+  border-radius: 12px !important;
+  background: linear-gradient(90deg, #4caf50, #43a047) !important;
   color: #fff !important;
+  border: none;
 }
 
 .el-dialog .el-button[type="danger"] {
-  background-color: #f56c6c !important;
-  border-color: #f56c6c !important;
+  border-radius: 12px !important;
+  background: linear-gradient(90deg, #f56c6c, #f44336) !important;
   color: #fff !important;
+  border: none;
 }
-
-/* 表格风格统一 */
-.el-dialog .el-table th,
-.el-dialog .el-table td {
-  color: #f0eee9 !important;
-  background-color: rgba(255,255,255,0.03) !important;
-}
-
-.el-dialog .el-table .el-button {
-  border-radius: 6px !important;
-}
-
-/* 上传 hover 高亮 */
-.el-dialog .el-upload:hover {
-  border-color: #c6a667 !important;
-}
-
-/* 适配多行文本 */
-.el-dialog .el-input[type="textarea"],
-.el-dialog .el-textarea {
-  min-height: 50px !important;
-}
-
 
 </style>
