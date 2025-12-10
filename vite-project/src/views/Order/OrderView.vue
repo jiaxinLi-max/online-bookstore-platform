@@ -208,59 +208,105 @@ export default {
 </script>
 
 <style scoped>
+/* 页面整体容器 */
 .order-confirmation {
-  padding: 20px;
-  border-radius: 8px;
-  max-width: 600px;
-  margin: 50px auto;
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 28px 36px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.1);
 }
 
+/* 标题 */
+.order-confirmation h2 {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #333;
+}
+
+/* 订单概要 */
 .order-details {
-  margin-bottom: 20px;
+  background: #fafafa;
+  border: 1px solid #eee;
+  padding: 18px 22px;
+  border-radius: 14px;
+  margin-bottom: 30px;
 }
 
 .order-details p {
-  font-size: 16px;
-  margin: 5px 0;
+  margin: 6px 0;
+  font-size: 15px;
+  color: #444;
 }
 
-.dialog-content {
+.order-details strong {
+  color: #222;
+}
+
+/* 商品卡片（更像电商订单） */
+.product-card {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-}
-
-.message {
-  font-size: 24px;
-  font-weight: bold;
-}
-
-
-.product-item img {
-  width: 100px;
-  height: 100px;
-  margin-right: 10px;
+  gap: 18px;
+  padding: 14px;
+  margin-bottom: 18px;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .product-image-style {
-  width: 200px; /* 设置图片宽度 */
-  height: 100px; /* 设置图片高度 */
-  object-fit: cover; /* 确保图片填充整个区域 */
-  border-radius: 5px; /* 可选：添加圆角效果 */
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+  object-fit: cover;
 }
 
-.product-card {
-  width: 500px; /* 设置卡片宽度 */
-  max-height: 300px; /* 设置卡片最大高度 */
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* 水平方向居中 */
-  justify-content: center; /* 垂直方向居中 */
-  text-align: center;
-  padding: 10px;
-  box-sizing: border-box;
-  margin: 0 auto; /* 添加这行使卡片在父元素中水平居中 */
+.product-card h3 {
+  margin: 4px 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #333;
 }
+
+.product-card span {
+  display: block;
+  margin: 4px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+/* 支付按钮 */
+.order-confirmation .el-button {
+  width: 100%;
+  margin-top: 18px;
+  font-size: 16px;
+  padding: 12px 0;
+  border-radius: 10px;
+}
+
+/* 支付结束弹窗美化 */
+.afterDialog .el-dialog {
+  border-radius: 18px !important;
+}
+
+.dialog-content {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.message {
+  display: block;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.afterDialog .el-button {
+  border-radius: 10px;
+  padding: 10px 18px;
+}
+
 </style>
