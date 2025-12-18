@@ -68,12 +68,12 @@
 
     <!-- 修改个人信息弹窗 -->
     <el-dialog v-model="editDialogVisible" title="修改个人信息" width="500px">
-      <el-form>
-        <el-form-item label="真实姓名"><el-input v-model="editForm.name" /></el-form-item>
+      <el-form class="profile-form">
+      <el-form-item label="真实姓名"><el-input v-model="editForm.name" /></el-form-item>
         <el-form-item label="联系电话"><el-input v-model="editForm.telephone" /></el-form-item>
-        <el-form-item label="主地址"><el-input v-model="editForm.location" type="textarea" rows="2" /></el-form-item>
+        <el-form-item label="所在地址"><el-input v-model="editForm.location" type="textarea" rows="2" /></el-form-item>
         <el-form-item label="电子邮箱"><el-input v-model="editForm.email" /></el-form-item>
-        <el-form-item label="头像">
+        <el-form-item label="上传头像">
           <el-upload
               action="#"
               list-type="picture-card"
@@ -124,37 +124,85 @@
     </el-dialog>
 
     <!-- 地址簿管理弹窗 -->
-    <el-dialog v-model="addressDialogVisible" title="地址簿管理" width="600px">
-      <el-table :data="editForm.addressBook" stripe border style="width: 100%">
-        <el-table-column label="收件人" prop="name" width="120" />
-        <el-table-column label="电话" prop="phone" width="150" />
-        <el-table-column label="地址" prop="address" />
-        <el-table-column label="操作" width="150">
-          <template #default="scope">
-            <el-button link type="primary" @click="openAddressDialogForEdit(scope.row, scope.$index)">编辑</el-button>
-            <el-button link type="danger" @click="deleteAddress(scope.$index)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+    <!-- 地址簿管理弹窗（卡片式） -->
+    <el-dialog v-model="addressDialogVisible" title="地址簿管理" width="680px">
+      <div class="address-list">
+        <div
+            class="address-card"
+            v-for="(addr, index) in editForm.addressBook"
+            :key="index"
+        >
+          <div class="address-main">
+            <div class="address-header">
+              <span class="receiver">{{ addr.name }}</span>
+              <span class="phone">{{ addr.phone }}</span>
+            </div>
+            <div class="address-detail">
+              {{ addr.address }}
+            </div>
+          </div>
 
-      <div style="text-align: right; margin-top: 15px;">
-        <el-button type="success" @click="openAddressDialogForAdd">新增地址</el-button>
-        <el-button type="primary" @click="submitAllUserInfo">保存地址簿改动</el-button>
+          <div class="address-actions">
+            <el-button link type="primary" @click="openAddressDialogForEdit(addr, index)">
+              编辑
+            </el-button>
+            <el-button link type="danger" @click="deleteAddress(index)">
+              删除
+            </el-button>
+          </div>
+        </div>
+
+        <div v-if="editForm.addressBook.length === 0" class="empty-address">
+          暂无地址，请新增
+        </div>
       </div>
+
+      <template #footer>
+        <el-button @click="addressDialogVisible = false">关闭</el-button>
+        <el-button type="primary" @click="openAddressDialogForAdd">
+          新增地址
+        </el-button>
+        <el-button type="primary" plain @click="submitAllUserInfo">
+          保存地址簿
+        </el-button>
+      </template>
     </el-dialog>
 
+
     <!-- 新增/编辑地址弹窗 -->
-    <el-dialog v-model="isAddressEditing" title="编辑地址" width="400px" append-to-body>
-      <el-form :model="addressForm" label-width="80px">
-        <el-form-item label="收件人"><el-input v-model="addressForm.name" /></el-form-item>
-        <el-form-item label="电话"><el-input v-model="addressForm.phone" /></el-form-item>
-        <el-form-item label="地址"><el-input type="textarea" rows="2" v-model="addressForm.address" /></el-form-item>
+    <!-- 新增 / 编辑地址弹窗 -->
+    <el-dialog
+        v-model="isAddressEditing"
+        title="地址信息"
+        width="380px"
+        append-to-body
+        :close-on-click-modal="false"
+    >
+      <el-form :model="addressForm" label-width="70px">
+        <el-form-item label="收件人">
+          <el-input v-model="addressForm.name" placeholder="请输入收件人姓名" />
+        </el-form-item>
+
+        <el-form-item label="电话">
+          <el-input v-model="addressForm.phone" placeholder="请输入联系电话" />
+        </el-form-item>
+
+        <el-form-item label="地址">
+          <el-input
+              type="textarea"
+              rows="3"
+              v-model="addressForm.address"
+              placeholder="请输入详细地址"
+          />
+        </el-form-item>
       </el-form>
+
       <template #footer>
         <el-button @click="isAddressEditing = false">取消</el-button>
         <el-button type="primary" @click="saveAddress">保存</el-button>
       </template>
     </el-dialog>
+
   </div>
 </template>
 
@@ -511,105 +559,154 @@ onMounted(async ()=>{
   border-radius: 8px !important;
 }
 
-/* ===================== 弹窗整体美化 ===================== */
-.el-dialog {
-  border-radius: 24px !important;        /* 大圆角 */
-  background: #ffffff !important;        /* 白色背景 */
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important; /* 浮动阴影 */
-  color: #333 !important;
-  overflow: hidden;
-  transition: all 0.3s ease;
+/* ===================== 弹窗整体（teleport 修复版） ===================== */
+:deep(.el-dialog) {
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
 }
 
-/* 弹窗头部 */
-.el-dialog__header {
-  font-size: 20px;
-  font-weight: 700;
-  color: #333;
-  border-bottom: none !important;       /* 去掉默认边框 */
-  background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
-  color: #fff !important;
-  padding: 20px 25px;
-  border-radius: 24px 24px 0 0 !important;
+:deep(.el-dialog__header) {
+  padding: 16px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+  border-bottom: 1px solid #ebeef5;
+  background: #ffffff;
 }
 
-/* 弹窗主体 */
-.el-dialog__body {
-  padding: 25px 30px;
-  background-color: #fffaf7;            /* 柔和背景色 */
-  border-radius: 0 0 24px 24px;
+:deep(.el-dialog__body) {
+  padding: 20px;
 }
 
-/* 弹窗底部 */
-.el-dialog__footer {
-  border-top: none !important;          /* 去掉默认分割线 */
-  padding: 20px 25px;
+:deep(.el-dialog__footer) {
+  padding: 12px 20px 18px;
+  border-top: 1px solid #ebeef5;
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  background-color: #fffaf7;
+  background: #ffffff;
 }
 
-/* 表单输入元素圆角和阴影 */
-.el-dialog input,
-.el-dialog textarea,
-.el-dialog .el-input,
-.el-dialog .el-textarea {
-  background-color: #fff !important;
-  border-radius: 12px !important;
-  border: 1px solid #ddd !important;
-  box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
-  padding: 8px 12px;
-  transition: border-color 0.3s, box-shadow 0.3s;
+/* ===================== 表单基础美化 ===================== */
+:deep(.el-dialog .el-input__wrapper),
+:deep(.el-dialog .el-textarea__inner) {
+  border-radius: 6px;
+  box-shadow: none;
+  border: 1px solid #dcdfe6;
+  background-color: #fafafa;
+  transition: all 0.2s ease;
 }
 
-.el-dialog input:hover,
-.el-dialog textarea:hover,
-.el-dialog .el-input:hover,
-.el-dialog .el-textarea:hover {
-  border-color: #ff6b6b !important;
-  box-shadow: inset 0 2px 6px rgba(255,107,107,0.2);
+:deep(.el-dialog .el-input__wrapper:focus-within),
+:deep(.el-dialog .el-textarea__inner:focus) {
+  background-color: #ffffff;
+  border-color: #409eff;
 }
 
-/* 上传组件美化 */
-.el-dialog .el-upload .el-upload-dragger,
-.el-dialog .el-upload-list__item {
-  background-color: #fff !important;
-  border-radius: 12px !important;
-  border: 1px dashed #ddd !important;
-  transition: border-color 0.3s;
+/* ===================== 个人信息弹窗：对齐修复（关键） ===================== */
+:deep(.profile-form .el-form-item) {
+  display: flex;
+  align-items: flex-start;   /* ← 这句现在终于会生效 */
+  margin-bottom: 20px;
 }
 
-.el-dialog .el-upload:hover {
-  border-color: #ff6b6b !important;
+:deep(.profile-form .el-form-item__label) {
+  line-height: 32px;
+  padding-top: 6px;
+  font-size: 14px;
+  color: #606266;
+  font-weight: 500;
 }
 
-/* 弹窗按钮渐变色风格 */
-.el-dialog .el-button[type="primary"] {
-  border-radius: 12px !important;
+/* input 高度统一 */
+:deep(.profile-form .el-input__wrapper) {
+  min-height: 36px;
+}
+
+/* textarea 与 input 对齐 */
+:deep(.profile-form .el-textarea__inner) {
+  line-height: 1.6;
+  padding-top: 6px;
+}
+
+/* ===================== 头像上传区域 ===================== */
+:deep(.profile-form .el-upload) {
+  --el-upload-picture-card-size: 72px;
+}
+
+:deep(.profile-form .el-upload-list--picture-card) {
+  gap: 8px;
+}
+
+:deep(.profile-form .el-upload--picture-card) {
+  width: 72px;
+  height: 72px;
+  line-height: 72px;
+  border-radius: 8px;
+  background: #fafafa;
+  border: 1px dashed #dcdfe6;
+  transition: all 0.2s ease;
+}
+
+:deep(.profile-form .el-upload--picture-card:hover) {
+  border-color: #409eff;
+  background: #f5faff;
+}
+
+/* 头像那一行单独居中 */
+:deep(.profile-form .el-form-item:has(.el-upload)) {
+  align-items: center;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+/* ===================== 地址簿卡片 ===================== */
+:deep(.address-list) {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+:deep(.address-card) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1px solid #ebeef5;
+  background: #fafafa;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+:deep(.address-card:hover) {
+  background: #ffffff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* ===================== 订单详情 ===================== */
+:deep(.el-descriptions) {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+:deep(.el-descriptions-item__label) {
+  width: 120px;
   font-weight: 600;
-  background: linear-gradient(90deg, #ff6b6b, #ff5252) !important;
-  border: none !important;
-  color: #fff !important;
-  transition: all 0.3s;
+  color: #606266;
+  background-color: #fafafa;
 }
 
-.el-dialog .el-button[type="primary"]:hover {
-  background: linear-gradient(90deg, #ff5252, #ff3b3b) !important;
+/* ===================== 弹窗中的表格 ===================== */
+:deep(.el-dialog .el-table) {
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.el-dialog .el-button[type="success"] {
-  border-radius: 12px !important;
-  background: linear-gradient(90deg, #4caf50, #43a047) !important;
-  color: #fff !important;
-  border: none;
-}
-
-.el-dialog .el-button[type="danger"] {
-  border-radius: 12px !important;
-  background: linear-gradient(90deg, #f56c6c, #f44336) !important;
-  color: #fff !important;
-  border: none;
+:deep(.el-dialog .el-table th) {
+  background-color: #fafafa;
+  font-weight: 600;
 }
 
 </style>
