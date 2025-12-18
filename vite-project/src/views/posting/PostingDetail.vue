@@ -401,4 +401,82 @@ onMounted(() => {
 .loading-icon { animation: rotating 2s linear infinite; margin-right: 10px; }
 @keyframes rotating { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .delete-btn { margin-left: auto; }
+
+.linked-products h3 {
+  font-size: 1.5em; /* 调整标题大小 */
+  color: #ffcc00; /* 匹配页面主色调 */
+  margin-top: 40px; /* 与上方内容隔开距离 */
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #444; /* 添加一条分割线 */
+}
+
+/* 书籍卡片列表的容器 */
+.products-list {
+  display: flex; /* 使用 Flexbox 布局实现横向排列 */
+  gap: 20px; /* 设置卡片之间的间距 */
+  overflow-x: auto; /* 当内容超出容器宽度时，显示横向滚动条 */
+  padding-bottom: 15px; /* 为滚动条留出空间，避免遮挡卡片阴影 */
+}
+
+/* 单个书籍卡片样式 - 这是控制大小的关键 */
+.product-card {
+  width: 160px; /* **核心：设置一个固定的卡片宽度** */
+  flex-shrink: 0; /* 防止卡片在 Flex 容器中被压缩 */
+  background-color: #2a2a2a; /* 卡片背景色 */
+  border: 1px solid #555;
+  border-radius: 8px;
+  overflow: hidden; /* 隐藏超出圆角的部分 */
+  display: flex;
+  flex-direction: column; /* 让图片和标题垂直排列 */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* 书籍封面的容器 */
+.product-image {
+  width: 100%;
+  height: 210px; /* **核心：设置一个固定的图片区域高度** */
+}
+
+/* 封面图片本身 */
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* **核心：让图片填满容器，同时保持比例（多余部分会被裁剪）** */
+}
+
+/* 书籍标题样式 */
+.product-title {
+  margin: 0;
+  padding: 12px 10px;
+  font-size: 14px;
+  color: #ccc;
+  text-align: center;
+  /* 处理长标题，避免换行破坏布局 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* (可选) 美化横向滚动条 */
+.products-list::-webkit-scrollbar {
+  height: 8px;
+}
+.products-list::-webkit-scrollbar-track {
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+.products-list::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+.products-list::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
 </style>
