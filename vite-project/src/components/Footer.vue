@@ -19,7 +19,6 @@
         <h4 class="footer-subtitle">快速导航</h4>
         <ul class="footer-list">
           <li @click="router.push('/home/all-products')">全部书籍</li>
-          <li @click="router.push('/home/rankings')">热销榜</li>
           <li @click="router.push('/home/all-columns')">栏目精选</li>
           <li @click="router.push('/home/all-postings')">真相笔记</li>
         </ul>
