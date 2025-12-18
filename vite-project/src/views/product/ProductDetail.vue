@@ -521,7 +521,7 @@ export default defineComponent({
 
     const handleDeleteComment = async (commentId: number) => {
       try {
-        await ElMessageBox.confirm('确定要删除这条评价吗？', '警告', { type: 'warning' });
+        await ElMessageBox.confirm('确定要删除这条评价吗？', '提示', { type: 'warning' });
         const res = await deleteComment(commentId);
         if (res.data.code == 200) {
           ElMessage.success("删除成功");
@@ -1206,7 +1206,150 @@ html, body { height: 100%; }
 .rating-text{ margin-left: 8px; }
 
 /* ... 其他已有样式保持不变 ... */
+/* ======== 右侧：固定购物车操作区 (重构版) ======== */
+.right-sticky {
+  flex: 0 0 40%;
+  max-width: 40%;
+  position: sticky;
+  top: 30px;
+  width: 360px;
+  margin-top: 20px;
+}
 
+/* 操作区外壳：增加层次感 */
+.right-sticky .action-area {
+  background: #ffffff;
+  border: 1px solid #ebeef5;
+  border-radius: 12px;
+  padding: 24px;
+  /* 悬浮阴影，更有质感 */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 右侧标题 */
+.right-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+/* 价格区域 - 核心修改：去掉黑框，改用电商红 */
+.price-big {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 36px;       /* 字体加大 */
+  color: #ff4d4f !important; /* 价格红 */
+  font-weight: 800;
+  margin-bottom: 5px;
+  background-color: transparent; /* 去掉黑色背景 */
+  padding: 0;
+  border-radius: 0;
+  text-align: left;
+  width: auto;
+  display: flex;
+  align-items: baseline;
+}
+
+/* 给价格加一个人民币符号 */
+.price-big::before {
+  content: '¥';
+  font-size: 20px;
+  margin-right: 4px;
+  font-weight: 600;
+}
+
+/* 购买卡片容器：更清爽 */
+.buy-card {
+  border-radius: 12px;
+  padding: 20px;
+  margin: 10px 0;
+  /* 淡淡的灰色背景，区分层级 */
+  background-color: #f8f9fa;
+  border: 1px solid #eee;
+  box-shadow: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.buy-card .action-row {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+/* 数量选择器行 */
+.quantity-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  margin-bottom: 0;
+}
+
+/* 库存提示 */
+.stock-tips {
+  font-size: 13px;
+  color: #ff9900;
+  background: #fffbe6;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #ffe58f;
+}
+
+/* 加入购物车按钮 - 核心修改：诱人的渐变色 + 投影 */
+.add-to-cart-btn {
+  width: 100%;
+  height: 50px;
+  /* 淘宝/京东风格的暖色渐变，极具购买欲 */
+  background: linear-gradient(135deg, #ff9000 0%, #ff5000 100%);
+  color: #fff;
+  border: none;
+  border-radius: 25px; /* 胶囊圆角，更亲切 */
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 15px rgba(255, 80, 0, 0.25); /* 橙色光晕 */
+}
+
+/* 悬停效果：上浮 + 阴影加深 */
+.add-to-cart-btn:hover {
+  background: linear-gradient(135deg, #ff8000 0%, #ff4000 100%) !important;
+  border-color: transparent !important;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px rgba(255, 80, 0, 0.35);
+}
+
+/* 点击效果 */
+.add-to-cart-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 10px rgba(255, 80, 0, 0.2);
+}
+
+/* 管理员区域 */
+.manager-actions-group {
+  width: 100%;
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px dashed #ccc; /* 虚线框区分管理员 */
+  margin-top: 20px;
+}
+.stock-display {
+  color: #666;
+  font-size: 14px;
+  background: #f0f0f0;
+  text-shadow: none;
+  font-weight: normal;
+}
 </style>
 
 
