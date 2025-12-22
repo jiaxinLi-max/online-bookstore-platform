@@ -103,10 +103,7 @@
               立即支付
             </el-button>
 
-            <div class="payment-methods">
-              <img src="https://img.icons8.com/color/48/000000/alipay.png" alt="alipay" />
-              <span>支持支付宝快捷支付</span>
-            </div>
+
           </div>
         </aside>
       </div>
