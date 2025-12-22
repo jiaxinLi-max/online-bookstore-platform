@@ -19,7 +19,7 @@
             <div class="order-receipt-grid">
               <div class="receipt-item">
                 <span class="label">订单编号</span>
-                <span class="value code-font">{{ orderId || '读取中...' }}</span>
+                <span class="value code-font">{{ orderId }}</span>
               </div>
               <div class="receipt-item">
                 <span class="label">下单时间</span>
@@ -46,9 +46,7 @@
             <div class="product-scroll-area">
               <div v-for="product in products" :key="product.cartItemId" class="product-row">
                 <div class="product-thumb">
-                  <el-image :src="product.cover" fit="cover">
-                    <template #error><div class="image-slot"><el-icon><Picture /></el-icon></div></template>
-                  </el-image>
+                  <el-image :src="product.cover" fit="cover" />
                 </div>
                 <div class="product-info">
                   <div class="p-title">{{ product.title }}</div>
@@ -94,18 +92,17 @@
               </div>
             </div>
 
-            <!-- 立即支付按钮 -->
             <el-button
                 type="primary"
                 class="ultimate-pay-btn"
                 :loading="isPaying"
-                :disabled="orderClosed"
                 @click="confirmOrder"
+                v-if="!orderClosed"
             >
               <el-icon v-if="!isPaying"><Wallet /></el-icon>
-              {{ isPaying ? '正在支付...' : '立即支付' }}
+              立即支付
             </el-button>
-            
+
           </div>
         </aside>
       </div>
@@ -117,7 +114,6 @@
         width="420px"
         class="modern-status-dialog"
         :show-close="false"
-        :close-on-click-modal="false"
         align-center
     >
       <div class="status-result">
@@ -135,133 +131,58 @@
 </template>
 
 <script lang="ts">
-import { onMounted, ref, onUnmounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { addCredit, updateLevel } from '../../api/user.ts'
 import { postOrder, getStatus, getOrderItems, getCartItems } from '../../api/cart.ts';
 import type { Cart } from '../../api/cart.ts';
 import { ElMessage } from "element-plus";
 import { useRoute, useRouter } from 'vue-router';
 import {
-  DocumentChecked, ShoppingBag, CircleCheckFilled,
-  Wallet, SuccessFilled, ArrowLeft, Picture
+  Lock, Check, ArrowLeft, DocumentChecked,
+  ShoppingBag, CircleCheckFilled, Wallet, SuccessFilled
 } from '@element-plus/icons-vue';
 
 export default {
   components: {
-    DocumentChecked, ShoppingBag, CircleCheckFilled,
-    Wallet, SuccessFilled, ArrowLeft, Picture
+    Lock, Check, ArrowLeft, DocumentChecked,
+    ShoppingBag, CircleCheckFilled, Wallet, SuccessFilled
   },
   setup() {
+    const products = ref<Cart[]>([]);
+    const userId = sessionStorage.getItem('userId');
+    const userIdNumber = Number(userId);
     const router = useRouter();
     const route = useRoute();
 
-    // 基本数据
-    const userId = sessionStorage.getItem('userId');
-    const userIdNumber = Number(userId);
+    const isPaying = ref(false);
     const orderId = route.params.orderId as string;
     const createTime = route.params.createTime as string;
-    const totalAmount = Number(route.params.totalAmount || 0);
-    const realAmount = Number(route.params.realAmount || 0);
+    const totalAmount = Number(route.params.totalAmount);
+    const realAmount = Number(route.params.realAmount);
+    const orderClosed = ref<boolean>(false);
+    let pollingTimer: ReturnType<typeof setInterval> | null = null;
 
-    // 状态控制
-    const products = ref<Cart[]>([]);
-    const isPaying = ref(false);
-    const orderClosed = ref(false);
-    let pollingTimer: any = null;
-
-    // 格式化时间
-    const formatTime = (isoString: string) => {
+    function formatTime(isoString: string) {
       if (!isoString) return '--';
-      try {
-        const date = new Date(isoString);
-        return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
-      } catch (e) { return isoString; }
-    };
+      const date = new Date(isoString);
+      return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
+    }
 
-    // 轮询逻辑：检查后端订单支付状态
-    const startPolling = () => {
-      if (pollingTimer) clearInterval(pollingTimer);
-
-      let attempts = 0;
-      const maxAttempts = 100; // 约5分钟
-
-      pollingTimer = setInterval(async () => {
-        attempts++;
-        if (attempts > maxAttempts) {
-          stopPolling();
-          isPaying.value = false;
-          ElMessage.warning("支付确认超时，请刷新订单中心查看结果");
-          return;
-        }
-
-        try {
-          const res = await getStatus(Number(orderId));
-          if (res.data.code === '200') {
-            const status = res.data.data.status;
-            // 根据后端实际返回的状态字符串判断
-            if (status === 'TRADE_SUCCESS' || status === 'PAID') {
-              stopPolling();
-              handlePaymentSuccess();
-            } else if (status === 'TRADE_CLOSED') {
-              stopPolling();
-              isPaying.value = false;
-              ElMessage.error('交易已关闭或支付失败');
-            }
-          }
-        } catch (error) {
-          console.error("轮询异常:", error);
-        }
-      }, 3000); // 每3秒查询一次
-    };
-
-    const stopPolling = () => {
-      if (pollingTimer) {
-        clearInterval(pollingTimer);
-        pollingTimer = null;
-      }
-    };
-
-    const handlePaymentSuccess = async () => {
-      ElMessage.success("支付成功！");
-      try {
-        // 计算积分并更新等级
-        let updateScore = Math.floor(realAmount / 10);
-        await addCredit(userIdNumber, updateScore);
-        await updateLevel(userIdNumber);
-      } catch (e) {
-        console.error("更新会员信息失败", e);
-      }
-      isPaying.value = false;
-      orderClosed.value = true;
-    };
-
-    // 点击立即支付
     const confirmOrder = async () => {
-      if (!orderId || isNaN(Number(orderId))) {
-        ElMessage.error("无效的订单ID，无法支付");
-        return;
-      }
-
       isPaying.value = true;
       try {
-        // 发起支付，后端返回支付宝 Form 表单
-        const returnUrl = window.location.origin + "/#/order-status"; // 支付后跳转回的地址
-        const response = await postOrder(Number(orderId), returnUrl);
-
+        const response = await postOrder(Number(orderId), "http://localhost:3000/#/login");
         if (response.data.code === '200') {
           const paymentForm = response.data.data.paymentForm;
-
-          // 打开新窗口进行支付
           const payWindow = window.open('', '_blank');
           if (payWindow) {
             payWindow.document.open();
             payWindow.document.write(paymentForm);
+            startPolling();
             payWindow.document.close();
-
-            ElMessage.success("支付页面已打开");
-            startPolling(); // 开始不断询问后端：付钱了吗？
+            ElMessage.success("支付窗口已打开，请完成支付");
           } else {
-            ElMessage.error("支付窗口被拦截，请在浏览器设置中允许弹窗");
+            ElMessage.error("支付窗口被拦截，请允许弹窗后重试");
             isPaying.value = false;
           }
         } else {
@@ -269,87 +190,326 @@ export default {
           isPaying.value = false;
         }
       } catch (error) {
-        console.error("支付请求错误:", error);
-        ElMessage.error('无法连接到支付服务器，请检查网络');
+        ElMessage.error('服务异常，请稍后再试');
         isPaying.value = false;
       }
     };
 
+    const startPolling = () => {
+      pollingTimer = setInterval(async () => {
+        const res = await getStatus(Number(orderId));
+        if (res.data.code === '200') {
+          const status = res.data.data.status;
+          if (status === 'TRADE_SUCCESS') {
+            clearInterval(pollingTimer!);
+            ElMessage.success("支付成功！");
+            let updateScore = Math.floor(realAmount / 10);
+            await addCredit(Number(userId), updateScore);
+            await updateLevel(Number(userId));
+            orderClosed.value = true;
+          } else if (status === 'TRADE_CLOSED') {
+            clearInterval(pollingTimer!);
+            ElMessage.error('交易已取消或失效');
+            orderClosed.value = true;
+          }
+        }
+      }, 3000);
+    }
+
     const closeOrder = () => {
-      stopPolling();
+      if (pollingTimer) clearInterval(pollingTimer);
       router.push({ name: 'Cart' });
     }
 
-    // 获取订单内的商品明细
-    async function fetchOrderDetails() {
-      if (!orderId || orderId === 'undefined') {
-        console.warn("未发现订单ID");
-        return;
-      }
+    async function getAllInCart() {
+      if (!userId) return;
       try {
-        // 1. 先获取该订单包含哪些 cartItemIds
-        const resOrder = await getOrderItems(Number(orderId));
-        const targetIds = resOrder.data.data.cartItemIds || [];
-
-        // 2. 获取用户购物车全集，从中过滤出属于该订单的商品
-        const resCart = await getCartItems(userIdNumber);
-        if (resCart.data.code === '200') {
-          const allItems = resCart.data.data.items || [];
-          products.value = allItems.filter((item: any) => targetIds.includes(item.cartItemId));
+        const res = await getCartItems(userIdNumber);
+        const res2 = await getOrderItems(Number(orderId));
+        if (res.data.data && Array.isArray(res.data.data.items)) {
+          const cartItemIds = res2.data.data.cartItemIds;
+          products.value = res.data.data.items.filter((item: any) =>
+              cartItemIds.includes(item.cartItemId)
+          );
         }
       } catch (error) {
-        console.error('获取订单商品明细失败:', error);
+        console.error('获取明细失败:', error);
       }
     }
 
-    onMounted(() => {
-      if (!orderId) {
-        ElMessage.warning("订单信息已失效，请重新下单");
-        router.push({ name: 'Cart' });
-        return;
-      }
-      fetchOrderDetails();
-    });
-
-    onUnmounted(() => {
-      stopPolling();
-    });
+    onMounted(getAllInCart);
 
     return {
-      orderId, totalAmount, createTime, confirmOrder, orderClosed,
-      userIdNumber, closeOrder, products, realAmount, formatTime, isPaying
+      orderId, totalAmount, createTime, confirmOrder, orderClosed, userIdNumber,
+      closeOrder, products, realAmount, formatTime, isPaying
     };
   }
 };
 </script>
 
 <style scoped>
-/* 保持你原来的样式不变 */
-.order-confirm-page { background-color: #f7f7f9; min-height: 100vh; padding: 30px 20px; color: #1d1d1f; }
-.confirm-container { max-width: 1080px; margin: 0 auto; animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
-@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 0 10px; }
-.page-title { font-size: 22px; font-weight: 600; margin: 0; }
-.confirm-layout { display: flex; gap: 30px; }
+.order-confirm-page {
+  background-color: #f7f7f9;
+  min-height: 100vh;
+  padding: 30px 20px;
+  color: #1d1d1f;
+}
+
+.confirm-container {
+  max-width: 1080px;
+  margin: 0 auto;
+  animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding: 0 10px;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.confirm-layout {
+  display: flex;
+  gap: 30px;
+}
+
 .layout-main { flex: 1; }
 .layout-aside { width: 340px; }
-.modern-card { background: #ffffff; border-radius: 24px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); }
-.card-title { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700; margin-bottom: 20px; color: #3a3a3c; }
-.order-receipt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.receipt-item { display: flex; flex-direction: column; gap: 6px; }
-.receipt-item .label { font-size: 13px; color: #86868b; }
-.receipt-item .value { font-size: 15px; font-weight: 500; }
-.code-font { font-family: 'Courier New', Courier, monospace; color: #ff6b6b; }
-.safe-tag { color: #34c759; display: flex; align-items: center; gap: 4px; font-size: 14px; }
-.product-row { display: flex; align-items: center; gap: 20px; padding: 16px 0; border-bottom: 1px solid #f2f2f7; }
-.product-thumb { width: 70px; height: 70px; border-radius: 14px; overflow: hidden; background: #fbfbfd; flex-shrink: 0; }
-.p-title { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
-.checkout-sticky-card { background: #ffffff; border-radius: 28px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); position: sticky; top: 30px; }
+
+/* 现代卡片通用样式 */
+.modern-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #3a3a3c;
+}
+
+.count-badge {
+  background: #f2f2f7;
+  color: #86868b;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* 订单摘要网格 */
+.order-receipt-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.receipt-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.receipt-item .label {
+  font-size: 13px;
+  color: #86868b;
+}
+
+.receipt-item .value {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.code-font {
+  font-family: 'Courier New', Courier, monospace;
+  color: #ff6b6b;
+}
+
+.safe-tag {
+  color: #34c759;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+}
+
+/* 商品清单行 */
+.product-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 0;
+  border-bottom: 1px solid #f2f2f7;
+}
+
+.product-row:last-child { border-bottom: none; }
+
+.product-thumb {
+  width: 70px;
+  height: 70px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fbfbfd;
+  flex-shrink: 0;
+}
+
+.product-info { flex: 1; }
+
+.p-title {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.p-price-qty {
+  font-size: 14px;
+  color: #86868b;
+}
+
+.p-qty { margin-left: 12px; }
+
+.p-total-price {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* 侧边结算栏 */
+.checkout-sticky-card {
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 30px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+  position: sticky;
+  top: 30px;
+}
+
+.summary-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 25px;
+}
+
+.price-calc {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.calc-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.calc-item .label { color: #86868b; }
+
 .discount-val { color: #34c759; font-weight: 600; }
+
+.final-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin: 10px 0 25px;
+}
+
+.total-label {
+  font-size: 16px;
+  font-weight: 600;
+}
+
 .total-amount { color: #ff6b6b; }
+
+.total-amount .currency { font-size: 18px; font-weight: 700; }
+
 .total-amount .number { font-size: 32px; font-weight: 800; }
-.ultimate-pay-btn { width: 100%; height: 58px; border-radius: 18px; font-size: 17px; font-weight: 600; background: #1d1d1f !important; border: none !important; }
-.status-result { text-align: center; padding: 20px 0; }
-.status-icon-box { font-size: 60px; color: #34c759; margin-bottom: 15px; }
-.wide-btn { width: 80%; height: 46px; border-radius: 12px; }
+
+.ultimate-pay-btn {
+  width: 100%;
+  height: 58px;
+  border-radius: 18px;
+  font-size: 17px;
+  font-weight: 600;
+  background: #1d1d1f !important;
+  border: none !important;
+  display: flex;
+  gap: 10px;
+  transition: all 0.3s;
+}
+
+.ultimate-pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  background: #333 !important;
+}
+
+.payment-methods {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+  font-size: 12px;
+  color: #aeaeb2;
+}
+
+.payment-methods img {
+  width: 24px;
+  opacity: 0.8;
+}
+
+/* 状态弹窗 */
+.status-result {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.status-icon-box {
+  font-size: 60px;
+  color: #34c759;
+  margin-bottom: 15px;
+}
+
+.status-result h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.status-result p {
+  color: #86868b;
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+.wide-btn {
+  width: 80%;
+  height: 46px;
+  border-radius: 12px;
+}
+
+@media (max-width: 850px) {
+  .confirm-layout { flex-direction: column; }
+  .layout-aside { width: 100%; }
+}
 </style>
