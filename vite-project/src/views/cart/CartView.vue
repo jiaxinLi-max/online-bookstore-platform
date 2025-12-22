@@ -214,7 +214,7 @@ export default {
 
     onMounted(fetchInitialData);
     return {
-      products, updateQuantity, removeFromCart, generateOrder, dialogVisible, name, telephone,
+      userIdNumber,products, updateQuantity, removeFromCart, generateOrder, dialogVisible, name, telephone,
       address, ableToOrder, selectedProducts, totalPrice, handleCheckout: () => { dialogVisible.value = true; },
       addressBook, selectedAddressIndex, onAddressSelect, toggleCheckAll, checkAll, indeterminate, userLevel, discountRate
     };

@@ -80,25 +80,21 @@ export const addCart = (userId: number, productId: number, quantity: number) => 
 //     });
 // };
 export const removeItemFromCart = (userId: number, cartItemId: number) => {
-    const token = sessionStorage.getItem('token'); // 从 sessionStorage 获取 token
+    const token = sessionStorage.getItem('token');
 
-    // 构建请求的 URL
-    const url = `${CART_MODULE}/${cartItemId}`; // 只需 cartItemId 作为路径参数
+    // 修改：手动拼接 userId 到 URL 中，确保后端 @RequestParam 能准确接收
+    const url = `${CART_MODULE}/${cartItemId}?userId=${userId}`;
 
     return axios.delete(url, {
         headers: {
-            'Content-Type': 'application/json',
-            'token': token, // 使用 'token' 作为请求头
-        },
-        params: {
-            userId: userId // 将 userId 作为查询参数传递
+            'token': token // DELETE 通常不需要 Content-Type
         }
     }).then(res => {
-        console.log("Response:", res);
-        return res; // 返回响应数据，通常是 res.data??注意这里
+        console.log("删除响应:", res);
+        return res;
     }).catch(error => {
         console.error("删除商品失败:", error);
-        throw error; // 抛出错误以便后续处理
+        throw error;
     });
 };
 
