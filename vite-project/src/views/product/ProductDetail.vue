@@ -180,7 +180,7 @@
         <!-- 顾客版 -->
         <div v-if="role === 'CUSTOMER'" class="customer-actions-group">
           <h2 class="right-title">{{ product.title }}</h2>
-          <div class="price-big">¥{{ product.price }}</div>
+          <div class="price-big">{{ product.price }}</div>
           <div class="quantity-row">
             <el-input-number v-model="quantity" :min="1" :max="maxQuantity" label="选择数量"></el-input-number>
             <span v-if="stockAmount <= 10" class="stock-tips">库存紧张</span>
