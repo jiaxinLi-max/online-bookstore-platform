@@ -7,7 +7,7 @@
         <div class="profile-card">
           <div class="avatar-wrapper">
             <el-avatar :src="avatar" :size="100" class="main-avatar" />
-            <!-- 等级随积分自动计算 -->
+            <!-- 等级随数据库 grade 和 score 自动计算 -->
             <div class="level-badge">LV.{{ currentLevel }}</div>
           </div>
           <h2 class="username-text">{{ username }}</h2>
@@ -25,8 +25,8 @@
                 :show-text="false"
             />
             <div class="progress-info">
-              <span>进度：{{ progressPoints }} / 100</span>
-              <span>总分：{{ credits }}</span>
+              <span>本级进度：{{ progressPoints }} / 100</span>
+              <span>当前积分：{{ score }}</span>
             </div>
           </div>
         </div>
@@ -37,9 +37,8 @@
             <div class="header-left">
               <el-icon><Calendar /></el-icon>
               <span>日常签到</span>
-              <!-- 新增：小问号说明 -->
               <el-tooltip
-                  content="每次签到获得 1 积分，满 100 积分自动升级"
+                  content="每次签到获得 1 积分，满 100 积分自动提升一级"
                   placement="top"
               >
                 <el-icon class="help-icon"><QuestionFilled /></el-icon>
@@ -211,7 +210,7 @@
 import { ref, reactive, computed, onMounted } from 'vue';
 import { ElMessage, ElMessageBox, type UploadFile } from "element-plus";
 import {
-  Calendar, List, Camera, User, Iphone, Message, Plus, Edit,
+  Calendar, List, Camera, Plus, Edit,
   Delete, EditPen, LocationInformation, ArrowRight, QuestionFilled
 } from '@element-plus/icons-vue';
 
@@ -228,17 +227,26 @@ const role = sessionStorage.getItem("role");
 const userId = sessionStorage.getItem("userId");
 const loading = ref(false);
 
-// 用户状态
+// 用户基本信息
 const name = ref('');
 const avatar = ref('');
 const telephone = ref('');
 const location = ref('');
 const email = ref('');
-const credits = ref(0);
 
-// 等级计算逻辑
-const currentLevel = computed(() => Math.floor(credits.value / 100));
-const progressPoints = computed(() => credits.value % 100);
+// --- 核心等级逻辑变量 ---
+const score = ref(0); // 数据库积分
+const grade = ref(0); // 数据库等级
+
+// 计算属性：当前显示等级 = 数据库 grade + (score / 100)
+const currentLevel = computed(() => {
+  return grade.value + Math.floor(score.value / 100);
+});
+
+// 计算属性：当前等级内的进度值 (0-99)
+const progressPoints = computed(() => score.value % 100);
+
+// 计算属性：进度条百分比
 const progressPercentage = computed(() => progressPoints.value);
 
 const customColors = [
@@ -262,20 +270,29 @@ const orderDetailDialogVisible = ref(false);
 const selectedOrder = ref(null);
 const historyProducts = ref([]);
 
-// 逻辑函数
+// 格式化时间
 const formatTime = (iso: string) => iso ? new Date(iso).toLocaleString() : '无';
 
+// 获取用户信息
 const getUserInfo = async () => {
   const res = await userInfo(username);
   if (res.data.code == 200) {
     const d = res.data.data;
-    name.value = d.name; avatar.value = d.avatar; telephone.value = d.telephone;
-    location.value = d.location; email.value = d.email;
-    credits.value = d.score || 0;
+    name.value = d.name;
+    avatar.value = d.avatar;
+    telephone.value = d.telephone;
+    location.value = d.location;
+    email.value = d.email;
+
+    // 重点：同步数据库的 grade 和 score
+    score.value = d.score || 0;
+    grade.value = d.grade || 0;
+
     Object.assign(editForm, { ...d, addressBook: d.addressBook || [] });
   }
 };
 
+// 头像上传
 const handleAvatarChange = async (file: UploadFile) => {
   if (file.raw) {
     const res = await getImage(file.raw);
@@ -283,17 +300,20 @@ const handleAvatarChange = async (file: UploadFile) => {
   }
 };
 
+// 签到逻辑
 const handleCheckIn = async () => {
   const res = await checkIn(Number(userId));
   if (res.data.code == 200) {
     ElMessage.success('签到成功，获得1积分');
     await addCredit(Number(userId), 1);
     await updateLevel(Number(userId));
+    // 重新拉取用户信息，更新界面上的 score 和 grade
     await getUserInfo();
     isChecked.value = true;
   }
 };
 
+// 保存资料
 const submitAllUserInfo = async () => {
   const res = await userInfoUpdate({ username, ...editForm });
   if (res.data.code == 200) {
@@ -303,6 +323,7 @@ const submitAllUserInfo = async () => {
   }
 };
 
+// 地址管理逻辑
 const saveAddress = () => {
   if (!addressForm.name || !addressForm.phone || !addressForm.address) return ElMessage.warning('请填写完整');
   if (editingAddressIndex.value !== null) editForm.addressBook[editingAddressIndex.value] = { ...addressForm };
@@ -314,6 +335,7 @@ const openAddressDialogForAdd = () => { editingAddressIndex.value = null; Object
 const openAddressDialogForEdit = (addr, idx) => { editingAddressIndex.value = idx; Object.assign(addressForm, addr); isAddressEditing.value=true; };
 const deleteAddress = (idx) => ElMessageBox.confirm('确定删除?').then(() => editForm.addressBook.splice(idx, 1));
 
+// 订单逻辑
 const fetchHistoryOrders = async () => {
   loading.value = true;
   const res = await getHistoryOrders(Number(userId));
@@ -371,31 +393,10 @@ onMounted(async () => {
 .main-label { font-size: 14px; font-weight: bold; color: #1e293b; }
 .sub-label { font-size: 11px; color: #94a3b8; }
 
-/* 标题样式 + 小问号 */
-.widget-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  color: #334155;
-}
-.help-icon {
-  font-size: 14px;
-  color: #94a3b8;
-  cursor: help;
-  margin-left: 2px;
-}
-.help-icon:hover {
-  color: #64748b;
-}
+.widget-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.header-left { display: flex; align-items: center; gap: 8px; font-weight: 600; color: #334155; }
+.help-icon { font-size: 14px; color: #94a3b8; cursor: help; margin-left: 2px; }
 
-/* 其他样式 */
 .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #f1f5f9; font-size: 14px; }
 .info-row .tag { background: #eff6ff; color: #3b82f6; padding: 2px 8px; border-radius: 4px; }
 .content-card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }

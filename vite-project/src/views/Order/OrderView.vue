@@ -172,6 +172,7 @@ export default {
       isPaying.value = true;
       try {
         const response = await postOrder(Number(orderId), "http://localhost:3000/#/login");
+
         if (response.data.code === '200') {
           const paymentForm = response.data.data.paymentForm;
           const payWindow = window.open('', '_blank');

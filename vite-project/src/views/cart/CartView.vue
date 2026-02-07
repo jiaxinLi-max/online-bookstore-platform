@@ -125,9 +125,8 @@ export default {
 
     // 折扣算法
     const discountRate = computed(() => {
-      if (userLevel.value >= 3) return 0.90;
-      if (userLevel.value === 2) return 0.95;
-      if (userLevel.value === 1) return 0.98;
+      if (userLevel.value >= 1) return 1-0.05*userLevel.value;
+
       return 1.0;
     });
 
